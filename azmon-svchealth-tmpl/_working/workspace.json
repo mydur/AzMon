@@ -1,5 +1,0 @@
-{
-  "logAnalytics": {
-    "value": "/subscriptions/e567a78f-72ba-4080-bb21-ca09184b1357/resourcegroups/azmon-test-rg/providers/microsoft.operationalinsights/workspaces/azmon-test-lana"
-  }
-}
