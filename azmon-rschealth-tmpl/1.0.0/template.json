@@ -25,7 +25,7 @@
     },
     "EmailAddress": {
       "defaultValue": "",
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Email address for the person to notify"
       }
@@ -36,18 +36,18 @@
     }
   },
   "variables": {
-    "TemplateId": "azmon-svchealth",
-    "TemplateVersion": "1.0.1",
+    "TemplateId": "azmon-rschealth",
+    "TemplateVersion": "1.0.0",
     "TemplateDate": "20190410",
     "TemplateDescription": "Initial version",
-    "TemplateUsage": "Is used to create alert rules for service health",
+    "TemplateUsage": "Is used to create alert rules for resource health",
     "TemplateDocumentation": "<Name of document.>"
   },
   "resources": [
     {
       "type": "Microsoft.Insights/activityLogAlerts",
       "apiVersion": "2017-04-01",
-      "name": "[concat('AzSvcIssue - ', subscription().displayname, ' - Incident')]",
+      "name": "[concat('AzRscIssue - ', resourceGroup().name, ' - Unavailable')]",
       "location": "Global",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -61,49 +61,60 @@
       "properties": {
         "enabled": true,
         "scopes": [
-          "[concat('/subscriptions/', subscription().subscriptionId)]"
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name)]"
         ],
         "condition": {
           "allOf": [
             {
               "field": "category",
-              "equals": "ServiceHealth",
+              "equals": "ResourceHealth",
               "containsAny": null
             },
             {
               "anyOf": [
                 {
-                  "field": "properties.incidentType",
-                  "equals": "Incident",
+                  "field": "properties.currentHealthStatus",
+                  "equals": "Unavailable",
                   "containsAny": null
                 }
               ]
             },
             {
-              "field": "properties.impactedServices[*].ServiceName",
-              "equals": null,
-              "containsAny": [
-                "Application Insights",
-                "Automation",
-                "Azure Active Directory",
-                "Azure DNS",
-                "Azure Monitor",
-                "Azure Policy",
-                "Azure Resource Manager",
-                "Backup",
-                "Diagnostic Logs",
-                "Log Analytics",
-                "Network Infrastructure",
-                "Network Watcher",
-                "Storage",
-                "Virtual Machines",
-                "Virtual Network"
+              "anyOf": [
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Available",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Unknown",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Degraded",
+                  "containsAny": null
+                }
               ]
             },
             {
-              "field": "properties.impactedServices[*].ImpactedRegions[*].RegionName",
-              "equals": null,
-              "containsAny": ["West Europe"]
+              "anyOf": [
+                {
+                  "field": "properties.cause",
+                  "equals": "PlatformInitiated",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "status",
+                  "equals": "Active",
+                  "containsAny": null
+                }
+              ]
             }
           ]
         },
@@ -119,7 +130,7 @@
     {
       "type": "Microsoft.Insights/activityLogAlerts",
       "apiVersion": "2017-04-01",
-      "name": "[concat('AzSvcIssue - ', subscription().displayname, ' - Information')]",
+      "name": "[concat('AzRscInfo - ', resourceGroup().name, ' - Degraded')]",
       "location": "Global",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -133,59 +144,51 @@
       "properties": {
         "enabled": true,
         "scopes": [
-          "[concat('/subscriptions/', subscription().subscriptionId)]"
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name)]"
         ],
         "condition": {
           "allOf": [
             {
               "field": "category",
-              "equals": "ServiceHealth",
+              "equals": "ResourceHealth",
               "containsAny": null
             },
             {
               "anyOf": [
                 {
-                  "field": "properties.incidentType",
-                  "equals": "Maintenance",
-                  "containsAny": null
-                },
-                {
-                  "field": "properties.incidentType",
-                  "equals": "Informational",
-                  "containsAny": null
-                },
-                {
-                  "field": "properties.incidentType",
-                  "equals": "ActionRequired",
+                  "field": "properties.currentHealthStatus",
+                  "equals": "Degraded",
                   "containsAny": null
                 }
               ]
             },
             {
-              "field": "properties.impactedServices[*].ServiceName",
-              "equals": null,
-              "containsAny": [
-                "Application Insights",
-                "Automation",
-                "Azure Active Directory",
-                "Azure DNS",
-                "Azure Monitor",
-                "Azure Policy",
-                "Azure Resource Manager",
-                "Backup",
-                "Diagnostic Logs",
-                "Log Analytics",
-                "Network Infrastructure",
-                "Network Watcher",
-                "Storage",
-                "Virtual Machines",
-                "Virtual Network"
+              "anyOf": [
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Available",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Unknown",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Unavailable",
+                  "containsAny": null
+                }
               ]
             },
             {
-              "field": "properties.impactedServices[*].ImpactedRegions[*].RegionName",
-              "equals": null,
-              "containsAny": ["West Europe"]
+              "anyOf": [
+                {
+                  "field": "status",
+                  "equals": "Active",
+                  "containsAny": null
+                }
+              ]
             }
           ]
         },

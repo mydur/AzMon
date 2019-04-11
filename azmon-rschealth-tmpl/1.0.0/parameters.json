@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azmonsvc"
+      "value": "azmonrsc"
     },
     "actionGroupName": {
-      "value": "azmonsvc-email-agrp"
+      "value": "azmon-email-agrp"
     },
     "actionGroupShortName": {
-      "value": "azmonsvemail"
+      "value": "azmonemail"
     },
     "EmailAddress": {
       "value": "rudy.michiels@getronics.com"

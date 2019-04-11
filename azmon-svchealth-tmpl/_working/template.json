@@ -9,6 +9,14 @@
         "description": "Identifier for the project or application"
       }
     },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
     "actionGroupName": {
       "type": "string",
       "defaultValue": "",
@@ -25,7 +33,7 @@
     },
     "EmailAddress": {
       "defaultValue": "",
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Email address for the person to notify"
       }
@@ -37,9 +45,9 @@
   },
   "variables": {
     "TemplateId": "azmon-svchealth",
-    "TemplateVersion": "1.0.1",
-    "TemplateDate": "20190410",
-    "TemplateDescription": "Initial version",
+    "TemplateVersion": "1.0.2",
+    "TemplateDate": "20190411",
+    "TemplateVersionDescription": "Added Environment as parameter and also as tag",
     "TemplateUsage": "Is used to create alert rules for service health",
     "TemplateDocumentation": "<Name of document.>"
   },
@@ -53,7 +61,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "dependsOn": [
         "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
@@ -125,7 +134,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "dependsOn": [
         "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
@@ -207,7 +217,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "groupShortName": "[parameters('ActionGroupShortName')]",

@@ -9,6 +9,14 @@
         "description": "Identifier for the project or application"
       }
     },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
     "actionGroupName": {
       "type": "string",
       "defaultValue": "",
@@ -36,10 +44,10 @@
     }
   },
   "variables": {
-    "TemplateId": "azmon-reshealth",
-    "TemplateVersion": "1.0.0",
-    "TemplateDate": "20190410",
-    "TemplateDescription": "Initial version",
+    "TemplateId": "azmon-rschealth",
+    "TemplateVersion": "1.0.1",
+    "TemplateDate": "20190411",
+    "TemplateVersionDescription": "Added Environment as parameter and also as tag",
     "TemplateUsage": "Is used to create alert rules for resource health",
     "TemplateDocumentation": "<Name of document.>"
   },
@@ -53,7 +61,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "dependsOn": [
         "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
@@ -136,7 +145,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "dependsOn": [
         "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
@@ -210,7 +220,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "groupShortName": "[parameters('ActionGroupShortName')]",

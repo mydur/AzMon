@@ -5,6 +5,9 @@
     "Project": {
       "value": "azmonrsc"
     },
+    "Environment": {
+      "value": "test"
+    },
     "actionGroupName": {
       "value": "azmon-email-agrp"
     },
