@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "New Multi-dimensional Metric Alert (Replace with your alert name)"
+        },
+        "alertDescription": {
+            "value": "New multi-dimensional metric alert created via template (Replace with your alert description)"
+        },
+        "alertSeverity": {
+            "value":3
+        },
+        "isEnabled": {
+            "value": true
+        },
+        "resourceId": {
+            "value": "/subscriptions/replace-with-subscription-id/resourceGroups/replace-with-resourcegroup-name/providers/Microsoft.Storage/storageAccounts/replace-with-storage-account"
+        },
+        "criterion1": {
+            "value": {
+                    "name": "1st criterion",
+                    "metricName": "Transactions",
+                    "dimensions": [
+                        {
+                            "name":"ResponseType",
+                            "operator": "Include",
+                            "values": ["Success"]
+                        },
+                        {
+                            "name":"ApiName",
+                            "operator": "Include",
+                            "values": ["GetBlob"]
+                        }
+                    ],
+                    "operator": "GreaterThan",
+                    "threshold": "5",
+                    "timeAggregation": "Total"
+                }
+        },
+        "criterion2": {
+            "value":{
+                "name": "2nd criterion",
+                "metricName": "SuccessE2ELatency",
+                "dimensions": [
+                    {
+                        "name":"ApiName",
+                        "operator": "Include",
+                        "values": ["GetBlob"]
+                    }
+                ],
+                "operator": "GreaterThan",
+                "threshold": "250",
+                "timeAggregation": "Average"
+            }
+        },
+        "actionGroupId": {
+            "value": "/subscriptions/replace-with-subscription-id/resourceGroups/replace-with-resource-group-name/providers/Microsoft.Insights/actionGroups/replace-with-actiongroup-name"
+        }
+    }
+}

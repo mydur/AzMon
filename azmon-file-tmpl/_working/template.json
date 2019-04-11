@@ -1,0 +1,251 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "StorAcctName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "FileCapacityThresholdMBWarning": {
+      "defaultValue": 500,
+      "type": "int"
+    },
+    "FileCapacityThresholdMBCritical": {
+      "defaultValue": 500,
+      "type": "int"
+    },
+    "ActionGroupName": {
+      "defaultValue": "",
+      "type": "String"
+    },
+    "ActionGroupShortName": {
+      "defaultValue": "",
+      "type": "String"
+    },
+    "EmailAddress": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-blob",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20190328",
+    "TemplateDescription": "Initial verison.",
+    "TemplateUsage": "Used to create blob monitoring config.",
+    "TemplateDocumentation": "<Name of document.>"
+  },
+  "resources": [
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[parameters('ActionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]"
+      },
+      "properties": {
+        "groupShortName": "[parameters('ActionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[parameters('EmailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
+      },
+      "dependsOn": []
+    },
+    {
+      "name": "[concat('File services availability (', parameters('StorAcctName'), ')')]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "location": "global",
+      "apiVersion": "2018-03-01",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]"
+      },
+      "properties": {
+        "description": "[concat('Blob Availability (', parameters('StorAcctName'))]",
+        "severity": 2,
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Storage/storageAccounts/', parameters('StorAcctName'), '/fileServices/default')]"
+        ],
+        "evaluationFrequency": "PT15M",
+        "windowSize": "PT1H",
+        "criteria": {
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+          "allOf": [
+            {
+              "name": "1st criterion",
+              "metricName": "Availability",
+              "dimensions": [],
+              "operator": "LessThan",
+              "threshold": 100,
+              "timeAggregation": "Average"
+            }
+          ]
+        },
+        "actions": [
+          {
+            "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+          }
+        ],
+        "dependsOn": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        ]
+      }
+    },
+    {
+      "name": "[concat('Storage account availability (', parameters('StorAcctName'), ')')]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "location": "global",
+      "apiVersion": "2018-03-01",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]"
+      },
+      "properties": {
+        "description": "[concat('Storage Account Availability (', parameters('StorAcctName'))]",
+        "severity": 2,
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Storage/storageAccounts/', parameters('StorAcctName'))]"
+        ],
+        "evaluationFrequency": "PT15M",
+        "windowSize": "PT1H",
+        "criteria": {
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+          "allOf": [
+            {
+              "name": "1st criterion",
+              "metricName": "Availability",
+              "dimensions": [],
+              "operator": "LessThan",
+              "threshold": 100,
+              "timeAggregation": "Average"
+            }
+          ]
+        },
+        "actions": [
+          {
+            "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+          }
+        ],
+        "dependsOn": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        ]
+      }
+    },
+    {
+      "name": "[concat('File capacity - Warning(', parameters('StorAcctName'), ')')]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "location": "global",
+      "apiVersion": "2018-03-01",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]"
+      },
+      "properties": {
+        "description": "[concat('File capacity - Warning (', parameters('StorAcctName'))]",
+        "severity": 3,
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Storage/storageAccounts/', parameters('StorAcctName'), '/fileServices/default')]"
+        ],
+        "evaluationFrequency": "PT15M",
+        "windowSize": "PT1H",
+        "criteria": {
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+          "allOf": [
+            {
+              "name": "1st criterion",
+              "metricName": "FileCapacity",
+              "dimensions": [],
+              "operator": "GreaterThan",
+              "threshold": "[mul(parameters('FileCapacityThresholdMBWarning'), 1000000)]",
+              "timeAggregation": "Average"
+            }
+          ]
+        },
+        "actions": [
+          {
+            "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+          }
+        ],
+        "dependsOn": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        ]
+      }
+    },
+    {
+      "name": "[concat('File capacity - Critical(', parameters('StorAcctName'), ')')]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "location": "global",
+      "apiVersion": "2018-03-01",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]"
+      },
+      "properties": {
+        "description": "[concat('File capacity - Critical (', parameters('StorAcctName'))]",
+        "severity": 1,
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Storage/storageAccounts/', parameters('StorAcctName'), '/fileServices/default')]"
+        ],
+        "evaluationFrequency": "PT15M",
+        "windowSize": "PT1H",
+        "criteria": {
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+          "allOf": [
+            {
+              "name": "1st criterion",
+              "metricName": "FileCapacity",
+              "dimensions": [],
+              "operator": "GreaterThan",
+              "threshold": "[mul(parameters('FileCapacityThresholdMBCritical'), 1000000)]",
+              "timeAggregation": "Average"
+            }
+          ]
+        },
+        "actions": [
+          {
+            "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+          }
+        ],
+        "dependsOn": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        ]
+      }
+    }
+  ]
+}

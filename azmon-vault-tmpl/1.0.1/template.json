@@ -1,0 +1,112 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "WorkspaceName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "WorkspaceRGName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "string"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-backup",
+    "TemplateVersion": "1.0.1",
+    "TemplateDate": "20190408",
+    "TemplateDescription": "Initial verison.",
+    "TemplateUsage": "Used to create backup vault.",
+    "TemplateDocumentation": "<Name of document.>",
+    "Environment": "test",
+    "backupVaultName": "[concat(parameters('Project'), '-', variables('Environment'), '-bvlt')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.RecoveryServices/vaults",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('backupVaultName')]",
+      "location": "westeurope",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]"
+      },
+      "properties": {
+        "upgradeDetails": {}
+      },
+      "sku": {
+        "name": "RS0",
+        "tier": "Standard"
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-06-01",
+          "name": "[concat('nightly0100')]",
+          "type": "backupPolicies",
+          "dependsOn": [
+            "[concat('Microsoft.RecoveryServices/vaults/', variables('backupVaultName'))]"
+          ],
+          "location": "westeurope",
+          "properties": {
+            "backupManagementType": "AzureStorage",
+            "workloadType": "AzureFileShare",
+            "schedulePolicy": {
+              "scheduleRunFrequency": "Daily",
+              "scheduleRunDays": null,
+              "scheduleRunTimes": ["03:00"],
+              "schedulePolicyType": "SimpleSchedulePolicy"
+            },
+            "retentionPolicy": {
+              "dailySchedule": {
+                "retentionTimes": ["03:00"],
+                "retentionDuration": {
+                  "count": 180,
+                  "durationType": "Days"
+                }
+              },
+              "retentionPolicyType": "LongTermRetentionPolicy"
+            },
+            "timeZone": "Romance Standard Time"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.RecoveryServices/vaults/providers/diagnosticSettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(variables('backupVaultName'), '/Microsoft.Insights/azmon')]",
+      "location": "westeurope",
+      "dependsOn": [
+        "[resourceId('Microsoft.RecoveryServices/vaults', variables('backupVaultName'))]"
+      ],
+      "properties": {
+        "name": "azmon",
+        "storageAccountId": null,
+        "eventHubAuthorizationRuleId": null,
+        "eventHubName": null,
+        "workspaceId": "[resourceId(parameters('WorkspaceRGName'), 'microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+        "logs": [
+          {
+            "category": "AzureBackupReport",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 7,
+              "enabled": false
+            }
+          }
+        ],
+        "metrics": []
+      }
+    }
+  ]
+}
