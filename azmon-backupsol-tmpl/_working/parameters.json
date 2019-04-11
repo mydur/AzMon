@@ -4,6 +4,9 @@
   "parameters": {
     "WorkspaceName": {
       "value": "azmon-test-lana"
+    },
+    "Environment": {
+      "value": "test"
     }
   }
 }
