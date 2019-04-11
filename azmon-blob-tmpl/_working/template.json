@@ -4,31 +4,60 @@
   "parameters": {
     "Project": {
       "type": "string",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "Identifier for the project, application or customer"
+      }
     },
-    "StorAcctName": {
+    "Environment": {
       "type": "string",
-      "defaultValue": ""
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "storAcctName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Storage Account name to be created (all lower, no special characters)"
+      }
     },
     "BlobCapacityThresholdMBWarning": {
       "defaultValue": 500,
-      "type": "int"
+      "type": "int",
+      "metadata": {
+        "description": "Capacity warning threshold in MB"
+      }
     },
     "BlobCapacityThresholdMBCritical": {
       "defaultValue": 750,
-      "type": "int"
+      "type": "int",
+      "metadata": {
+        "description": "Capacity critical threshold in MB"
+      }
     },
-    "ActionGroupName": {
+    "actionGroupName": {
       "defaultValue": "",
-      "type": "String"
+      "type": "string",
+      "metadata": {
+        "description": "Action group name for direct email notification"
+      }
     },
-    "ActionGroupShortName": {
+    "actionGroupShortName": {
       "defaultValue": "",
-      "type": "String"
+      "type": "string",
+      "metadata": {
+        "description": "Action group short (max 12 chars) name for direct email notification"
+      }
     },
     "EmailAddress": {
       "type": "string",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "Email address to be added to action group for direct email notification"
+      }
     },
     "CreatedOn": {
       "defaultValue": "[utcNow()]",
@@ -53,7 +82,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "groupShortName": "[parameters('ActionGroupShortName')]",
@@ -84,7 +114,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Blob Availability (', parameters('StorAcctName'))]",
@@ -127,7 +158,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Storage Account Availability (', parameters('StorAcctName'))]",
@@ -170,7 +202,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Blob Capacity (', parameters('StorAcctName'))]",
@@ -213,7 +246,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Blob Capacity (', parameters('StorAcctName'))]",
