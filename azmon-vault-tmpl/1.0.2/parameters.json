@@ -5,7 +5,7 @@
     "Project": {
       "value": "azbkup"
     },
-    "Environement": {
+    "Environment": {
       "value": "test"
     },
     "WorkspaceName": {
@@ -13,6 +13,12 @@
     },
     "WorkspaceRGName": {
       "value": "azmon-test-rg"
+    },
+    "existingVirtualMachinesRG": {
+      "value": "monitor-test-rg"
+    },
+    "existingVirtualMachines": {
+      "value": ["montestvm01", "montestvm02"]
     }
   }
 }
