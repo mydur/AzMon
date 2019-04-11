@@ -5,6 +5,9 @@
     "Project": {
       "value": "azbkup"
     },
+    "Environement": {
+      "value": "test"
+    },
     "WorkspaceName": {
       "value": "azmon-test-lana"
     },

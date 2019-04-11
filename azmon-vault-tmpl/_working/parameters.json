@@ -13,6 +13,12 @@
     },
     "WorkspaceRGName": {
       "value": "azmon-test-rg"
+    },
+    "existingVirtualMachinesRG": {
+      "value": "monitor-test-rg"
+    },
+    "existingVirtualMachines": {
+      "value": ["monitortestvm01", "monitortestvm02"]
     }
   }
 }

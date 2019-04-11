@@ -4,29 +4,84 @@
   "parameters": {
     "Project": {
       "type": "string",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "Identifier for the project, application or customer"
+      }
     },
-    "WorkspaceName": {
+    "Environment": {
       "type": "string",
-      "defaultValue": ""
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
     },
-    "WorkspaceRGName": {
+    "workspaceName": {
       "type": "string",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "Specify the workspace name"
+      }
     },
-    "CreatedOn": {
+    "workspaceRGName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Specify the workspace resource group name"
+      }
+    },
+    "instantRpRetentionRangeInDays": {
+      "type": "int",
+      "defaultValue": 2,
+      "allowedValues": [1, 2, 3, 4, 5],
+      "metadata": {
+        "description": "Number of days Instant Recovery Point should be retained"
+      }
+    },
+    "dailyRetentionDurationCount": {
+      "type": "int",
+      "defaultValue": 30,
+      "metadata": {
+        "description": "Number of days you want to retain the backup"
+      }
+    },
+    "weeklyRetentionDurationCount": {
+      "type": "int",
+      "defaultValue": 12,
+      "metadata": {
+        "description": "Number of weeks you want to retain the backup"
+      }
+    },
+    "monthlyRetentionDurationCount": {
+      "type": "int",
+      "defaultValue": 60,
+      "metadata": {
+        "description": "Number of months you want to retain the backup"
+      }
+    },
+    "yearlyRetentionDurationCount": {
+      "type": "int",
+      "defaultValue": 10,
+      "metadata": {
+        "description": "Number of years you want to retain the backup"
+      }
+    },
+    "createdOn": {
       "defaultValue": "[utcNow()]",
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Used to timestamp created resources"
+      }
     }
   },
   "variables": {
-    "TemplateId": "azmon-backup",
+    "TemplateId": "azmon-vault",
     "TemplateVersion": "1.0.1",
     "TemplateDate": "20190408",
     "TemplateDescription": "Initial verison.",
-    "TemplateUsage": "Used to create backup vault.",
+    "TemplateUsage": "Used to create backup vault and initial configuration",
     "TemplateDocumentation": "<Name of document.>",
-    "Environment": "test",
     "backupVaultName": "[concat(parameters('Project'), '-', variables('Environment'), '-bvlt')]"
   },
   "resources": [
@@ -39,7 +94,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "upgradeDetails": {}
@@ -51,7 +107,7 @@
       "resources": [
         {
           "apiVersion": "2016-06-01",
-          "name": "[concat('nightly0100')]",
+          "name": "[concat('file-nightly0100')]",
           "type": "backupPolicies",
           "dependsOn": [
             "[concat('Microsoft.RecoveryServices/vaults/', variables('backupVaultName'))]"
@@ -78,19 +134,92 @@
             },
             "timeZone": "Romance Standard Time"
           }
+        },
+        {
+          "apiVersion": "2016-06-01",
+          "name": "[concat('vm-nightly0300')]",
+          "type": "backupPolicies",
+          "dependsOn": [
+            "[concat('Microsoft.RecoveryServices/vaults/', variables('backupVaultName'))]"
+          ],
+          "location": "westeurope",
+          "properties": {
+            "backupManagementType": "AzureIaasVM",
+            "instantRpRetentionRangeInDays": "[parameters('instantRpRetentionRangeInDays')]",
+            "schedulePolicy": {
+              "scheduleRunFrequency": "Daily",
+              "scheduleRunDays": null,
+              "scheduleRunTimes": ["05:00"],
+              "schedulePolicyType": "SimpleSchedulePolicy"
+            },
+            "retentionPolicy": {
+              "dailySchedule": {
+                "retentionTimes": ["05:00"],
+                "retentionDuration": {
+                  "count": "[parameters('dailyRetentionDurationCount')]",
+                  "durationType": "Days"
+                }
+              },
+              "weeklySchedule": {
+                "daysOfTheWeek": ["Sunday"],
+                "retentionTimes": ["05:00"],
+                "retentionDuration": {
+                  "count": "[parameters('weeklyRetentionDurationCount')]",
+                  "durationType": "Weeks"
+                }
+              },
+              "monthlySchedule": {
+                "retentionScheduleFormatType": "Daily",
+                "retentionScheduleDaily": {
+                  "daysOfTheMonth": [
+                    {
+                      "date": 1,
+                      "isLast": false
+                    }
+                  ]
+                },
+                "retentionScheduleWeekly": null,
+                "retentionTimes": ["05:00"],
+                "retentionDuration": {
+                  "count": "[parameters('monthlyRetentionDurationCount')]",
+                  "durationType": "Months"
+                }
+              },
+              "yearlySchedule": {
+                "retentionScheduleFormatType": "Daily",
+                "monthsOfYear": ["January"],
+                "retentionScheduleDaily": {
+                  "daysOfTheMonth": [
+                    {
+                      "date": 1,
+                      "isLast": false
+                    }
+                  ]
+                },
+                "retentionScheduleWeekly": null,
+                "retentionTimes": ["05:00"],
+                "retentionDuration": {
+                  "count": "[parameters('yearlyRetentionDurationCount')]",
+                  "durationType": "Years"
+                }
+              },
+              "retentionPolicyType": "LongTermRetentionPolicy"
+            },
+            "timeZone": "Romance Standard Time"
+          }
         }
       ]
     },
     {
       "type": "Microsoft.RecoveryServices/vaults/providers/diagnosticSettings",
       "apiVersion": "2017-05-01-preview",
-      "name": "[concat(variables('backupVaultName'), '/Microsoft.Insights/azmon')]",
+      "name": "[concat(variables('backupVaultName'), '/Microsoft.Insights/', parameters('workspaceName'))]",
       "location": "westeurope",
       "dependsOn": [
         "[resourceId('Microsoft.RecoveryServices/vaults', variables('backupVaultName'))]"
       ],
       "properties": {
-        "name": "azmon",
+        "name": "[parameters('workspaceName')]",
         "storageAccountId": null,
         "eventHubAuthorizationRuleId": null,
         "eventHubName": null,
