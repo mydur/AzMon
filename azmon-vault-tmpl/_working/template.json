@@ -6,7 +6,15 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Customer or project that resources will be used for"
+        "description": "Identifier for the project, application or customer"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
       }
     },
     "workspaceName": {
@@ -87,7 +95,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "upgradeDetails": {}
