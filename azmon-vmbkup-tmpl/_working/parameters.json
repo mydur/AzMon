@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azbkup"
+    },
+    "Environement": {
+      "value": "test"
+    },
+    "existingVirtualMachinesResourceGroup": {
+      "value": "monitor-test-rg"
+    },
+    "existingVirtualMachines": {
+      "value": ["montestvm01", "montestvm02"]
+    },
+    "existingRecoveryServicesVault": {
+      "value": "azbackup-test-bvlt"
+    },
+    "existingBackupPolicy": {
+      "value": "vm-nightly0300"
+    }
+  }
+}
