@@ -13,6 +13,15 @@
     },
     "WorkspaceRGName": {
       "value": "azmon-test-rg"
+    },
+    "actionGroupName": {
+      "value": "azmonbkup-test-agrp"
+    },
+    "actionGroupShortName": {
+      "value": "azmonbkup01"
+    },
+    "emailAddress": {
+      "value": "rudy.michiels@getronics.com"
     }
   }
 }

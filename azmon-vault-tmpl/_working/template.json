@@ -14,7 +14,7 @@
       "allowedValues": ["dev", "test", "acc", "prod"],
       "defaultValue": "test",
       "metadata": {
-        "description": "Can one of the following, dev-test-acc-prod"
+        "description": "Can be one of the following, dev-test-acc-prod"
       }
     },
     "workspaceName": {
@@ -29,6 +29,27 @@
       "defaultValue": "",
       "metadata": {
         "description": "Specify the workspace resource group name"
+      }
+    },
+    "actionGroupName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Action group name for direct email notification"
+      }
+    },
+    "actionGroupShortName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Action group short (max 12 chars) name for direct email notification"
+      }
+    },
+    "emailAddress": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Email address to be added to action group for direct email notification"
       }
     },
     "instantRpRetentionRangeInDays": {
@@ -77,9 +98,9 @@
   },
   "variables": {
     "TemplateId": "azmon-vault",
-    "TemplateVersion": "1.0.3",
+    "TemplateVersion": "1.0.4",
     "TemplateDate": "20190408",
-    "TemplateDescription": "Initial verison.",
+    "TemplateDescription": "Added AzBackup alert rule",
     "TemplateUsage": "Used to create backup vault and initial configuration",
     "TemplateDocumentation": "<Name of document.>",
     "backupVaultName": "[concat(parameters('Project'), '-', parameters('Environment'), '-bvlt')]"
@@ -236,6 +257,83 @@
         ],
         "metrics": []
       }
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[parameters('ActionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "groupShortName": "[parameters('actionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(variables('backupVaultName'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[parameters('EmailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
+      },
+      "dependsOn": []
+    },
+    {
+      "name": "[concat('AzBackup - ', variables('backupVaultName'), ' - Job failure')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "westeurope",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "description": "[concat('AzBackup - ', variables('backupVaultName'), ' - Job failure')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let bkupVaultName = \"', variables('backupVaultName'), '\";\r\nAzureDiagnostics \r\n| where Category == \"AzureBackupReport\" \r\n| where OperationName == \"Job\" \r\n//| where TimeGenerated > ago(6h) \r\n| where ResourceType == \"VAULTS\" \r\n| where Resource == bkupVaultName \r\n| where JobStatus_s == \"Failed\" \r\n| summarize count() by Resource ')]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 360,
+          "timeWindowInMinutes": 365
+        },
+        "action": {
+          "severity": "2",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
     }
   ]
 }
