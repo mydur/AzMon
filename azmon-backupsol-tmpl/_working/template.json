@@ -20,15 +20,15 @@
   },
   "variables": {
     "TemplateId": "azmon-backupsol",
-    "TemplateVersion": "1.0.0",
-    "TemplateDate": "20190409",
-    "TemplateDescription": "Initial verison.",
+    "TemplateVersion": "1.0.1",
+    "TemplateDate": "20190423",
+    "TemplateDescription": "Modified the name of the solution so it contains square brackets.",
     "TemplateUsage": "Use to deploy backup monitoring solution to Log Analytics workspace",
     "TemplateDocumentation": "<Name of document.>",
     "omsSolutions": {
       "customSolution": {
         "name": "Azure Backup Monitoring Solution",
-        "solutionName": "[concat('AzureBackup', '(', parameters('workspaceName'), ')')]",
+        "solutionName": "[concat('AzureBackup', '[', parameters('workspaceName'), ']')]",
         "publisher": "Microsoft",
         "displayName": "Azure Backup Monitoring Solution",
         "description": "Monitor and analyze your Backup Vaults",
