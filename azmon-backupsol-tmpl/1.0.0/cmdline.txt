@@ -1,0 +1,1 @@
+.\deploy.ps1 -subscriptionId "e567a78f-72ba-4080-bb21-ca09184b1357" -resourceGroupName "azmon-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azbkupsol"
