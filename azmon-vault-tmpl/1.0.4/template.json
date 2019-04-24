@@ -1,0 +1,339 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Identifier for the project, application or customer"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can be one of the following, dev-test-acc-prod"
+      }
+    },
+    "workspaceName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Specify the workspace name"
+      }
+    },
+    "workspaceRGName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Specify the workspace resource group name"
+      }
+    },
+    "actionGroupName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Action group name for direct email notification"
+      }
+    },
+    "actionGroupShortName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Action group short (max 12 chars) name for direct email notification"
+      }
+    },
+    "emailAddress": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Email address to be added to action group for direct email notification"
+      }
+    },
+    "instantRpRetentionRangeInDays": {
+      "type": "int",
+      "defaultValue": 2,
+      "allowedValues": [1, 2, 3, 4, 5],
+      "metadata": {
+        "description": "Number of days Instant Recovery Point should be retained"
+      }
+    },
+    "dailyRetentionDurationCount": {
+      "type": "int",
+      "defaultValue": 30,
+      "metadata": {
+        "description": "Number of days you want to retain the backup"
+      }
+    },
+    "weeklyRetentionDurationCount": {
+      "type": "int",
+      "defaultValue": 12,
+      "metadata": {
+        "description": "Number of weeks you want to retain the backup"
+      }
+    },
+    "monthlyRetentionDurationCount": {
+      "type": "int",
+      "defaultValue": 60,
+      "metadata": {
+        "description": "Number of months you want to retain the backup"
+      }
+    },
+    "yearlyRetentionDurationCount": {
+      "type": "int",
+      "defaultValue": 10,
+      "metadata": {
+        "description": "Number of years you want to retain the backup"
+      }
+    },
+    "createdOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "string",
+      "metadata": {
+        "description": "Used to timestamp created resources"
+      }
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-vault",
+    "TemplateVersion": "1.0.4",
+    "TemplateDate": "20190408",
+    "TemplateDescription": "Added AzBackup alert rule",
+    "TemplateUsage": "Used to create backup vault and initial configuration",
+    "TemplateDocumentation": "<Name of document.>",
+    "backupVaultName": "[concat(parameters('Project'), '-', parameters('Environment'), '-bvlt')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.RecoveryServices/vaults",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('backupVaultName')]",
+      "location": "westeurope",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "upgradeDetails": {}
+      },
+      "sku": {
+        "name": "RS0",
+        "tier": "Standard"
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-06-01",
+          "name": "[concat('file-nightly0100')]",
+          "type": "backupPolicies",
+          "dependsOn": [
+            "[concat('Microsoft.RecoveryServices/vaults/', variables('backupVaultName'))]"
+          ],
+          "location": "westeurope",
+          "properties": {
+            "backupManagementType": "AzureStorage",
+            "workloadType": "AzureFileShare",
+            "schedulePolicy": {
+              "scheduleRunFrequency": "Daily",
+              "scheduleRunDays": null,
+              "scheduleRunTimes": ["03:00"],
+              "schedulePolicyType": "SimpleSchedulePolicy"
+            },
+            "retentionPolicy": {
+              "dailySchedule": {
+                "retentionTimes": ["03:00"],
+                "retentionDuration": {
+                  "count": 180,
+                  "durationType": "Days"
+                }
+              },
+              "retentionPolicyType": "LongTermRetentionPolicy"
+            },
+            "timeZone": "Romance Standard Time"
+          }
+        },
+        {
+          "apiVersion": "2016-06-01",
+          "name": "[concat('vm-nightly0300')]",
+          "type": "backupPolicies",
+          "dependsOn": [
+            "[concat('Microsoft.RecoveryServices/vaults/', variables('backupVaultName'))]"
+          ],
+          "location": "westeurope",
+          "properties": {
+            "backupManagementType": "AzureIaasVM",
+            "instantRpRetentionRangeInDays": "[parameters('instantRpRetentionRangeInDays')]",
+            "schedulePolicy": {
+              "scheduleRunFrequency": "Daily",
+              "scheduleRunDays": null,
+              "scheduleRunTimes": ["05:00"],
+              "schedulePolicyType": "SimpleSchedulePolicy"
+            },
+            "retentionPolicy": {
+              "dailySchedule": {
+                "retentionTimes": ["05:00"],
+                "retentionDuration": {
+                  "count": "[parameters('dailyRetentionDurationCount')]",
+                  "durationType": "Days"
+                }
+              },
+              "weeklySchedule": {
+                "daysOfTheWeek": ["Sunday"],
+                "retentionTimes": ["05:00"],
+                "retentionDuration": {
+                  "count": "[parameters('weeklyRetentionDurationCount')]",
+                  "durationType": "Weeks"
+                }
+              },
+              "monthlySchedule": {
+                "retentionScheduleFormatType": "Daily",
+                "retentionScheduleDaily": {
+                  "daysOfTheMonth": [
+                    {
+                      "date": 1,
+                      "isLast": false
+                    }
+                  ]
+                },
+                "retentionScheduleWeekly": null,
+                "retentionTimes": ["05:00"],
+                "retentionDuration": {
+                  "count": "[parameters('monthlyRetentionDurationCount')]",
+                  "durationType": "Months"
+                }
+              },
+              "yearlySchedule": {
+                "retentionScheduleFormatType": "Daily",
+                "monthsOfYear": ["January"],
+                "retentionScheduleDaily": {
+                  "daysOfTheMonth": [
+                    {
+                      "date": 1,
+                      "isLast": false
+                    }
+                  ]
+                },
+                "retentionScheduleWeekly": null,
+                "retentionTimes": ["05:00"],
+                "retentionDuration": {
+                  "count": "[parameters('yearlyRetentionDurationCount')]",
+                  "durationType": "Years"
+                }
+              },
+              "retentionPolicyType": "LongTermRetentionPolicy"
+            },
+            "timeZone": "Romance Standard Time"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.RecoveryServices/vaults/providers/diagnosticSettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(variables('backupVaultName'), '/Microsoft.Insights/', parameters('workspaceName'))]",
+      "location": "westeurope",
+      "dependsOn": [
+        "[resourceId('Microsoft.RecoveryServices/vaults', variables('backupVaultName'))]"
+      ],
+      "properties": {
+        "name": "[parameters('workspaceName')]",
+        "storageAccountId": null,
+        "eventHubAuthorizationRuleId": null,
+        "eventHubName": null,
+        "workspaceId": "[resourceId(parameters('WorkspaceRGName'), 'microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+        "logs": [
+          {
+            "category": "AzureBackupReport",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 7,
+              "enabled": false
+            }
+          }
+        ],
+        "metrics": []
+      }
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[parameters('ActionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "groupShortName": "[parameters('actionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(variables('backupVaultName'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[parameters('EmailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
+      },
+      "dependsOn": []
+    },
+    {
+      "name": "[concat('AzBackup - ', variables('backupVaultName'), ' - Job failure')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "westeurope",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "description": "[concat('AzBackup - ', variables('backupVaultName'), ' - Job failure')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let bkupVaultName = \"', variables('backupVaultName'), '\";\r\nAzureDiagnostics \r\n| where Category == \"AzureBackupReport\" \r\n| where OperationName == \"Job\" \r\n//| where TimeGenerated > ago(6h) \r\n| where ResourceType == \"VAULTS\" \r\n| where Resource == bkupVaultName \r\n| where JobStatus_s == \"Failed\" \r\n| summarize count() by Resource ')]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 360,
+          "timeWindowInMinutes": 365
+        },
+        "action": {
+          "severity": "2",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    }
+  ]
+}
