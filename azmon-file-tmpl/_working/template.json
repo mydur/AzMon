@@ -65,11 +65,11 @@
     }
   },
   "variables": {
-    "TemplateId": "azmon-blob",
+    "TemplateId": "azmon-file",
     "TemplateVersion": "1.0.0",
     "TemplateDate": "20190328",
     "TemplateVersionDescription": "Initial verison.",
-    "TemplateUsage": "Used to create blob monitoring config.",
+    "TemplateUsage": "Used to create file monitoring config.",
     "TemplateDocumentation": "<Name of document.>"
   },
   "resources": [
