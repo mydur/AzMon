@@ -88,6 +88,14 @@
         "description": "Number of years you want to retain the backup"
       }
     },
+    "redundancyType": {
+      "type": "string",
+      "defaultValue": "LocallyRedundant",
+      "allowedValues": ["LocallyRedundant", "GeoRedundant"],
+      "metadata": {
+        "description": "Redundancy type for the storage where backup is stored (LocallyRedundant or GeoRedundant)"
+      }
+    },
     "createdOn": {
       "defaultValue": "[utcNow()]",
       "type": "string",
@@ -232,6 +240,20 @@
       ]
     },
     {
+      "name": "[concat(variables('backupVaultName'), '/vaultstorageconfig')]",
+      "type": "Microsoft.RecoveryServices/vaults/backupstorageconfig",
+      "apiVersion": "2016-12-01",
+      "location": "westeurope",
+      "properties": {
+        "storageModelType": "[parameters('redundancyType')]",
+        "storageType": "[parameters('redundancyType')]",
+        "storageTypeState": "Unlocked"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.RecoveryServices/vaults', variables('backupVaultName'))]"
+      ]
+    },
+    {
       "type": "Microsoft.RecoveryServices/vaults/providers/diagnosticSettings",
       "apiVersion": "2017-05-01-preview",
       "name": "[concat(variables('backupVaultName'), '/Microsoft.Insights/', parameters('workspaceName'))]",
@@ -275,7 +297,7 @@
         "enabled": true,
         "emailReceivers": [
           {
-            "name": "[concat(variables('backupVaultName'), ' SMTP_-EmailAction-')]",
+            "name": "[concat(variables('backupVaultName'), ' SMTP_EmailAction')]",
             "emailAddress": "[parameters('EmailAddress')]"
           }
         ],
