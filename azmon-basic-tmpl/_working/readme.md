@@ -1,4 +1,4 @@
-# azmon-vault-tmpl
+# azmon-basic-tmpl
 
 The purpose of this template is to deploy a basic setup of Azure Monitor. It contains the following resources:
 
