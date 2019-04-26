@@ -18,8 +18,8 @@ To be able to re-use this template the following parameters were introduced.
 
 Looping through the list of virtual machines can be done by the copy instruction in the resource definition. The number of times the loop is executed is determined via count instruction which is part of the copy instruction. The count is then determined by the length of the existingVirtualMachines parameter.
 
-Remark:
-There's a prerequisite for this template to work. All virtual machines listed in the parameter need to be in the same resource group which is also available as a parameter.
+> Remark:
+> There's a prerequisite for this template to work. All virtual machines listed in the parameter need to be in the same resource group which is also available as a parameter.
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-vmbkup-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
