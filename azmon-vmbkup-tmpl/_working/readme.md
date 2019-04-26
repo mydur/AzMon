@@ -16,6 +16,11 @@ To be able to re-use this template the following parameters were introduced.
 - existingBackupPolicy: Backup policy to be used to backup VMs. Backup Policy defines the schedule of the backup and how long to retain backup copies. By default every vault comes with a 'DefaultPolicy' which canbe used here.
 - location: Location for all resources. Default value here is the same location as the resource group where the template is deployed.
 
+Looping through the list of virtual machines can be done by the copy instruction in the resource definition. The number of times the loop is executed is determined via count instruction which is part of the copy instruction. The count is then determined by the length of the existingVirtualMachines parameter.
+
+Remark:
+There's a prerequisite for this template to work. All virtual machines listed in the parameter need to be in the same resource group which is also available as a parameter.
+
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-vmbkup-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a><br />
