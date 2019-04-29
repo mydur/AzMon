@@ -712,7 +712,7 @@
         "description": "[concat('Service - DHCP Client (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -721,7 +721,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -766,7 +766,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -802,7 +802,7 @@
         "description": "[concat('Service - Windows Event Log (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -811,7 +811,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -847,7 +847,7 @@
         "description": "[concat('Service - Windows Firewall (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -856,7 +856,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -892,7 +892,7 @@
         "description": "[concat('Service - RPC (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -901,7 +901,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -937,7 +937,7 @@
         "description": "[concat('Service - Server (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -946,7 +946,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -982,7 +982,7 @@
         "description": "[concat('Service - WinRM (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -991,7 +991,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
