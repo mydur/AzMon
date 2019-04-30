@@ -44,13 +44,7 @@ param(
     $templateFilePath = "template.json",
 
     [string]
-    $parametersFilePath = "parameters.json",
-
-    [string]
-    $workspaceName = "azmon-test-lana",
-
-    [string]
-    $workspaceRGName = "azmon-test-rg"
+    $parametersFilePath = "parameters.json"
 )
 
 <#
@@ -74,7 +68,7 @@ $ErrorActionPreference = "Stop"
 
 # sign in
 Write-Host "Logging in...";
-#Login-AzureRmAccount;
+#Login-AzAccount;
 
 # select subscription
 Write-Host "Selecting subscription '$subscriptionId'";
@@ -98,7 +92,6 @@ if (!$resourceGroup) {
     }
     Write-Host "Creating resource group '$resourceGroupName' in location '$resourceGroupLocation'";
     New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
-    $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 }
 else {
     Write-Host "Using existing resource group '$resourceGroupName'";
@@ -111,25 +104,4 @@ if (Test-Path $parametersFilePath) {
 }
 else {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
-}
-
-
-Write-Host "Starting policy assignment..."
-$policyDef = Get-AzPolicyDefinition -Id '/providers/Microsoft.Authorization/policyDefinitions/0868462e-646c-4fe3-9ced-a733534b6a2c' -ApiVersion "2019-01-01"
-$assignmentDisplayName = 'AZMON: Deploy Log Analytics Agent for Windows VMs in ' + $resourceGroupName
-$workspaceResourceId = (Get-AzOperationalInsightsWorkspace -ResourceGroupName $workspaceRGName -Name $workspaceName).ResourceId
-$policyParams = @{'logAnalytics' = $workspaceResourceId}
-$policyParams
-$assignment = New-AzPolicyAssignment -Name ('DeployWinMMA(' + $resourceGroupName + ')') -DisplayName $assignmentDisplayName -Scope $resourceGroup.ResourceId -PolicyDefinition $policyDef -Location $resourceGroupLocation -PolicyParameterObject $policyParams -AssignIdentity -ApiVersion "2019-01-01"
-$assignment
-Write-Host "Waiting for AAD replication..."
-Start-Sleep 60
-Write-Host "Starting managed identity work..."
-$roleDefinitionIds = $policyDef.Properties.policyRule.then.details.roleDefinitionIds
-$roleDefinitionIds
-if ($roleDefinitionIds.Count -gt 0) {
-    $roleDefinitionIds | ForEach-Object {
-        $roleDefId = $_.Split("/") | Select-Object -Last 1
-        New-AzRoleAssignment -Scope $resourceGroup.ResourceId -ObjectId $assignment.Identity.PrincipalId -RoleDefinitionId $roleDefId
-    }
 }

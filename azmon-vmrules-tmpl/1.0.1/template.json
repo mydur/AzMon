@@ -4,27 +4,53 @@
   "parameters": {
     "Project": {
       "defaultValue": "",
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project, application or customer"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
     },
     "AZMONBasicRGName": {
       "defaultValue": "",
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Resource group name where basic monitoring was deployed"
+      }
     },
-    "WorkspaceName": {
+    "workspaceName": {
       "defaultValue": "",
-      "type": "String"
+      "type": "String",
+      "metadata": {
+        "description": "Workspace name where basic monitoring is running"
+      }
     },
-    "ActionGroupName": {
+    "actionGroupName": {
       "defaultValue": "",
-      "type": "String"
+      "type": "String",
+      "metadata": {
+        "description": "Action group name for direct email notification"
+      }
     },
-    "ActionGroupShortName": {
+    "actionGroupShortName": {
       "defaultValue": "",
-      "type": "String"
+      "type": "String",
+      "metadata": {
+        "description": "Action group short (max 12 chars) name for direct email notification"
+      }
     },
-    "EmailAddress": {
+    "emailAddress": {
       "defaultValue": "",
-      "type": "String"
+      "type": "String",
+      "metadata": {
+        "description": "Email address to be added to action group for direct email notification"
+      }
     },
     "CreatedOn": {
       "defaultValue": "[utcNow()]",
@@ -49,7 +75,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Heartbeat alert - Critical (', resourceGroup().name, ')')]",
@@ -93,7 +120,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Logical Disk - Current Disk Queue Length - Critical (', resourceGroup().name, ')')]",
@@ -137,7 +165,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Logical Disk - Current Disk Queue Length - Warning (', resourceGroup().name, ')')]",
@@ -181,7 +210,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Logical Disk - Free MB on C - Critical (', resourceGroup().name, ')')]",
@@ -225,7 +255,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Memory - Available MB - Critical (', resourceGroup().name, ')')]",
@@ -269,7 +300,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Memory - Available MB - Warning (', resourceGroup().name, ')')]",
@@ -313,7 +345,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Memory - Pages per Sec - Warning (', resourceGroup().name, ')')]",
@@ -357,7 +390,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Memory - Pages per Sec - Critical (', resourceGroup().name, ')')]",
@@ -401,7 +435,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Memory - Percent Committed Bytes in Use - Critical (', resourceGroup().name, ')')]",
@@ -445,7 +480,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Memory - Percent Committed Bytes in Use - Warning (', resourceGroup().name, ')')]",
@@ -489,7 +525,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Processor - Queue Length - Warning (', resourceGroup().name, ')')]",
@@ -533,7 +570,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Processor - Queue Length - Critical (', resourceGroup().name, ')')]",
@@ -577,7 +615,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Processor - Time Total - Critical (', resourceGroup().name, ')')]",
@@ -621,7 +660,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Processor - Time Total - Warning (', resourceGroup().name, ')')]",
@@ -665,13 +705,14 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Service - DHCP Client (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -680,7 +721,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -709,7 +750,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Service - DNS Client (', resourceGroup().name, ')')]",
@@ -724,7 +766,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -753,13 +795,14 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Service - Windows Event Log (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -768,7 +811,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -797,13 +840,14 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Service - Windows Firewall (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -812,7 +856,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -841,13 +885,14 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Service - RPC (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -856,7 +901,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -885,13 +930,14 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Service - Server (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -900,7 +946,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -929,13 +975,14 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "description": "[concat('Service - WinRM (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -944,7 +991,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 30
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -973,7 +1020,8 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
-        "Project": "[parameters('Project')]"
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
       },
       "properties": {
         "groupShortName": "[parameters('ActionGroupShortName')]",
@@ -994,23 +1042,6 @@
         "azureFunctionReceivers": []
       },
       "dependsOn": []
-    },
-    {
-      "type": "Microsoft.Authorization/policyAssignments",
-      "name": "[concat('Monitoring agent on VMs in ', resourceGroup().name)]",
-      "apiVersion": "2018-05-01",
-      "location": "West Europe",
-      "properties": {
-        "displayName": "[concat('Monitoring agent on VMs in ', resourceGroup().name)]",
-        "description": "[concat('Monitoring agent on VMs in ', resourceGroup().name)]",
-        "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name)]",
-        "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/55f3eceb-5573-4f18-9695-226972c6d74a",
-        "parameters": {
-          "logAnalytics_1": {
-            "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
-          }
-        }
-      }
     }
   ]
 }

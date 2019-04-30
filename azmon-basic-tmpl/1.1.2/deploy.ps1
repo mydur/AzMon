@@ -44,13 +44,7 @@ param(
     $templateFilePath = "template.json",
 
     [string]
-    $parametersFilePath = "parameters.json",
-
-    [string]
-    $workspaceName = "azmon-test-lana",
-
-    [string]
-    $workspaceRGName = "azmon-test-rg"
+    $parametersFilePath = "parameters.json"
 )
 
 <#
@@ -63,7 +57,7 @@ Function RegisterRP {
     )
 
     Write-Host "Registering resource provider '$ResourceProviderNamespace'";
-    Register-AzResourceProvider -ProviderNamespace $ResourceProviderNamespace;
+    Register-AzureRmResourceProvider -ProviderNamespace $ResourceProviderNamespace;
 }
 
 #******************************************************************************
@@ -78,7 +72,7 @@ Write-Host "Logging in...";
 
 # select subscription
 Write-Host "Selecting subscription '$subscriptionId'";
-Select-AzSubscription -SubscriptionID $subscriptionId;
+Select-AzureRmSubscription -SubscriptionID $subscriptionId;
 
 # Register RPs
 $resourceProviders = @("microsoft.automation", "microsoft.operationalinsights", "microsoft.operationsmanagement", "microsoft.storage");
@@ -90,15 +84,14 @@ if ($resourceProviders.length) {
 }
 
 #Create or check for existing resource group
-$resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+$resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 if (!$resourceGroup) {
     Write-Host "Resource group '$resourceGroupName' does not exist. To create a new resource group, please enter a location.";
     if (!$resourceGroupLocation) {
         $resourceGroupLocation = Read-Host "resourceGroupLocation";
     }
     Write-Host "Creating resource group '$resourceGroupName' in location '$resourceGroupLocation'";
-    New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
-    $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+    New-AzureRmResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
 }
 else {
     Write-Host "Using existing resource group '$resourceGroupName'";
@@ -107,29 +100,8 @@ else {
 # Start the deployment
 Write-Host "Starting deployment...";
 if (Test-Path $parametersFilePath) {
-    New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath;
+    New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath;
 }
 else {
-    New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
-}
-
-
-Write-Host "Starting policy assignment..."
-$policyDef = Get-AzPolicyDefinition -Id '/providers/Microsoft.Authorization/policyDefinitions/0868462e-646c-4fe3-9ced-a733534b6a2c' -ApiVersion "2019-01-01"
-$assignmentDisplayName = 'AZMON: Deploy Log Analytics Agent for Windows VMs in ' + $resourceGroupName
-$workspaceResourceId = (Get-AzOperationalInsightsWorkspace -ResourceGroupName $workspaceRGName -Name $workspaceName).ResourceId
-$policyParams = @{'logAnalytics' = $workspaceResourceId}
-$policyParams
-$assignment = New-AzPolicyAssignment -Name ('DeployWinMMA(' + $resourceGroupName + ')') -DisplayName $assignmentDisplayName -Scope $resourceGroup.ResourceId -PolicyDefinition $policyDef -Location $resourceGroupLocation -PolicyParameterObject $policyParams -AssignIdentity -ApiVersion "2019-01-01"
-$assignment
-Write-Host "Waiting for AAD replication..."
-Start-Sleep 60
-Write-Host "Starting managed identity work..."
-$roleDefinitionIds = $policyDef.Properties.policyRule.then.details.roleDefinitionIds
-$roleDefinitionIds
-if ($roleDefinitionIds.Count -gt 0) {
-    $roleDefinitionIds | ForEach-Object {
-        $roleDefId = $_.Split("/") | Select-Object -Last 1
-        New-AzRoleAssignment -Scope $resourceGroup.ResourceId -ObjectId $assignment.Identity.PrincipalId -RoleDefinitionId $roleDefId
-    }
+    New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath;
 }
