@@ -574,7 +574,7 @@
         "description": "[concat('Processor - Queue Length - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 3 and ProcQueueLength < 5')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"System\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 3 and ProcQueueLength < 5')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -619,7 +619,7 @@
         "description": "[concat('Processor - Queue Length - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 5')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"System\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 5')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
