@@ -8,13 +8,13 @@ The sourceResourceId configuration item can only handle a single virtual machine
 
 To be able to re-use this template the following parameters were introduced.
 
-- Project: An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.
-- Environment: The environment for which the resources can be used. Allowed values are dev-test-acc-prod.
-- existingVirtualMachinesResourceGroup: Resource group where the virtual machines are located. This can be different from resource group of the vault.
-- existingVirtualMachines: Array of Azure virtual machines. e.g. ["vm1","vm2","vm3"]
-- existingRecoverservicesVault: Recovery services vault name where the VMs will be backed up to.
-- existingBackupPolicy: Backup policy to be used to backup VMs. Backup Policy defines the schedule of the backup and how long to retain backup copies. By default every vault comes with a 'DefaultPolicy' which canbe used here.
-- location: Location for all resources. Default value here is the same location as the resource group where the template is deployed.
+- **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.
+- **Environment:** The environment for which the resources can be used. Allowed values are dev-test-acc-prod.
+- **existingVirtualMachinesResourceGroup:** Resource group where the virtual machines are located. This can be different from resource group of the vault.
+- **existingVirtualMachines:** Array of Azure virtual machines. e.g. ["vm1","vm2","vm3"]
+- **existingRecoverservicesVault:** Recovery services vault name where the VMs will be backed up to.
+- **existingBackupPolicy:** Backup policy to be used to backup VMs. Backup Policy defines the schedule of the backup and how long to retain backup copies. By default every vault comes with a 'DefaultPolicy' which canbe used here.
+- **location:** Location for all resources. Default value here is the same location as the resource group where the template is deployed.
 
 Looping through the list of virtual machines can be done by the copy instruction in the resource definition. The number of times the loop is executed is determined via count instruction which is part of the copy instruction. The count is then determined by the length of the existingVirtualMachines parameter.
 
