@@ -73,10 +73,10 @@
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.1.3",
-    "TemplateDate": "20190430",
-    "TemplateVersionDescription": "Added Location as a parameter with allowedValues",
-    "TemplateUsage": "Is used to setup a basic monitoring environment.",
+    "TemplateVersion": "1.1.4",
+    "TemplateDate": "20190521",
+    "TemplateVersionDescription": "Added Network monitoring saved searches.",
+    "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
     "storageAccountName": "[concat(parameters('Project'), parameters('Environment'), 'stor')]",
     "automationAccountName": "[concat(parameters('Project'), '-', parameters('Environment'), '-auto')]",
@@ -818,6 +818,51 @@
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Pages per Sec - Warning",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 350 and PagesSec < 500')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchNetworkAzVnet2OnPrem",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Network - AzVnet2OnPrem",
+            "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2OnPrem\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchNetworkAzVnet2Web",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Network - AzVnet2Web",
+            "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2Web\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchNetworkAzVnet2AzVnet",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Network - AzVnet2AzVnet",
+            "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2AzVnet\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
             "Version": 2
           },
           "dependsOn": [
