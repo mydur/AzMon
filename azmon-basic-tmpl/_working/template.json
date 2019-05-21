@@ -380,7 +380,7 @@
         {
           "apiVersion": "2015-11-01-preview",
           "type": "datasources",
-          "name": "ProcessProcessorTime",
+          "name": "PerfProcessProcessorTime",
           "dependsOn": [
             "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
           ],
@@ -390,6 +390,21 @@
             "instanceName": "*",
             "intervalSeconds": 60,
             "counterName": "% Processor Time"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfProcessPrivateBytes",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Process",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Private Bytes"
           }
         },
         {
@@ -920,6 +935,29 @@
         "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
         "containedResources": [
           "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/AzureActivity(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('DnsAnalytics(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/DnsAnalytics(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('DnsAnalytics(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/DnsAnalytics",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/DnsAnalytics(', variables('workspaceName'), ')')]"
         ]
       },
       "dependsOn": [
