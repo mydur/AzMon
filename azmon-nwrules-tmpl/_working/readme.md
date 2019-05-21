@@ -1,4 +1,4 @@
-# azmon-vmrules-tmpl
+# azmon-nwrules-tmpl
 
 The purpose of this template is to deploy network monitoring alert rules that are used to alert if one or more of the three tests detected network issues. These tests are:
 
@@ -6,7 +6,7 @@ The purpose of this template is to deploy network monitoring alert rules that ar
 - **AzVnet2Web:** Azure VNet to internet communication.
 - **AzVnet2AzVnet:** Azure VNet to Azure VNet communication
 
-> These scenarios need to be configured manually in the log analytics workspace via a set of steps that are separately available.
+> These tests need to be configured manually in the log analytics workspace via a set of steps that are separately available.
 
 To be able to re-use the template the following parameters were introduced:
 
