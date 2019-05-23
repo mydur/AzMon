@@ -3,6 +3,7 @@
 The vmworkbook template is used to deploy an Azure monitor workbook to report on computer health and base performance counters.
 
 After deployment the workbook contains the following.
+
 **AVAILABILITY AND HEALTH**
 
 - **Computers reporting in the last 24 hours:** Timechart graph that indicates how many computers are reporting to the log analytics workspace in the last 24 hours.
