@@ -1,4 +1,4 @@
-# azmon-basic-tmpl
+# azmon-vmworkbook-tmpl
 
 The vmworkbook template is used to deploy an Azure monitor workbook to report on computer health and base performance counters.
 
