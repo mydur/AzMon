@@ -64,6 +64,6 @@ Tags are very important in Azure Governance as they help you in filtering the re
 
 > As you probably noticed the subscription that is targetted is not part of the parameters. That's because the resources are created in a resource group that lives in the targetted subscription and thus the name of the subscription can be retrieved by a function in JSON.
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-rschealth-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-svchealth-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a><br />
