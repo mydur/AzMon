@@ -21,6 +21,6 @@ Tags are very important in Azure Governance as they help you in filtering the re
 
 > As you probably noticed the resource group in which the virtual machines live that need to be monitored is not one of the parameters. That's because these alert rules are created in the same resource group as the virtual machines and the name of the target resource group can be obtained via a function in the template.
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-basic-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-vmrules-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a><br />
