@@ -111,7 +111,7 @@
     {
       "name": "Network - Azure Vnet to On-premise",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "[parameters('Location')]",
+      "location": "westeurope",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -156,7 +156,7 @@
     {
       "name": "Network - Azure Vnet to Web",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "[parameters('Location')]",
+      "location": "westeurope",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -201,7 +201,7 @@
     {
       "name": "Network - Azure Vnet to Azure Vnet",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "[parameters('Location')]",
+      "location": "westeurope",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
