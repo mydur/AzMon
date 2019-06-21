@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azmontest"
+      "value": "azmon02"
     },
     "VMResourceGroup": {
-      "value": "monitorvm-test-rg"
+      "value": "azmonvm-test-rg"
     }
   }
 }
