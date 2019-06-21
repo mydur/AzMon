@@ -1,0 +1,1071 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project, application or customer"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "Location": {
+      "type": "string",
+      "allowedValues": [
+        "East Asia",
+        "Southeast Asia",
+        "Central US",
+        "East US",
+        "East US 2",
+        "West US",
+        "North Central US",
+        "South Central US",
+        "North Europe",
+        "West Europe",
+        "Japan West",
+        "Japan East",
+        "Brazil South",
+        "Australia East",
+        "Australia",
+        "Southeast",
+        "South India",
+        "Central India",
+        "West India",
+        "Canada Central",
+        "Canada East",
+        "UK South",
+        "UK West",
+        "West Central US",
+        "West US 2",
+        "Korea Central",
+        "Korea South",
+        "France Central",
+        "France South",
+        "Australia Central",
+        "Australia Central 2",
+        "South Africa North",
+        "South Africa West"
+      ],
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The region or location where resources will be deployed"
+      }
+    },
+    "AZMONBasicRGName": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Resource group name where basic monitoring was deployed"
+      }
+    },
+    "workspaceName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Workspace name where basic monitoring is running"
+      }
+    },
+    "actionGroupName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Action group name for direct email notification"
+      }
+    },
+    "actionGroupShortName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Action group short (max 12 chars) name for direct email notification"
+      }
+    },
+    "emailAddress": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Email address to be added to action group for direct email notification"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-vmrules",
+    "TemplateVersion": "1.0.2",
+    "TemplateDate": "20190430",
+    "TemplateDescription": "Added Location as a parameter with allowedValues",
+    "TemplateUsage": "Is used to create virtual machine monitoring rules.",
+    "TemplateDocumentation": "<Name of document.>",
+    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+  },
+  "resources": [
+    {
+      "name": "[concat('Heartbeat alert - Critical (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Heartbeat alert - Critical (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nHeartbeat\n| where _ResourceId contains ResourceGroupName\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \n| where LastHeartbeat < ago(5m)')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 10
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Logical Disk - Current Disk Queue Length - Critical (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Logical Disk - Current Disk Queue Length - Critical (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\n| where LogicalDiskQueueLength  > 5')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 15
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Logical Disk - Current Disk Queue Length - Warning (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Logical Disk - Current Disk Queue Length - Warning (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\n| where LogicalDiskQueueLength  > 3')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 15
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Logical Disk - Free MB on C - Critical (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Logical Disk - Free MB on C - Critical (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf \n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Free Megabytes\" \n| where InstanceName == \"C:\"\n| where TimeGenerated > ago(5m) \n| summarize FreeMB=avg(CounterValue) by Computer \n| where FreeMB < 5000')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 15
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Memory - Available MB - Critical (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Memory - Available MB - Critical (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AvailMB=avg(CounterValue) by Computer\n| where AvailMB < 200')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Memory - Available MB - Warning (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Memory - Available MB - Warning (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AvailMB=avg(CounterValue) by Computer\n| where AvailMB < 750 and AvailMB > 500')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Memory - Pages per Sec - Warning (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Memory - Pages per Sec - Warning (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 350 and PagesSec < 500')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Memory - Pages per Sec - Critical (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Memory - Pages per Sec - Critical (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 500')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Memory - Percent Committed Bytes in Use - Critical (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Memory - Percent Committed Bytes in Use - Critical (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize CommittedBytesUse=avg(CounterValue) by Computer\n| where CommittedBytesUse > 90')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Memory - Percent Committed Bytes in Use - Warning (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Memory - Percent Committed Bytes in Use - Warning (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize CommittedBytesUse=avg(CounterValue) by Computer\n| where CommittedBytesUse > 75 and CommittedBytesUse < 90')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Processor - Queue Length - Warning (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Processor - Queue Length - Warning (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"System\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 3 and ProcQueueLength < 5')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 15
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Processor - Queue Length - Critical (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Processor - Queue Length - Critical (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"System\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 5')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 15
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Processor - Time Total - Critical (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Processor - Time Total - Critical (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize ProcTotal=avg(CounterValue) by Computer \n| where ProcTotal > 85')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 15
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Processor - Time Total - Warning (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Processor - Time Total - Warning (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize ProcTotal=avg(CounterValue) by Computer \n| where ProcTotal > 70 and ProcTotal < 85')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 15
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Service - DHCP Client (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Service - DHCP Client (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Service - DNS Client (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Service - DNS Client (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DNS Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Service - Windows Event Log (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Service - Windows Event Log (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Service - Windows Firewall (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Service - Windows Firewall (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Service - RPC (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Service - RPC (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Service - Server (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Service - Server (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('Service - WinRM (', resourceGroup().name, ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[parameters('Location')]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('Service - WinRM (', resourceGroup().name, ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+      ]
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[parameters('ActionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "groupShortName": "[parameters('ActionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[parameters('EmailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
+      },
+      "dependsOn": []
+    }
+  ]
+}
