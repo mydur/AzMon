@@ -17,48 +17,6 @@
         "description": "Can one of the following, dev-test-acc-prod"
       }
     },
-    "Location": {
-      "type": "string",
-      "allowedValues": [
-        "East Asia",
-        "Southeast Asia",
-        "Central US",
-        "East US",
-        "East US 2",
-        "West US",
-        "North Central US",
-        "South Central US",
-        "North Europe",
-        "West Europe",
-        "Japan West",
-        "Japan East",
-        "Brazil South",
-        "Australia East",
-        "Australia",
-        "Southeast",
-        "South India",
-        "Central India",
-        "West India",
-        "Canada Central",
-        "Canada East",
-        "UK South",
-        "UK West",
-        "West Central US",
-        "West US 2",
-        "Korea Central",
-        "Korea South",
-        "France Central",
-        "France South",
-        "Australia Central",
-        "Australia Central 2",
-        "South Africa North",
-        "South Africa West"
-      ],
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "The region or location where resources will be deployed"
-      }
-    },
     "AZMONBasicRGName": {
       "defaultValue": "",
       "type": "string",
@@ -114,7 +72,7 @@
     {
       "name": "[concat('Heartbeat alert - Critical (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -158,7 +116,7 @@
     {
       "name": "[concat('Logical Disk - Current Disk Queue Length - Critical (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -202,7 +160,7 @@
     {
       "name": "[concat('Logical Disk - Current Disk Queue Length - Warning (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -246,7 +204,7 @@
     {
       "name": "[concat('Logical Disk - Free MB on C - Critical (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -290,7 +248,7 @@
     {
       "name": "[concat('Memory - Available MB - Critical (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -334,7 +292,7 @@
     {
       "name": "[concat('Memory - Available MB - Warning (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -378,7 +336,7 @@
     {
       "name": "[concat('Memory - Pages per Sec - Warning (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -422,7 +380,7 @@
     {
       "name": "[concat('Memory - Pages per Sec - Critical (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -466,7 +424,7 @@
     {
       "name": "[concat('Memory - Percent Committed Bytes in Use - Critical (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -510,7 +468,7 @@
     {
       "name": "[concat('Memory - Percent Committed Bytes in Use - Warning (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -554,7 +512,7 @@
     {
       "name": "[concat('Processor - Queue Length - Warning (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -598,7 +556,7 @@
     {
       "name": "[concat('Processor - Queue Length - Critical (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -642,7 +600,7 @@
     {
       "name": "[concat('Processor - Time Total - Critical (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -686,7 +644,7 @@
     {
       "name": "[concat('Processor - Time Total - Warning (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -730,7 +688,7 @@
     {
       "name": "[concat('Service - DHCP Client (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -774,7 +732,7 @@
     {
       "name": "[concat('Service - DNS Client (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -818,7 +776,7 @@
     {
       "name": "[concat('Service - Windows Event Log (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -862,7 +820,7 @@
     {
       "name": "[concat('Service - Windows Firewall (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -906,7 +864,7 @@
     {
       "name": "[concat('Service - RPC (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -950,7 +908,7 @@
     {
       "name": "[concat('Service - Server (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -994,7 +952,7 @@
     {
       "name": "[concat('Service - WinRM (', resourceGroup().name, ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",

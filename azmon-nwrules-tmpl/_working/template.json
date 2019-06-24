@@ -17,48 +17,6 @@
         "description": "Can one of the following, dev-test-acc-prod"
       }
     },
-    "Location": {
-      "type": "string",
-      "allowedValues": [
-        "East Asia",
-        "Southeast Asia",
-        "Central US",
-        "East US",
-        "East US 2",
-        "West US",
-        "North Central US",
-        "South Central US",
-        "North Europe",
-        "West Europe",
-        "Japan West",
-        "Japan East",
-        "Brazil South",
-        "Australia East",
-        "Australia",
-        "Southeast",
-        "South India",
-        "Central India",
-        "West India",
-        "Canada Central",
-        "Canada East",
-        "UK South",
-        "UK West",
-        "West Central US",
-        "West US 2",
-        "Korea Central",
-        "Korea South",
-        "France Central",
-        "France South",
-        "Australia Central",
-        "Australia Central 2",
-        "South Africa North",
-        "South Africa West"
-      ],
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "The region or location where resources will be deployed"
-      }
-    },
     "AZMONBasicRGName": {
       "defaultValue": "",
       "type": "string",
@@ -111,7 +69,7 @@
     {
       "name": "Network - Azure Vnet to On-premise",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -156,7 +114,7 @@
     {
       "name": "Network - Azure Vnet to Web",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -201,7 +159,7 @@
     {
       "name": "Network - Azure Vnet to Azure Vnet",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
