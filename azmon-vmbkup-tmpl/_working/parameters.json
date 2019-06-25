@@ -3,19 +3,19 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azbkup"
+      "value": "azmon"
     },
     "Environement": {
       "value": "test"
     },
     "existingVirtualMachinesResourceGroup": {
-      "value": "monitor-test-rg"
+      "value": "azmonvm-test-rg"
     },
     "existingVirtualMachines": {
       "value": ["montestvm01", "montestvm02"]
     },
     "existingRecoveryServicesVault": {
-      "value": "azbackup-test-bvlt"
+      "value": "azmon-test-bvlt"
     },
     "existingBackupPolicy": {
       "value": "vm-nightly0300"

@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azbkup"
+      "value": "azmon"
     },
     "Environment": {
       "value": "test"
