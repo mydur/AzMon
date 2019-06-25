@@ -11,7 +11,7 @@ The purpose of this template is to deploy network monitoring alert rules that ar
 To be able to re-use the template the following parameters were introduced:
 
 - **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.
-- **AZMONBasicRGName:** The resource group in which the log analytics workspace was installed by the azmon-basic-tmpl template.
+- **WorkspaceRGName:** The resource group in which the log analytics workspace was installed by the azmon-basic-tmpl template.
 - **WorkSpaceName:** The actual name of the log analytics workspace that can be found in the resource group of which the name is stored in AZMONBasicRGName.
 - **ActionGroupName:** The name of the action group that will be created by this template and used in all the alert rules also created by this template.
 - **ActionGroupShortName:** The short name of the above (max 12 characters).
