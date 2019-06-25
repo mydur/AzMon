@@ -9,10 +9,10 @@
       "value": "test"
     },
     "actionGroupName": {
-      "value": "azmon-email-agrp"
+      "value": "azmonrsc-email-agrp"
     },
     "actionGroupShortName": {
-      "value": "azmonemail"
+      "value": "azmonrsemail"
     },
     "EmailAddress": {
       "value": "rudy.michiels@getronics.com"

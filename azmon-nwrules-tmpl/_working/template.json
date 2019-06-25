@@ -17,7 +17,7 @@
         "description": "Can one of the following, dev-test-acc-prod"
       }
     },
-    "AZMONBasicRGName": {
+    "WorkspaceRGName": {
       "defaultValue": "",
       "type": "string",
       "metadata": {
@@ -83,10 +83,10 @@
         "enabled": "true",
         "source": {
           "query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2OnPrem\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
           ]
         },
         "schedule": {
@@ -128,10 +128,10 @@
         "enabled": "true",
         "source": {
           "query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2Web\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
           ]
         },
         "schedule": {
@@ -173,10 +173,10 @@
         "enabled": "true",
         "source": {
           "query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2AzVnet\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
           ]
         },
         "schedule": {

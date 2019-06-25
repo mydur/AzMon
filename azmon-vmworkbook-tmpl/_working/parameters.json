@@ -3,10 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azmontest"
+      "value": "azmon"
     },
     "WorkspaceName": {
-      "value": "monitor-test-lana"
+      "value": "azmon-test-lana"
+    },
+    "WorkspaceRGName": {
+      "value": "azmon-test-rg"
     },
     "Environment": {
       "value": "test"

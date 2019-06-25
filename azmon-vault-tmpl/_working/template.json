@@ -106,8 +106,8 @@
   },
   "variables": {
     "TemplateId": "azmon-vault",
-    "TemplateVersion": "1.0.5",
-    "TemplateDate": "20190424",
+    "TemplateVersion": "1.0.6",
+    "TemplateDate": "20190625",
     "TemplateDescription": "Added more AzBackup alert rules",
     "TemplateUsage": "Used to create backup vault and initial configuration",
     "TemplateDocumentation": "<Name of document.>",
@@ -118,7 +118,7 @@
       "type": "Microsoft.RecoveryServices/vaults",
       "apiVersion": "2016-06-01",
       "name": "[variables('backupVaultName')]",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
@@ -243,7 +243,7 @@
       "name": "[concat(variables('backupVaultName'), '/vaultstorageconfig')]",
       "type": "Microsoft.RecoveryServices/vaults/backupstorageconfig",
       "apiVersion": "2016-12-01",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "properties": {
         "storageModelType": "[parameters('redundancyType')]",
         "storageType": "[parameters('redundancyType')]",
@@ -315,7 +315,7 @@
     {
       "name": "[concat('AzBackup - ', variables('backupVaultName'), ' - Job failure')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -360,7 +360,7 @@
     {
       "name": "[concat('AzBackup - ', variables('backupVaultName'), ' - Delete protection policy')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",
@@ -405,7 +405,7 @@
     {
       "name": "[concat('AzBackup - ', variables('backupVaultName'), ' - Delete protected items')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
       "tags": {
         "TemplateId": "[variables('TemplateId')]",

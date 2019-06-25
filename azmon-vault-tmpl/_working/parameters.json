@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azbkup04"
+      "value": "azbkup"
     },
     "Environment": {
       "value": "test"
@@ -18,7 +18,7 @@
       "value": "azmonbkup-test-agrp"
     },
     "actionGroupShortName": {
-      "value": "azmonbkup01"
+      "value": "azmonbkup"
     },
     "emailAddress": {
       "value": "rudy.michiels@getronics.com"
