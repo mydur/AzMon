@@ -46,7 +46,7 @@
   "variables": {
     "TemplateId": "azmon-svchealth",
     "TemplateVersion": "1.0.3",
-    "TemplateDate": "20190411",
+    "TemplateDate": "20190806",
     "TemplateVersionDescription": "Added toLower() and replace() functions",
     "TemplateUsage": "Is used to create alert rules for service health",
     "TemplateDocumentation": "<Name of document.>",
