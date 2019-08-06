@@ -1,2 +1,1 @@
-connect-azaccount -tenant "0587b807-8aee-444c-b96b-f6afaa1b0251"
-.\deploy.ps1 -subscriptionId "fd355e78-91f8-4ad4-8184-fc3f52ef5c20" -resourceGroupName "azmonvm-test-rg" -resourceGroupLocation "West Europe" -deploymentName "azmonvmrules"
+.\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmonvm-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonvmrules"
