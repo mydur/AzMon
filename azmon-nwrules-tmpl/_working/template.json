@@ -6,7 +6,7 @@
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Identifier for the project, application or customer"
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE -=-"
       }
     },
     "Environment": {
@@ -14,42 +14,42 @@
       "allowedValues": ["dev", "test", "acc", "prod"],
       "defaultValue": "test",
       "metadata": {
-        "description": "Can one of the following, dev-test-acc-prod"
+        "description": "Can one of the following, dev-test-acc-prod -=- PLEASE ONLY USE LOWER CASE -=-"
       }
     },
     "WorkspaceRGName": {
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Resource group name where basic monitoring was deployed"
+        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE -=-"
       }
     },
     "workspaceName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Workspace name where basic monitoring is running"
+        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE -=-"
       }
     },
     "actionGroupName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Action group name for direct email notification"
+        "description": "Action group name for direct email notification -=- PLEASE ONLY USE LOWER CASE -=-"
       }
     },
     "actionGroupShortName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Action group short (max 12 chars) name for direct email notification"
+        "description": "Action group short (max 12 chars) name for direct email notification -=- PLEASE ONLY USE LOWER CASE -=-"
       }
     },
     "emailAddress": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Email address to be added to action group for direct email notification"
+        "description": "Email address to be added to action group for direct email notification -=- PLEASE ONLY USE LOWER CASE -=-"
       }
     },
     "CreatedOn": {
@@ -59,11 +59,17 @@
   },
   "variables": {
     "TemplateId": "azmon-nwrules",
-    "TemplateVersion": "1.0.0",
-    "TemplateDate": "20190521",
-    "TemplateDescription": "Initial version.",
+    "TemplateVersion": "1.0.1",
+    "TemplateDate": "20190806",
+    "TemplateDescription": "Added toLower() and replace() functions",
     "TemplateUsage": "Is used to create network monitoring rules.",
-    "TemplateDocumentation": "<Name of document.>"
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "WorkspaceRGName": "[toLower(parameters('WorkspaceRGName'))]",
+    "WorkspaceName": "[toLower(parameters('WorkspaceName'))]",
+    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
+    "actionGroupShortName": "[toLower(parameters('actionGroupShortName'))]"
   },
   "resources": [
     {
@@ -83,10 +89,10 @@
         "enabled": "true",
         "source": {
           "query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2OnPrem\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
           ]
         },
         "schedule": {
@@ -97,7 +103,7 @@
           "severity": "2",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('ActionGroupName'))]"
             ]
           },
           "trigger": {
@@ -108,7 +114,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('ActionGroupName'))]"
       ]
     },
     {
@@ -128,10 +134,10 @@
         "enabled": "true",
         "source": {
           "query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2Web\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
           ]
         },
         "schedule": {
@@ -142,7 +148,7 @@
           "severity": "2",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('ActionGroupName'))]"
             ]
           },
           "trigger": {
@@ -153,7 +159,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('ActionGroupName'))]"
       ]
     },
     {
@@ -173,10 +179,10 @@
         "enabled": "true",
         "source": {
           "query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2AzVnet\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('WorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
           ]
         },
         "schedule": {
@@ -187,7 +193,7 @@
           "severity": "2",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('ActionGroupName'))]"
             ]
           },
           "trigger": {
@@ -198,12 +204,12 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('ActionGroupName'))]"
       ]
     },
     {
       "type": "microsoft.insights/actionGroups",
-      "name": "[parameters('ActionGroupName')]",
+      "name": "[variables('ActionGroupName')]",
       "apiVersion": "2018-03-01",
       "location": "Global",
       "tags": {
@@ -214,7 +220,7 @@
         "Environment": "[parameters('Environment')]"
       },
       "properties": {
-        "groupShortName": "[parameters('ActionGroupShortName')]",
+        "groupShortName": "[variables('ActionGroupShortName')]",
         "enabled": true,
         "emailReceivers": [
           {
