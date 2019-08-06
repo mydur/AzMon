@@ -59,14 +59,20 @@
   },
   "variables": {
     "TemplateId": "azmon-vmrules",
-    "TemplateVersion": "1.0.2",
-    "TemplateDate": "20190430",
-    "TemplateDescription": "Added Location as a parameter with allowedValues",
+    "TemplateVersion": "1.0.3",
+    "TemplateDate": "20190806",
+    "TemplateDescription": "Added toLower() and replace() functions",
     "TemplateUsage": "Is used to create virtual machine monitoring rules.",
     "TemplateDocumentation": "<Name of document.>",
-    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
-    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
-    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
+    "workspaceName": "[toLower(parameters('workspaceName'))]",
+    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
+    "actionGroupShortName": "[toLower(parameters('actionGroupShortName'))]",
+    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
   },
   "resources": [
     {
@@ -99,7 +105,7 @@
           "severity": "0",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -110,7 +116,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -143,7 +149,7 @@
           "severity": "0",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -160,7 +166,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -193,7 +199,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -210,7 +216,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -243,7 +249,7 @@
           "severity": "0",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -260,7 +266,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -293,7 +299,7 @@
           "severity": "0",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -310,7 +316,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -343,7 +349,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -360,7 +366,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -393,7 +399,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -410,7 +416,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -443,7 +449,7 @@
           "severity": "0",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -460,7 +466,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -493,7 +499,7 @@
           "severity": "0",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -510,7 +516,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -543,7 +549,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -560,7 +566,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -593,7 +599,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -610,7 +616,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -643,7 +649,7 @@
           "severity": "0",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -660,7 +666,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -693,7 +699,7 @@
           "severity": "0",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -710,7 +716,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -743,7 +749,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -760,7 +766,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -793,7 +799,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -810,7 +816,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -843,7 +849,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -860,7 +866,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -893,7 +899,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -910,7 +916,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -943,7 +949,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -960,7 +966,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -993,7 +999,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -1010,7 +1016,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -1043,7 +1049,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -1060,7 +1066,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -1093,7 +1099,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -1110,12 +1116,12 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
       "type": "microsoft.insights/actionGroups",
-      "name": "[parameters('ActionGroupName')]",
+      "name": "[variables('actionGroupName')]",
       "apiVersion": "2018-03-01",
       "location": "Global",
       "tags": {
@@ -1126,7 +1132,7 @@
         "Environment": "[parameters('Environment')]"
       },
       "properties": {
-        "groupShortName": "[parameters('ActionGroupShortName')]",
+        "groupShortName": "[variables('actionGroupShortName')]",
         "enabled": true,
         "emailReceivers": [
           {
