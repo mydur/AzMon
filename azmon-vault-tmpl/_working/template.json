@@ -106,12 +106,18 @@
   },
   "variables": {
     "TemplateId": "azmon-vault",
-    "TemplateVersion": "1.0.6",
-    "TemplateDate": "20190625",
-    "TemplateDescription": "Added more AzBackup alert rules",
+    "TemplateVersion": "1.0.7",
+    "TemplateDate": "20190806",
+    "TemplateDescription": "Added toLower() and replace() functions",
     "TemplateUsage": "Used to create backup vault and initial configuration",
     "TemplateDocumentation": "<Name of document.>",
-    "backupVaultName": "[concat(parameters('Project'), '-', parameters('Environment'), '-bvlt')]"
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "WorkspaceRGName": "[toLower(parameters('WorkspaceRGName'))]",
+    "WorkspaceName": "[toLower(parameters('WorkspaceName'))]",
+    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
+    "actionGroupShortName": "[toLower(parameters('actionGroupShortName'))]",
+    "backupVaultName": "[concat(variables('Project'), '-', variables('Environment'), '-bvlt')]"
   },
   "resources": [
     {
@@ -256,17 +262,17 @@
     {
       "type": "Microsoft.RecoveryServices/vaults/providers/diagnosticSettings",
       "apiVersion": "2017-05-01-preview",
-      "name": "[concat(variables('backupVaultName'), '/Microsoft.Insights/', parameters('workspaceName'))]",
+      "name": "[concat(variables('backupVaultName'), '/Microsoft.Insights/', variables('workspaceName'))]",
       "location": "westeurope",
       "dependsOn": [
         "[resourceId('Microsoft.RecoveryServices/vaults', variables('backupVaultName'))]"
       ],
       "properties": {
-        "name": "[parameters('workspaceName')]",
+        "name": "[variables('workspaceName')]",
         "storageAccountId": null,
         "eventHubAuthorizationRuleId": null,
         "eventHubName": null,
-        "workspaceId": "[resourceId(parameters('WorkspaceRGName'), 'microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]",
+        "workspaceId": "[resourceId(variables('workspaceRGName'), 'microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
         "logs": [
           {
             "category": "AzureBackupReport",
@@ -282,7 +288,7 @@
     },
     {
       "type": "microsoft.insights/actionGroups",
-      "name": "[parameters('ActionGroupName')]",
+      "name": "[variables('actionGroupName')]",
       "apiVersion": "2018-03-01",
       "location": "Global",
       "tags": {
@@ -293,7 +299,7 @@
         "Environment": "[parameters('Environment')]"
       },
       "properties": {
-        "groupShortName": "[parameters('actionGroupShortName')]",
+        "groupShortName": "[variables('actionGroupShortName')]",
         "enabled": true,
         "emailReceivers": [
           {
@@ -329,10 +335,10 @@
         "enabled": "true",
         "source": {
           "query": "[concat('let bkupVaultName = \"', variables('backupVaultName'), '\";\r\nAzureDiagnostics \r\n| where Category == \"AzureBackupReport\" \r\n| where OperationName == \"Job\" \r\n//| where TimeGenerated > ago(6h) \r\n| where ResourceType == \"VAULTS\" \r\n| where Resource == bkupVaultName \r\n| where JobStatus_s == \"Failed\" \r\n| summarize count() by Resource ')]",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
           ]
         },
         "schedule": {
@@ -343,7 +349,7 @@
           "severity": "2",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -354,7 +360,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -374,10 +380,10 @@
         "enabled": "true",
         "source": {
           "query": "[concat('AzureActivity\r\n| where ResourceProvider == \"Microsoft.RecoveryServices\" \r\n| where OperationName == \"Delete Protection Policy\" \r\n| where ResourceId contains \"', variables('backupVaultName'), '\" \r\n| where ActivityStatus == \"Started\" \r\n| summarize count() by Resource')]",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
           ]
         },
         "schedule": {
@@ -388,7 +394,7 @@
           "severity": "2",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -399,7 +405,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
     {
@@ -419,10 +425,10 @@
         "enabled": "true",
         "source": {
           "query": "[concat('AzureActivity\r\n| where ResourceProvider == \"Microsoft.RecoveryServices\" \r\n| where OperationName == \"Delete Protected Items\" \r\n| where ResourceId contains \"', variables('backupVaultName'), '\" \r\n| where ActivityStatus == \"Started\" \r\n| summarize count() by Resource')]",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('WorkspaceName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
           ]
         },
         "schedule": {
@@ -433,7 +439,7 @@
           "severity": "2",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -444,7 +450,7 @@
         }
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('ActionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     }
   ]
