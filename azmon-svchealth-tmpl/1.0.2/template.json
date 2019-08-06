@@ -1,0 +1,244 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project or application"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "actionGroupName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Name for the new action group"
+      }
+    },
+    "actionGroupShortName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Short name for the new action group (max 12)"
+      }
+    },
+    "EmailAddress": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Email address for the person to notify"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-svchealth",
+    "TemplateVersion": "1.0.2",
+    "TemplateDate": "20190411",
+    "TemplateVersionDescription": "Added Environment as parameter and also as tag",
+    "TemplateUsage": "Is used to create alert rules for service health",
+    "TemplateDocumentation": "<Name of document.>"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/activityLogAlerts",
+      "apiVersion": "2017-04-01",
+      "name": "[concat('AzSvcIssue - ', subscription().displayname, ' - Incident')]",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId)]"
+        ],
+        "condition": {
+          "allOf": [
+            {
+              "field": "category",
+              "equals": "ServiceHealth",
+              "containsAny": null
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.incidentType",
+                  "equals": "Incident",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "field": "properties.impactedServices[*].ServiceName",
+              "equals": null,
+              "containsAny": [
+                "Application Insights",
+                "Automation",
+                "Azure Active Directory",
+                "Azure DNS",
+                "Azure Monitor",
+                "Azure Policy",
+                "Azure Resource Manager",
+                "Backup",
+                "Diagnostic Logs",
+                "Log Analytics",
+                "Network Infrastructure",
+                "Network Watcher",
+                "Storage",
+                "Virtual Machines",
+                "Virtual Network"
+              ]
+            },
+            {
+              "field": "properties.impactedServices[*].ImpactedRegions[*].RegionName",
+              "equals": null,
+              "containsAny": ["West Europe"]
+            }
+          ]
+        },
+        "actions": {
+          "actionGroups": [
+            {
+              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/activityLogAlerts",
+      "apiVersion": "2017-04-01",
+      "name": "[concat('AzSvcIssue - ', subscription().displayname, ' - Information')]",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId)]"
+        ],
+        "condition": {
+          "allOf": [
+            {
+              "field": "category",
+              "equals": "ServiceHealth",
+              "containsAny": null
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.incidentType",
+                  "equals": "Maintenance",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.incidentType",
+                  "equals": "Informational",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.incidentType",
+                  "equals": "ActionRequired",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "field": "properties.impactedServices[*].ServiceName",
+              "equals": null,
+              "containsAny": [
+                "Application Insights",
+                "Automation",
+                "Azure Active Directory",
+                "Azure DNS",
+                "Azure Monitor",
+                "Azure Policy",
+                "Azure Resource Manager",
+                "Backup",
+                "Diagnostic Logs",
+                "Log Analytics",
+                "Network Infrastructure",
+                "Network Watcher",
+                "Storage",
+                "Virtual Machines",
+                "Virtual Network"
+              ]
+            },
+            {
+              "field": "properties.impactedServices[*].ImpactedRegions[*].RegionName",
+              "equals": null,
+              "containsAny": ["West Europe"]
+            }
+          ]
+        },
+        "actions": {
+          "actionGroups": [
+            {
+              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[parameters('ActionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "groupShortName": "[parameters('ActionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[parameters('EmailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
+      },
+      "dependsOn": []
+    }
+  ]
+}
