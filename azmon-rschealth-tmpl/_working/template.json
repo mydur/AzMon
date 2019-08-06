@@ -49,7 +49,7 @@
     "TemplateDate": "20190806",
     "TemplateVersionDescription": "Added toLower() and replace() functions",
     "TemplateUsage": "Is used to create alert rules for resource health",
-    "TemplateDocumentation": "<Name of document.>",
+    "TemplateDocumentation": "<Name of document...>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
     "actionGroupName": "[toLower(parameters('actionGroupName'))]",
