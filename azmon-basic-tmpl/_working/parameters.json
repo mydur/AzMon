@@ -6,7 +6,7 @@
       "value": "azmon"
     },
     "VMRGName": {
-      "value": "monitorvm-test-rg"
+      "value": "monitorVM-test-rg"
     },
     "Environment": {
       "value": "test"

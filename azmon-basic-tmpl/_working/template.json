@@ -6,7 +6,7 @@
       "type": "String",
       "defaultValue": "",
       "metadata": {
-        "description": "Identifier for the project, customer or application"
+        "description": "Identifier for the project, customer or application -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "VMRGName": {
@@ -73,14 +73,17 @@
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.1.4",
+    "TemplateVersion": "1.1.5",
     "TemplateDate": "20190521",
     "TemplateVersionDescription": "Added Network monitoring saved searches.",
     "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
-    "storageAccountName": "[concat(parameters('Project'), parameters('Environment'), 'stor')]",
-    "automationAccountName": "[concat(parameters('Project'), '-', parameters('Environment'), '-auto')]",
-    "workspaceName": "[concat(parameters('Project'), '-', parameters('Environment'), '-lana')]"
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(replace(parameters('Environment'), '-', ''))]",
+    "VMRGName": "[toLower(parameters('VMRGName'))]",
+    "storageAccountName": "[concat(variables('Project'), variables('Environment'), 'stor')]",
+    "automationAccountName": "[concat(variables('Project'), '-', variables('Environment'), '-auto')]",
+    "workspaceName": "[concat(variables('Project'), '-', variables('Environment'), '-lana')]"
   },
   "resources": [
     {
@@ -478,7 +481,7 @@
           "properties": {
             "category": "Getronics Monitoring",
             "displayName": "Service - Windows Firewall",
-            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
             "version": 2
           },
           "dependsOn": [
@@ -492,7 +495,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Percent Free Space",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"% Free Space\" \n| where InstanceName <> \"HarddiskVolume1\" and InstanceName <> \"_Total\" and InstanceName <> \"C:\"\n| where TimeGenerated > ago(15m)\n| summarize PercentFree=avg(CounterValue) by Computer\n| where PercentFree < 10')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"% Free Space\" \n| where InstanceName <> \"HarddiskVolume1\" and InstanceName <> \"_Total\" and InstanceName <> \"C:\"\n| where TimeGenerated > ago(15m)\n| summarize PercentFree=avg(CounterValue) by Computer\n| where PercentFree < 10')]",
             "Version": 2
           },
           "dependsOn": [
@@ -506,7 +509,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - DHCP Client",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
             "Version": 2
           },
           "dependsOn": [
@@ -520,7 +523,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Heartbeat per resource group > 3 minutes",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\r\nHeartbeat \r\n| where _ResourceId contains ResourceGroupName\r\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \r\n| where LastHeartbeat < ago(3m)')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\r\nHeartbeat \r\n| where _ResourceId contains ResourceGroupName\r\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \r\n| where LastHeartbeat < ago(3m)')]",
             "Version": 2
           },
           "dependsOn": [
@@ -535,7 +538,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - DNS Client",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DNS Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DNS Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
             "Version": 2
           },
           "dependsOn": [
@@ -549,7 +552,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Current Disk Queue Length - Critical",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\n| where LogicalDiskQueueLength  > 5')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\n| where LogicalDiskQueueLength  > 5')]",
             "Version": 2
           },
           "dependsOn": [
@@ -563,7 +566,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Processor - Queue Length - Critical",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 5')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 5')]",
             "Version": 2
           },
           "dependsOn": [
@@ -577,7 +580,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Processor - Queue Length - Warning",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 3 and ProcQueueLength < 5')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 3 and ProcQueueLength < 5')]",
             "Version": 2
           },
           "dependsOn": [
@@ -591,7 +594,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Pages per Sec",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 350 and PagesSec < 500')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 350 and PagesSec < 500')]",
             "Version": 2
           },
           "dependsOn": [
@@ -605,7 +608,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - Windows Event Log",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
             "Version": 2
           },
           "dependsOn": [
@@ -619,7 +622,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Current Disk Queue Length - Warning",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\n| where LogicalDiskQueueLength  > 3')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\n| where LogicalDiskQueueLength  > 3')]",
             "Version": 2
           },
           "dependsOn": [
@@ -633,7 +636,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Percent Committed Bytes In Use - Warning",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize CommittedBytesUse=avg(CounterValue) by Computer\n| where CommittedBytesUse > 75 and CommittedBytesUse < 90')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize CommittedBytesUse=avg(CounterValue) by Computer\n| where CommittedBytesUse > 75 and CommittedBytesUse < 90')]",
             "Version": 2
           },
           "dependsOn": [
@@ -647,7 +650,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Available MB - Warning",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AvailMB=avg(CounterValue) by Computer\n| where AvailMB < 750 and AvailMB > 500')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AvailMB=avg(CounterValue) by Computer\n| where AvailMB < 750 and AvailMB > 500')]",
             "Version": 2
           },
           "dependsOn": [
@@ -661,7 +664,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Available MB - Critical",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AvailMB=avg(CounterValue) by Computer\n| where AvailMB < 200')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AvailMB=avg(CounterValue) by Computer\n| where AvailMB < 200')]",
             "Version": 2
           },
           "dependsOn": [
@@ -675,7 +678,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Processor - Time Total - Critical",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize ProcTotal=avg(CounterValue) by Computer \n| where ProcTotal > 85')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize ProcTotal=avg(CounterValue) by Computer \n| where ProcTotal > 85')]",
             "Version": 2
           },
           "dependsOn": [
@@ -689,7 +692,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Processor - Time Total - Warning",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize ProcTotal=avg(CounterValue) by Computer \n| where ProcTotal > 70 and ProcTotal < 85')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize ProcTotal=avg(CounterValue) by Computer \n| where ProcTotal > 70 and ProcTotal < 85')]",
             "Version": 2
           },
           "dependsOn": [
@@ -703,7 +706,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Current Disk Queue Length",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\r\nPerf\r\n| where _ResourceId contains ResourceGroupName\r\n| where ObjectName == \"LogicalDisk\" \r\n| where CounterName == \"Current Disk Queue Length\" \r\n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\r\n| where TimeGenerated > ago(15m)\r\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\r\n| where LogicalDiskQueueLength  > 3')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\r\nPerf\r\n| where _ResourceId contains ResourceGroupName\r\n| where ObjectName == \"LogicalDisk\" \r\n| where CounterName == \"Current Disk Queue Length\" \r\n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\r\n| where TimeGenerated > ago(15m)\r\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\r\n| where LogicalDiskQueueLength  > 3')]",
             "Version": 2
           },
           "dependsOn": [
@@ -717,7 +720,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - WinRM",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
             "Version": 2
           },
           "dependsOn": [
@@ -731,7 +734,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Pages per Sec - Critical",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 500')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 500')]",
             "Version": 2
           },
           "dependsOn": [
@@ -745,7 +748,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Free MB on C",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf \n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Free Megabytes\" \n| where InstanceName == \"C:\"\n| where TimeGenerated > ago(5m) \n| summarize FreeMB=avg(CounterValue) by Computer \n| where FreeMB < 5000')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf \n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Free Megabytes\" \n| where InstanceName == \"C:\"\n| where TimeGenerated > ago(5m) \n| summarize FreeMB=avg(CounterValue) by Computer \n| where FreeMB < 5000')]",
             "Version": 2
           },
           "dependsOn": [
@@ -759,7 +762,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Heartbeat alert - Critical",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nHeartbeat\n| where _ResourceId contains ResourceGroupName\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \n| where LastHeartbeat < ago(5m)')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nHeartbeat\n| where _ResourceId contains ResourceGroupName\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \n| where LastHeartbeat < ago(5m)')]",
             "Version": 2
           },
           "dependsOn": [
@@ -773,7 +776,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - RPC",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
             "Version": 2
           },
           "dependsOn": [
@@ -788,7 +791,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Percent Committed Bytes In Use - Critical",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize CommittedBytesUse=avg(CounterValue) by Computer\n| where CommittedBytesUse > 90')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize CommittedBytesUse=avg(CounterValue) by Computer\n| where CommittedBytesUse > 90')]",
             "Version": 2
           },
           "dependsOn": [
@@ -802,7 +805,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - Server",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
             "Version": 2
           },
           "dependsOn": [
@@ -817,7 +820,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Pages per Sec - Warning",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', parameters('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 350 and PagesSec < 500')]",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 350 and PagesSec < 500')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1339,5 +1342,19 @@
         "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "StorageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    },
+    "AutomationAccountName": {
+      "type": "string",
+      "value": "[variables('automationAccountName')]"
+    },
+    "WorkspaceName": {
+      "type": "string",
+      "value": "[variables('workspaceName')]"
+    }
+  }
 }
