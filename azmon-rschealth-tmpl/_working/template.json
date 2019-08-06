@@ -45,11 +45,15 @@
   },
   "variables": {
     "TemplateId": "azmon-rschealth",
-    "TemplateVersion": "1.0.1",
-    "TemplateDate": "20190411",
-    "TemplateVersionDescription": "Added Environment as parameter and also as tag",
+    "TemplateVersion": "1.0.2",
+    "TemplateDate": "20190806",
+    "TemplateVersionDescription": "Added toLower() and replace() functions",
     "TemplateUsage": "Is used to create alert rules for resource health",
-    "TemplateDocumentation": "<Name of document.>"
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
+    "actionGroupShortName": "[toLower(parameters('actionGroupShortName'))]"
   },
   "resources": [
     {
@@ -65,7 +69,7 @@
         "Environment": "[parameters('Environment')]"
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ],
       "properties": {
         "enabled": true,
@@ -130,7 +134,7 @@
         "actions": {
           "actionGroups": [
             {
-              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             }
           ]
         }
@@ -149,7 +153,7 @@
         "Environment": "[parameters('Environment')]"
       },
       "dependsOn": [
-        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ],
       "properties": {
         "enabled": true,
@@ -205,7 +209,7 @@
         "actions": {
           "actionGroups": [
             {
-              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             }
           ]
         }
@@ -213,7 +217,7 @@
     },
     {
       "type": "microsoft.insights/actionGroups",
-      "name": "[parameters('ActionGroupName')]",
+      "name": "[variables('actionGroupName')]",
       "apiVersion": "2018-03-01",
       "location": "Global",
       "tags": {
@@ -224,7 +228,7 @@
         "Environment": "[parameters('Environment')]"
       },
       "properties": {
-        "groupShortName": "[parameters('ActionGroupShortName')]",
+        "groupShortName": "[variables('actionGroupShortName')]",
         "enabled": true,
         "emailReceivers": [
           {
