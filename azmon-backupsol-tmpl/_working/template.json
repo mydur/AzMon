@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Specify the workspace name"
+        "description": "Specify the workspace name -=- PLEASE ONLY USE LOWER CASE -=-"
       }
     },
     "Environment": {
@@ -62,15 +62,16 @@
   },
   "variables": {
     "TemplateId": "azmon-backupsol",
-    "TemplateVersion": "1.0.2",
+    "TemplateVersion": "1.0.3",
     "TemplateDate": "20190430",
-    "TemplateDescription": "Added Location as a parameter with allowedValues",
+    "TemplateDescription": "Added toLower() and replace() functions",
     "TemplateUsage": "Use to deploy backup monitoring solution to Log Analytics workspace",
     "TemplateDocumentation": "<Name of document.>",
+    "workspaceName": "[toLower(parameters('workspaceName'))]",
     "omsSolutions": {
       "customSolution": {
         "name": "Azure Backup Monitoring Solution",
-        "solutionName": "[concat('AzureBackup', '[', parameters('workspaceName'), ']')]",
+        "solutionName": "[concat('AzureBackup', '[', variables('workspaceName'), ']')]",
         "publisher": "Microsoft",
         "displayName": "Azure Backup Monitoring Solution",
         "description": "Monitor and analyze your Backup Vaults",
@@ -81,7 +82,7 @@
   "resources": [
     {
       "apiVersion": "2015-11-01-preview",
-      "name": "[parameters('workspaceName')]",
+      "name": "[variables('workspaceName')]",
       "type": "Microsoft.OperationalInsights/workspaces",
       "location": "[parameters('Location')]",
       "resources": [
@@ -91,7 +92,7 @@
           "type": "views",
           "location": "[parameters('Location')]",
           "dependsOn": [
-            "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+            "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
           ],
           "properties": {
             "Name": "[variables('omsSolutions').customSolution.name]",
@@ -709,8 +710,8 @@
           "apiVersion": "2015-11-01-preview",
           "location": "[parameters('Location')]",
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-            "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'), '/views/', variables('omsSolutions').customSolution.name)]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]",
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'), '/views/', variables('omsSolutions').customSolution.name)]"
           ],
           "plan": {
             "name": "[variables('omsSolutions').customSolution.solutionName]",
@@ -719,10 +720,10 @@
             "promotionCode": ""
           },
           "properties": {
-            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+            "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]",
             "referencedResources": [],
             "containedResources": [
-              "[resourceId('Microsoft.OperationalInsights/workspaces/views/', parameters('workspaceName'), variables('omsSolutions').customSolution.name)]"
+              "[resourceId('Microsoft.OperationalInsights/workspaces/views/', variables('workspaceName'), variables('omsSolutions').customSolution.name)]"
             ]
           }
         }
