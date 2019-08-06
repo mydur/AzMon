@@ -1,0 +1,247 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project or application"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "actionGroupName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Name for the new action group"
+      }
+    },
+    "actionGroupShortName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Short name for the new action group (max 12)"
+      }
+    },
+    "EmailAddress": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Email address for the person to notify"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-rschealth",
+    "TemplateVersion": "1.0.1",
+    "TemplateDate": "20190411",
+    "TemplateVersionDescription": "Added Environment as parameter and also as tag",
+    "TemplateUsage": "Is used to create alert rules for resource health",
+    "TemplateDocumentation": "<Name of document.>"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/activityLogAlerts",
+      "apiVersion": "2017-04-01",
+      "name": "[concat('AzRscIssue - ', resourceGroup().name, ' - Unavailable')]",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name)]"
+        ],
+        "condition": {
+          "allOf": [
+            {
+              "field": "category",
+              "equals": "ResourceHealth",
+              "containsAny": null
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.currentHealthStatus",
+                  "equals": "Unavailable",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Available",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Unknown",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Degraded",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.cause",
+                  "equals": "PlatformInitiated",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "status",
+                  "equals": "Active",
+                  "containsAny": null
+                }
+              ]
+            }
+          ]
+        },
+        "actions": {
+          "actionGroups": [
+            {
+              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/activityLogAlerts",
+      "apiVersion": "2017-04-01",
+      "name": "[concat('AzRscInfo - ', resourceGroup().name, ' - Degraded')]",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name)]"
+        ],
+        "condition": {
+          "allOf": [
+            {
+              "field": "category",
+              "equals": "ResourceHealth",
+              "containsAny": null
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.currentHealthStatus",
+                  "equals": "Degraded",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Available",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Unknown",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.previousHealthStatus",
+                  "equals": "Unavailable",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "status",
+                  "equals": "Active",
+                  "containsAny": null
+                }
+              ]
+            }
+          ]
+        },
+        "actions": {
+          "actionGroups": [
+            {
+              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', parameters('actionGroupName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[parameters('ActionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "groupShortName": "[parameters('ActionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[parameters('EmailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
+      },
+      "dependsOn": []
+    }
+  ]
+}
