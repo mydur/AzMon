@@ -6,7 +6,7 @@
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Identifier for the project or application"
+        "description": "Identifier for the project or application -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "Environment": {
@@ -21,14 +21,14 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Name for the new action group"
+        "description": "Name for the new action group -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "actionGroupShortName": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Short name for the new action group (max 12)"
+        "description": "Short name for the new action group (max 12) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "EmailAddress": {

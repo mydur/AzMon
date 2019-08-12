@@ -13,7 +13,7 @@
       "type": "String",
       "defaultValue": "",
       "metadata": {
-        "description": "Resourcegroup name where VMs are deployed (used for demo saved searches)"
+        "description": "Resourcegroup name where VMs are deployed (used for demo saved searches) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "Environment": {

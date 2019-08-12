@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Identifier for the project, application or customer"
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "Environment": {
@@ -20,26 +20,26 @@
     "existingVirtualMachinesResourceGroup": {
       "type": "string",
       "metadata": {
-        "description": "Resource group where the virtual machines are located. This can be different from resource group of the vault. "
+        "description": "Resource group where the virtual machines are located. This can be different from resource group of the vault -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "existingVirtualMachines": {
       "type": "array",
       "metadata": {
-        "description": "Array of Azure virtual machines. e.g. [\"vm1\",\"vm2\",\"vm3\"]"
+        "description": "Array of Azure virtual machines. e.g. [\"vm1\",\"vm2\",\"vm3\"] -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "existingRecoveryServicesVault": {
       "type": "string",
       "metadata": {
-        "description": "Recovery services vault name where the VMs will be backed up to. "
+        "description": "Recovery services vault name where the VMs will be backed up to -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "existingBackupPolicy": {
       "type": "string",
       "defaultValue": "DefaultPolicy",
       "metadata": {
-        "description": "Backup policy to be used to backup VMs. Backup POlicy defines the schedule of the backup and how long to retain backup copies. By default every vault comes with a 'DefaultPolicy' which canbe used here."
+        "description": "Backup policy to be used to backup VMs. Backup Policy defines the schedule of the backup and how long to retain backup copies. By default every vault comes with a 'DefaultPolicy' which canbe used here -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "location": {

@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Identifier for the project, application or customer"
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "Environment": {
@@ -21,7 +21,7 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Storage Account name to be created (all lower, no special characters)"
+        "description": "Storage Account name to be created (all lower, no special characters) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "BlobCapacityThresholdMBWarning": {
@@ -42,14 +42,14 @@
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Action group name for direct email notification"
+        "description": "Action group name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "actionGroupShortName": {
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Action group short (max 12 chars) name for direct email notification"
+        "description": "Action group short (max 12 chars) name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "EmailAddress": {

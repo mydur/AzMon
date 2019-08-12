@@ -6,7 +6,7 @@
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Identifier for the project, application or customer"
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "Environment": {
@@ -21,28 +21,28 @@
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Resource group name where basic monitoring was deployed"
+        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "workspaceName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Workspace name where basic monitoring is running"
+        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "actionGroupName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Action group name for direct email notification"
+        "description": "Action group name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "actionGroupShortName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Action group short (max 12 chars) name for direct email notification"
+        "description": "Action group short (max 12 chars) name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "emailAddress": {
@@ -253,7 +253,7 @@
             ]
           },
           "trigger": {
-            "thresholdOperator": "GreaterThan",
+            "thresholdOperator": "LessThan",
             "threshold": 5000,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",

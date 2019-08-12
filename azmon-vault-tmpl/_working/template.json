@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Identifier for the project, application or customer"
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "Environment": {
@@ -21,28 +21,28 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Specify the workspace name"
+        "description": "Specify the workspace name -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "workspaceRGName": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Specify the workspace resource group name"
+        "description": "Specify the workspace resource group name -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "actionGroupName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Action group name for direct email notification"
+        "description": "Action group name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "actionGroupShortName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Action group short (max 12 chars) name for direct email notification"
+        "description": "Action group short (max 12 chars) name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "emailAddress": {

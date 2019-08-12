@@ -6,7 +6,7 @@
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE -=-"
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "Environment": {
@@ -14,42 +14,42 @@
       "allowedValues": ["dev", "test", "acc", "prod"],
       "defaultValue": "test",
       "metadata": {
-        "description": "Can one of the following, dev-test-acc-prod -=- PLEASE ONLY USE LOWER CASE -=-"
+        "description": "Can one of the following, dev-test-acc-prod -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "WorkspaceRGName": {
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE -=-"
+        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "workspaceName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE -=-"
+        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "actionGroupName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Action group name for direct email notification -=- PLEASE ONLY USE LOWER CASE -=-"
+        "description": "Action group name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "actionGroupShortName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Action group short (max 12 chars) name for direct email notification -=- PLEASE ONLY USE LOWER CASE -=-"
+        "description": "Action group short (max 12 chars) name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "emailAddress": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Email address to be added to action group for direct email notification -=- PLEASE ONLY USE LOWER CASE -=-"
+        "description": "Email address to be added to action group for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "CreatedOn": {

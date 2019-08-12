@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Identifier for the project, customer or application"
+        "description": "Identifier for the project, customer or application -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "Environment": {
@@ -21,14 +21,14 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Name of the workspace used by the queries."
+        "description": "Name of the workspace used by the queries -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "WorkspaceRGName": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Resourgroup name of the workspace used by the queries."
+        "description": "Resourgroup name of the workspace used by the queries -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
     "workbookId": {
