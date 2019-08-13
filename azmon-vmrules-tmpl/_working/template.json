@@ -59,9 +59,9 @@
   },
   "variables": {
     "TemplateId": "azmon-vmrules",
-    "TemplateVersion": "1.0.3",
-    "TemplateDate": "20190806",
-    "TemplateDescription": "Added toLower() and replace() functions",
+    "TemplateVersion": "1.0.4",
+    "TemplateDate": "201913",
+    "TemplateDescription": "Set period and frequency equal",
     "TemplateUsage": "Is used to create virtual machine monitoring rules.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -98,7 +98,7 @@
           "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
+          "frequencyInMinutes": 10,
           "timeWindowInMinutes": 10
         },
         "action": {
@@ -143,7 +143,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "0",
@@ -193,7 +193,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -243,7 +243,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "0",
@@ -293,7 +293,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "0",
@@ -343,7 +343,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "1",
@@ -393,7 +393,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "1",
@@ -443,7 +443,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "0",
@@ -493,7 +493,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "0",
@@ -543,7 +543,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "1",
@@ -593,7 +593,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -643,7 +643,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "0",
@@ -693,7 +693,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "0",
@@ -743,7 +743,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
