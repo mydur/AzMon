@@ -32,7 +32,7 @@
       }
     },
     "fileCapacityThresholdMBCritical": {
-      "defaultValue": 500,
+      "defaultValue": 1000,
       "type": "int",
       "metadata": {
         "description": "Capacity critical threshold in MB"
