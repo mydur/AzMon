@@ -31,27 +31,6 @@
         "description": "Specify the workspace resource group name -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
-    "actionGroupName": {
-      "defaultValue": "",
-      "type": "String",
-      "metadata": {
-        "description": "Action group name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
-      }
-    },
-    "actionGroupShortName": {
-      "defaultValue": "",
-      "type": "String",
-      "metadata": {
-        "description": "Action group short (max 12 chars) name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
-      }
-    },
-    "emailAddress": {
-      "defaultValue": "",
-      "type": "String",
-      "metadata": {
-        "description": "Email address to be added to action group for direct email notification"
-      }
-    },
     "instantRpRetentionRangeInDays": {
       "type": "int",
       "defaultValue": 2,
@@ -106,17 +85,18 @@
   },
   "variables": {
     "TemplateId": "azmon-vault",
-    "TemplateVersion": "1.0.7",
-    "TemplateDate": "20190806",
-    "TemplateDescription": "Added toLower() and replace() functions",
+    "TemplateVersion": "1.0.8",
+    "TemplateDate": "20190814",
+    "TemplateDescription": "Adapted for Servicenow action groups",
     "TemplateUsage": "Used to create backup vault and initial configuration",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
     "WorkspaceRGName": "[toLower(parameters('WorkspaceRGName'))]",
     "WorkspaceName": "[toLower(parameters('WorkspaceName'))]",
-    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
-    "actionGroupShortName": "[toLower(parameters('actionGroupShortName'))]",
+    "actionGroupName": "[concat('backup-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupShortName": "[concat('backup', variables('Project'))]",
+    "emailAddress": "dummy@nowhere.com",
     "backupVaultName": "[concat(variables('Project'), '-', variables('Environment'), '-bvlt')]"
   },
   "resources": [
@@ -304,7 +284,7 @@
         "emailReceivers": [
           {
             "name": "[concat(variables('backupVaultName'), ' SMTP_EmailAction')]",
-            "emailAddress": "[parameters('EmailAddress')]"
+            "emailAddress": "[variables('EmailAddress')]"
           }
         ],
         "smsReceivers": [],
