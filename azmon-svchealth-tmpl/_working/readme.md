@@ -49,10 +49,9 @@ To be able to re-use the template the following parameters were introduced:
 
 - **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.
 - **Environment:** The environment for which the resources can be used. Allowed values are dev-test-acc-prod.
-- **actionGroupName:** Full name of the action group that is created for direct notification via email.
-- **actionGroupShortName:** Short name of maximum 12 characters for the email notification action group.
-- **emailAddress:** Email address of the person or group to be added to the action group.
 - **CreatedOn:** This paramters is in fact a variable that holds the current date and time to be added as a tag to the resources created by this template. Because of technical reasons this has to be a parameter and not a variable. The default value for the parameter is the outcome of the function [utcNow()].
+
+> Earlier versions of the template (before v1.0.4) also had parameters for action group (short and long) and email address. These parameters have been removed to comply to the way we will use action groups together with Servicenow.
 
 Tags are very important in Azure Governance as they help you in filtering the resources you're using. Resources created by this template get the following tags of which the values are stored in a variable with the same name:
 

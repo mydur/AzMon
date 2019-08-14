@@ -17,27 +17,6 @@
         "description": "Can one of the following, dev-test-acc-prod"
       }
     },
-    "actionGroupName": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Name for the new action group -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
-      }
-    },
-    "actionGroupShortName": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Short name for the new action group (max 12) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
-      }
-    },
-    "EmailAddress": {
-      "defaultValue": "",
-      "type": "string",
-      "metadata": {
-        "description": "Email address for the person to notify"
-      }
-    },
     "CreatedOn": {
       "defaultValue": "[utcNow()]",
       "type": "String"
@@ -45,15 +24,16 @@
   },
   "variables": {
     "TemplateId": "azmon-svchealth",
-    "TemplateVersion": "1.0.3",
-    "TemplateDate": "20190806",
+    "TemplateVersion": "1.0.4",
+    "TemplateDate": "20190814",
     "TemplateVersionDescription": "Added toLower() and replace() functions",
     "TemplateUsage": "Is used to create alert rules for service health",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
-    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
-    "actionGroupShortName": "[toLower(parameters('actionGroupShortName'))]"
+    "actionGroupName": "[concat('svchealth-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupShortName": "[concat('svch', variables('Project'))]",
+    "emailAddress": "dummy@nowhere.com"
   },
   "resources": [
     {
@@ -230,7 +210,7 @@
         "emailReceivers": [
           {
             "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
-            "emailAddress": "[parameters('EmailAddress')]"
+            "emailAddress": "[variables('EmailAddress')]"
           }
         ],
         "smsReceivers": [],
