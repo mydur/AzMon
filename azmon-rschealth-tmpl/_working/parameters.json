@@ -7,15 +7,6 @@
     },
     "Environment": {
       "value": "test"
-    },
-    "actionGroupName": {
-      "value": "azmonrsc-email-agrp"
-    },
-    "actionGroupShortName": {
-      "value": "azmonrsemail"
-    },
-    "EmailAddress": {
-      "value": "rudy.michiels@getronics.com"
     }
   }
 }
