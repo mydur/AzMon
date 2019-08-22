@@ -35,7 +35,7 @@
       }
     },
     {
-      "name": "tag_ownedby_default-subscription-pol",
+      "name": "tag_ownedby_default-resources-pol",
       "type": "Microsoft.Authorization/policyAssignments",
       "apiVersion": "2018-03-01",
       "dependsOn": [],
