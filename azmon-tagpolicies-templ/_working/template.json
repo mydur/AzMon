@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {
+    "TemplateId": "azmon-tagpolicies",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20190822",
+    "TemplateVersionDescription": "Adapted for Servicenow action groups",
+    "TemplateUsage": "Activate tag enforcement policies",
+    "TemplateDocumentation": "<Name of document.>"
+  },
+  "resources": [
+    {
+      "name": "tag_ownedby_default-resgroups-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_ownedby_default-resgroups-pol",
+        "description": "Appends the OwnedBy tag and Default value when any resource group which is missing this tag is created or updated. Does not modify the tags of resource groups created before this policy was applied until those resource groups are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+        "parameters": {
+          "tagName": {
+            "value": "OwnedBy"
+          },
+          "tagValue": {
+            "value": "Default"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_ownedby_default-subscription-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_ownedby_default-resources-pol",
+        "description": "Appends the OwnedBy tag with its value from the resource group when any resource which is missing this tag is created or updated. Does not modify the tags of resources created before this policy was applied until those resources are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+        "parameters": {
+          "tagName": {
+            "value": "OwnedBy"
+          }
+        }
+      }
+    }
+  ]
+}
