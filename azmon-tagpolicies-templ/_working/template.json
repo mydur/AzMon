@@ -6,7 +6,7 @@
     "TemplateId": "azmon-tagpolicies",
     "TemplateVersion": "1.0.0",
     "TemplateDate": "20190822",
-    "TemplateVersionDescription": "Adapted for Servicenow action groups",
+    "TemplateVersionDescription": "Initial version",
     "TemplateUsage": "Activate tag enforcement policies",
     "TemplateDocumentation": "<Name of document.>"
   },
@@ -50,6 +50,221 @@
         "parameters": {
           "tagName": {
             "value": "OwnedBy"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_createdby_default-resgroups-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_createdby_default-resgroups-pol",
+        "description": "Appends the CreatedBy tag and Default value when any resource group which is missing this tag is created or updated. Does not modify the tags of resource groups created before this policy was applied until those resource groups are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+        "parameters": {
+          "tagName": {
+            "value": "CreatedBy"
+          },
+          "tagValue": {
+            "value": "Default"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_createdby_default-resources-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_createdby_default-resources-pol",
+        "description": "Appends the CreatedBy tag with its value from the resource group when any resource which is missing this tag is created or updated. Does not modify the tags of resources created before this policy was applied until those resources are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+        "parameters": {
+          "tagName": {
+            "value": "CreatedBy"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_createdon_default-resgroups-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_createdon_default-resgroups-pol",
+        "description": "Appends the CreatedOn tag and Default (yyyymmdd) value when any resource group which is missing this tag is created or updated. Does not modify the tags of resource groups created before this policy was applied until those resource groups are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+        "parameters": {
+          "tagName": {
+            "value": "CreatedOn"
+          },
+          "tagValue": {
+            "value": "yyyymmdd"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_createdon_default-resources-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_createdon_default-resources-pol",
+        "description": "Appends the CreatedOn tag with its value from the resource group when any resource which is missing this tag is created or updated. Does not modify the tags of resources created before this policy was applied until those resources are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+        "parameters": {
+          "tagName": {
+            "value": "CreatedOn"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_endson_default-resgroups-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_endson_default-resgroups-pol",
+        "description": "Appends the EndsOn tag and Default (yyyymmdd) value when any resource group which is missing this tag is created or updated. Does not modify the tags of resource groups created before this policy was applied until those resource groups are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+        "parameters": {
+          "tagName": {
+            "value": "EndsOn"
+          },
+          "tagValue": {
+            "value": "yyyymmdd"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_endson_default-resources-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_endson_default-resources-pol",
+        "description": "Appends the EndsOn tag with its value from the resource group when any resource which is missing this tag is created or updated. Does not modify the tags of resources created before this policy was applied until those resources are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+        "parameters": {
+          "tagName": {
+            "value": "EndsOn"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_project_default-resgroups-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_project_default-resgroups-pol",
+        "description": "Appends the Project tag and Default value when any resource group which is missing this tag is created or updated. Does not modify the tags of resource groups created before this policy was applied until those resource groups are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+        "parameters": {
+          "tagName": {
+            "value": "Project"
+          },
+          "tagValue": {
+            "value": "Default"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_project_default-resources-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_project_default-resources-pol",
+        "description": "Appends the Project tag with its value from the resource group when any resource which is missing this tag is created or updated. Does not modify the tags of resources created before this policy was applied until those resources are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+        "parameters": {
+          "tagName": {
+            "value": "Project"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_environment_default-resgroups-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_environment_default-resgroups-pol",
+        "description": "Appends the Project tag and Default value when any resource group which is missing this tag is created or updated. Does not modify the tags of resource groups created before this policy was applied until those resource groups are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+        "parameters": {
+          "tagName": {
+            "value": "Environment"
+          },
+          "tagValue": {
+            "value": "Default"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_environment_default-resources-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "tag_environment_default-resources-pol",
+        "description": "Appends the Environment tag with its value from the resource group when any resource which is missing this tag is created or updated. Does not modify the tags of resources created before this policy was applied until those resources are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+        "parameters": {
+          "tagName": {
+            "value": "Environment"
           }
         }
       }
