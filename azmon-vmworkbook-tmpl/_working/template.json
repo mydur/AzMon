@@ -38,13 +38,25 @@
     "CreatedOn": {
       "defaultValue": "[utcNow()]",
       "type": "string"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
     }
   },
   "variables": {
     "TemplateId": "azmon-vmworkbook",
-    "TemplateVersion": "1.0.3",
-    "TemplateDate": "20190806",
-    "TemplateVersionDescription": "Added toLower() and replace() functions",
+    "TemplateVersion": "1.0.4",
+    "TemplateDate": "20190822",
+    "TemplateVersionDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
     "TemplateUsage": "Used to create VM workbook for given resource group and log analytics workspace.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -63,6 +75,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },

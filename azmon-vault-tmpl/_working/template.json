@@ -75,19 +75,28 @@
         "description": "Redundancy type for the storage where backup is stored (LocallyRedundant or GeoRedundant)"
       }
     },
-    "createdOn": {
+    "CreatedOn": {
       "defaultValue": "[utcNow()]",
-      "type": "string",
-      "metadata": {
-        "description": "Used to timestamp created resources"
-      }
+      "type": "string"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
     }
   },
   "variables": {
     "TemplateId": "azmon-vault",
-    "TemplateVersion": "1.0.8",
-    "TemplateDate": "20190814",
-    "TemplateDescription": "Adapted for Servicenow action groups",
+    "TemplateVersion": "1.0.9",
+    "TemplateDate": "20190822",
+    "TemplateDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
     "TemplateUsage": "Used to create backup vault and initial configuration",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -109,6 +118,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -275,6 +287,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -307,6 +322,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -352,6 +370,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -397,6 +418,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },

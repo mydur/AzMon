@@ -55,13 +55,25 @@
     "CreatedOn": {
       "defaultValue": "[utcNow()]",
       "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
     }
   },
   "variables": {
     "TemplateId": "azmon-nwrules",
-    "TemplateVersion": "1.0.1",
-    "TemplateDate": "20190806",
-    "TemplateDescription": "Added toLower() and replace() functions",
+    "TemplateVersion": "1.0.2",
+    "TemplateDate": "20190822",
+    "TemplateDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
     "TemplateUsage": "Is used to create network monitoring rules.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -81,6 +93,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -126,6 +141,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -171,6 +189,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -216,6 +237,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },

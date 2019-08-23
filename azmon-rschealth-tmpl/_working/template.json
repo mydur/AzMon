@@ -20,13 +20,25 @@
     "CreatedOn": {
       "defaultValue": "[utcNow()]",
       "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
     }
   },
   "variables": {
     "TemplateId": "azmon-rschealth",
-    "TemplateVersion": "1.0.3",
-    "TemplateDate": "20190814",
-    "TemplateVersionDescription": "Adapted for Servicenow action groups",
+    "TemplateVersion": "1.0.4",
+    "TemplateDate": "20190822",
+    "TemplateVersionDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
     "TemplateUsage": "Is used to create alert rules for resource health",
     "TemplateDocumentation": "<Name of document...>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -45,6 +57,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -129,6 +144,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -204,6 +222,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },

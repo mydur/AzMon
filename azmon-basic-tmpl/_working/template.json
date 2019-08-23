@@ -69,13 +69,25 @@
     "CreatedOn": {
       "defaultValue": "[utcNow()]",
       "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
     }
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.1.5",
-    "TemplateDate": "20190521",
-    "TemplateVersionDescription": "Added Network monitoring saved searches.",
+    "TemplateVersion": "1.1.6",
+    "TemplateDate": "20190822",
+    "TemplateDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
     "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -95,6 +107,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -115,6 +130,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
@@ -1302,6 +1320,9 @@
         "TemplateId": "[variables('TemplateId')]",
         "TemplateVersion": "[variables('TemplateVersion')]",
         "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },

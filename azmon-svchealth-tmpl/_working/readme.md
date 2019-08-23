@@ -60,6 +60,9 @@ Tags are very important in Azure Governance as they help you in filtering the re
 - **CreatedOn:** Current timestamp.
 - **Project:** Project, customer or application identifier.
 - **Environment:** The environment for which the resources can be used.
+- **EndsOn:** This parameter provides an indication of when the created resource should be end-of-life. It helps when cleaning up your Azure resources to have an idea when a resource isn't used anymore. The format of the date provided is yyyymmdd. When there's no end date available you should use 99999999.
+- **CreatedBy:** A free text field to provide information about the person or team that created the resource. Isn't to be confused with the OwnedBy field.
+- **OwnedBy:** A free text field to provide information about the person or team that owns the resource. Isn't to be confused with the CreatedBy field.
 
 > As you probably noticed the subscription that is targetted is not part of the parameters. That's because the resources are created in a resource group that lives in the targetted subscription and thus the name of the subscription can be retrieved by a function in JSON.
 

@@ -1,0 +1,228 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project or application -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-svchealth",
+    "TemplateVersion": "1.0.4",
+    "TemplateDate": "20190814",
+    "TemplateVersionDescription": "Adapted for Servicenow action groups",
+    "TemplateUsage": "Is used to create alert rules for service health",
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "actionGroupName": "[concat('svchealth-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupShortName": "[concat('svch', variables('Project'))]",
+    "emailAddress": "dummy@nowhere.com"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/activityLogAlerts",
+      "apiVersion": "2017-04-01",
+      "name": "[concat('AzSvcIssue - ', subscription().displayname, ' - Incident')]",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId)]"
+        ],
+        "condition": {
+          "allOf": [
+            {
+              "field": "category",
+              "equals": "ServiceHealth",
+              "containsAny": null
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.incidentType",
+                  "equals": "Incident",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "field": "properties.impactedServices[*].ServiceName",
+              "equals": null,
+              "containsAny": [
+                "Application Insights",
+                "Automation",
+                "Azure Active Directory",
+                "Azure DNS",
+                "Azure Monitor",
+                "Azure Policy",
+                "Azure Resource Manager",
+                "Backup",
+                "Diagnostic Logs",
+                "Log Analytics",
+                "Network Infrastructure",
+                "Network Watcher",
+                "Storage",
+                "Virtual Machines",
+                "Virtual Network"
+              ]
+            },
+            {
+              "field": "properties.impactedServices[*].ImpactedRegions[*].RegionName",
+              "equals": null,
+              "containsAny": ["West Europe"]
+            }
+          ]
+        },
+        "actions": {
+          "actionGroups": [
+            {
+              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/activityLogAlerts",
+      "apiVersion": "2017-04-01",
+      "name": "[concat('AzSvcIssue - ', subscription().displayname, ' - Information')]",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "scopes": [
+          "[concat('/subscriptions/', subscription().subscriptionId)]"
+        ],
+        "condition": {
+          "allOf": [
+            {
+              "field": "category",
+              "equals": "ServiceHealth",
+              "containsAny": null
+            },
+            {
+              "anyOf": [
+                {
+                  "field": "properties.incidentType",
+                  "equals": "Maintenance",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.incidentType",
+                  "equals": "Informational",
+                  "containsAny": null
+                },
+                {
+                  "field": "properties.incidentType",
+                  "equals": "ActionRequired",
+                  "containsAny": null
+                }
+              ]
+            },
+            {
+              "field": "properties.impactedServices[*].ServiceName",
+              "equals": null,
+              "containsAny": [
+                "Application Insights",
+                "Automation",
+                "Azure Active Directory",
+                "Azure DNS",
+                "Azure Monitor",
+                "Azure Policy",
+                "Azure Resource Manager",
+                "Backup",
+                "Diagnostic Logs",
+                "Log Analytics",
+                "Network Infrastructure",
+                "Network Watcher",
+                "Storage",
+                "Virtual Machines",
+                "Virtual Network"
+              ]
+            },
+            {
+              "field": "properties.impactedServices[*].ImpactedRegions[*].RegionName",
+              "equals": null,
+              "containsAny": ["West Europe"]
+            }
+          ]
+        },
+        "actions": {
+          "actionGroups": [
+            {
+              "actionGroupId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[variables('actionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "groupShortName": "[variables('actionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[variables('EmailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
+      },
+      "dependsOn": []
+    }
+  ]
+}

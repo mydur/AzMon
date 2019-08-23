@@ -1,0 +1,88 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "existingVirtualMachinesResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group where the virtual machines are located. This can be different from resource group of the vault -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "existingVirtualMachines": {
+      "type": "array",
+      "metadata": {
+        "description": "Array of Azure virtual machines. e.g. [\"vm1\",\"vm2\",\"vm3\"] -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "existingRecoveryServicesVault": {
+      "type": "string",
+      "metadata": {
+        "description": "Recovery services vault name where the VMs will be backed up to -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "existingBackupPolicy": {
+      "type": "string",
+      "defaultValue": "DefaultPolicy",
+      "metadata": {
+        "description": "Backup policy to be used to backup VMs. Backup Policy defines the schedule of the backup and how long to retain backup copies. By default every vault comes with a 'DefaultPolicy' which canbe used here -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-vmbkup",
+    "TemplateVersion": "1.0.1",
+    "TemplateDate": "20190806",
+    "TemplateDescription": "Added toLower() and replace() functions",
+    "TemplateUsage": "Used to enable VM backup on existing vault and policy",
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "existingVirtualMachinesResourceGroup": "[toLower(parameters('existingVirtualMachinesResourceGroup'))]",
+    "existingVirtualMachines": "[toLower(parameters('existingVirtualMachines'))]",
+    "existingRecoveryServicesVault": "[toLower(parameters('existingRecoveryServicesVault'))]",
+    "existingBackupPolicy": "[toLower(parameters('existingBackupPolicy'))]",
+    "backupFabric": "Azure",
+    "v2VmType": "Microsoft.Compute/virtualMachines",
+    "v2VmContainer": "iaasvmcontainer;iaasvmcontainerv2;",
+    "v2Vm": "vm;iaasvmcontainerv2;"
+  },
+  "resources": [
+    {
+      "name": "[concat(variables('existingRecoveryServicesVault'), '/', variables('backupFabric'), '/', variables('v2VmContainer'), concat(variables('existingVirtualMachinesResourceGroup'),';',variables('existingVirtualMachines')[copyIndex()]), '/', variables('v2Vm'), concat(variables('existingVirtualMachinesResourceGroup'),';',variables('existingVirtualMachines')[copyIndex()]))]",
+      "apiVersion": "2016-06-01",
+      "location": "[parameters('location')]",
+      "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+      "copy": {
+        "name": "v2VmsCopy",
+        "count": "[length(variables('existingVirtualMachines'))]"
+      },
+      "properties": {
+        "protectedItemType": "[variables('v2VmType')]",
+        "policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies',variables('existingRecoveryServicesVault'),variables('existingBackupPolicy') )]",
+        "sourceResourceId": "[resourceId(subscription().subscriptionId,variables('existingVirtualMachinesResourceGroup'),'Microsoft.Compute/virtualMachines',variables('existingVirtualMachines')[copyIndex()])]"
+      }
+    }
+  ]
+}

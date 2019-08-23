@@ -13,6 +13,15 @@
     },
     "Location": {
       "value": "West Europe"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
     }
   }
 }
