@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azmon"
+      "value": "mydurmon"
     },
     "VMRGName": {
-      "value": "monitorVM-test-rg"
+      "value": "mydur-test-rg"
     },
     "Environment": {
       "value": "test"

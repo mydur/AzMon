@@ -60,7 +60,7 @@
     "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
     "workspaceName": "[toLower(parameters('workspaceName'))]",
     "actionGroupName": "[concat('vmrules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
-    "actionGroupShortName": "[concat('vmrules', variables('Project'))]",
+    "actionGroupShortName": "[take(concat('vmrules', variables('Project')), 12)]",
     "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",

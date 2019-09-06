@@ -3,16 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azmon"
+      "value": "mydurmon"
     },
     "Environment": {
       "value": "test"
     },
     "AZMONBasicRGName": {
-      "value": "azmon-test-rg"
+      "value": "azmonmydur-test-rg"
     },
     "WorkspaceName": {
-      "value": "azmon-test-lana"
+      "value": "mydurmon-test-lana"
     },
     "EndsOn": {
       "value": "99999999"
