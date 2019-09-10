@@ -4,9 +4,9 @@
   "parameters": {},
   "variables": {
     "TemplateId": "azgov-tagpolicies",
-    "TemplateVersion": "1.0.1",
-    "TemplateDate": "20190906",
-    "TemplateVersionDescription": "Renamed to AzGov and all resources policies inherit",
+    "TemplateVersion": "1.0.2",
+    "TemplateDate": "20190910",
+    "TemplateVersionDescription": "Added CostCenter tag",
     "TemplateUsage": "Append standard tags to resources and groups",
     "TemplateDocumentation": "<Name of document.>"
   },
@@ -265,6 +265,49 @@
         "parameters": {
           "tagName": {
             "value": "Environment"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_costcenter-resgroups-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "AzGov: Append CostCenter tag on resource groups.",
+        "description": "Appends the CostCenter tag and Default value when any resource group which is missing this tag is created or updated. Does not modify the tags of resource groups created before this policy was applied until those resource groups are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+        "parameters": {
+          "tagName": {
+            "value": "CostCenter"
+          },
+          "tagValue": {
+            "value": "Default"
+          }
+        }
+      }
+    },
+    {
+      "name": "tag_costcenter-resources-pol",
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2018-03-01",
+      "dependsOn": [],
+      "properties": {
+        "displayName": "AzGov: Append CostCenter tag on resources and get value from resource group.",
+        "description": "Appends the CostCenter tag with its value from the resource group when any resource which is missing this tag is created or updated. Does not modify the tags of resources created before this policy was applied until those resources are changed.",
+        "metadata": {
+          "assignedBy": "[concat(variables('TemplateId'), ' ' , variables('TemplateVersion'))]"
+        },
+        "scope": "[subscription().id]",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+        "parameters": {
+          "tagName": {
+            "value": "CostCenter"
           }
         }
       }
