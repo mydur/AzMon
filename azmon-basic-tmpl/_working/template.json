@@ -85,9 +85,9 @@
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.1.6",
-    "TemplateDate": "20190822",
-    "TemplateDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
+    "TemplateVersion": "1.1.7",
+    "TemplateDate": "20190910",
+    "TemplateDescription": "Added subscription Activity Log as datasource",
     "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -148,6 +148,18 @@
       },
       "dependsOn": [],
       "resources": [
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "AzureActivityLog",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "AzureActivityLog",
+          "properties": {
+            "linkedResourceId": "[concat(subscription().id, '/providers/Microsoft.Insights/eventTypes/management')]"
+          }
+        },
         {
           "apiVersion": "2015-11-01-preview",
           "type": "dataSources",
