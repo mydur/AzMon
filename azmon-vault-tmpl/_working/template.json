@@ -104,7 +104,7 @@
     "WorkspaceRGName": "[toLower(parameters('WorkspaceRGName'))]",
     "WorkspaceName": "[toLower(parameters('WorkspaceName'))]",
     "actionGroupName": "[concat('backup-', variables('Project'), '-', variables('Environment'), '-agrp')]",
-    "actionGroupShortName": "[concat('backup', variables('Project'))]",
+    "actionGroupShortName": "[take(concat('bkup', variables('Project')), 12)]",
     "emailAddress": "dummy@nowhere.com",
     "backupVaultName": "[concat(variables('Project'), '-', variables('Environment'), '-bvlt')]"
   },
@@ -242,7 +242,7 @@
       "name": "[concat(variables('backupVaultName'), '/Microsoft.Authorization/recoveryserviceslock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('backupVaultName'))]"
+        "[resourceId('Microsoft.RecoveryServices/vaults', variables('backupVaultName'))]"
       ],
       "properties": {
         "level": "CannotDelete",

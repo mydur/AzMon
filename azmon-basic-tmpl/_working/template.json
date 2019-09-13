@@ -30,7 +30,7 @@
       "minValue": 31,
       "maxValue": 730,
       "metadata": {
-        "description": "Number of retention days in the PerGB2018 pricing tier."
+        "description": "Number of retention days in the PerGB2018 pricing tier (31-730)."
       }
     },
     "Location": {
