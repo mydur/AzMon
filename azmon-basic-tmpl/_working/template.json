@@ -24,6 +24,15 @@
         "description": "Can one of the following, dev-test-acc-prod"
       }
     },
+    "dataRetention": {
+      "type": "int",
+      "defaultValue": 31,
+      "minValue": 31,
+      "maxValue": 730,
+      "metadata": {
+        "description": "Number of retention days in the PerGB2018 pricing tier."
+      }
+    },
     "Location": {
       "type": "string",
       "allowedValues": [
@@ -85,9 +94,9 @@
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.1.8",
+    "TemplateVersion": "1.1.9",
     "TemplateDate": "20190913",
-    "TemplateDescription": "Added resource locks",
+    "TemplateDescription": "Changed pricing tier for lana",
     "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -156,7 +165,7 @@
         "features": {
           "searchVersion": 1
         },
-        "retentionInDays": 30
+        "retentionInDays": "[parameters('dataRetention')]"
       },
       "dependsOn": [],
       "resources": [
