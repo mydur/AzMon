@@ -1,0 +1,1393 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "type": "String",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Identifier for the project, customer or application -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "VMRGName": {
+      "type": "String",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Resourcegroup name where VMs are deployed (used for demo saved searches) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "Location": {
+      "type": "string",
+      "allowedValues": [
+        "East Asia",
+        "Southeast Asia",
+        "Central US",
+        "East US",
+        "East US 2",
+        "West US",
+        "North Central US",
+        "South Central US",
+        "North Europe",
+        "West Europe",
+        "Japan West",
+        "Japan East",
+        "Brazil South",
+        "Australia East",
+        "Australia",
+        "Southeast",
+        "South India",
+        "Central India",
+        "West India",
+        "Canada Central",
+        "Canada East",
+        "UK South",
+        "UK West",
+        "West Central US",
+        "West US 2",
+        "Korea Central",
+        "Korea South",
+        "France Central",
+        "France South",
+        "Australia Central",
+        "Australia Central 2",
+        "South Africa North",
+        "South Africa West"
+      ],
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The region or location where resources will be deployed"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-basic",
+    "TemplateVersion": "1.1.7",
+    "TemplateDate": "20190910",
+    "TemplateDescription": "Added subscription Activity Log as datasource",
+    "TemplateUsage": "Is used to setup a base monitoring environment.",
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(replace(parameters('Environment'), '-', ''))]",
+    "VMRGName": "[toLower(parameters('VMRGName'))]",
+    "storageAccountName": "[concat(variables('Project'), variables('Environment'), 'stor')]",
+    "automationAccountName": "[concat(variables('Project'), '-', variables('Environment'), '-auto')]",
+    "workspaceName": "[concat(variables('Project'), '-', variables('Environment'), '-lana')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Automation/automationAccounts",
+      "name": "[variables('automationAccountName')]",
+      "apiVersion": "2015-10-31",
+      "location": "[parameters('Location')]",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "scale": null,
+      "properties": {
+        "sku": {
+          "name": "Free"
+        }
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "microsoft.operationalinsights/workspaces",
+      "name": "[variables('workspaceName')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "[parameters('Location')]",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "scale": null,
+      "properties": {
+        "sku": {
+          "name": "free"
+        },
+        "features": {
+          "searchVersion": 1
+        },
+        "retentionInDays": 7
+      },
+      "dependsOn": [],
+      "resources": [
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "AzureActivityLog",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "AzureActivityLog",
+          "properties": {
+            "linkedResourceId": "[concat(subscription().id, '/providers/Microsoft.Insights/eventTypes/management')]"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventSystemLog",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "System",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventApplicationLog",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Application",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfMemoryAvailMB",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Memory",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Available MBytes"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfMemoryPagesSec",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Memory",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Pages/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfMemoryCommitedBytesInUse",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Memory",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "% Committed Bytes In Use"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskFreeSpace",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "% Free Space"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskAvgDiskRead",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk sec/Read"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskAvgDiskTransfer",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk sec/Transfer"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskAvgDiskWrite",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk sec/Write"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskCurDiskQueueLength",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Current Disk Queue Length"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskFreeMB",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Free Megabytes"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskDiskReads",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Disk Reads/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskDiskWrites",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Disk Writes/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfLogicalDiskDiskTransfers",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "LogicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Disk Transfers/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfSystemProcessor",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "System",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Processor Queue Length"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfProcessorTotal",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Processor",
+            "instanceName": "_Total",
+            "intervalSeconds": 60,
+            "counterName": "% Processor Time"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfProcessProcessorTime",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Process",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "% Processor Time"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfProcessPrivateBytes",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Process",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Private Bytes"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfNetworkBytesTotal",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Network Interface",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Bytes Total/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfNetworkBytesSent",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Network Adapter",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Bytes Sent/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PerfNetworkBytesReceived",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Network Adapter",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Bytes Received/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "name": "[concat(variables('storageAccountName'), '(', variables('workspaceName'), ')')]",
+          "type": "storageinsightconfigs",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "properties": {
+            "containers": [],
+            "tables": [
+              "WADWindowsEventLogsTable",
+              "WADPerformanceCountersTable"
+            ],
+            "storageAccount": {
+              "id": "[resourceId(resourceGroup().name,'Microsoft.Storage/storageaccounts/', variables('storageAccountName'))]",
+              "key": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-06-15').key1]"
+            }
+          }
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSvcWindowsFirewall",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Monitoring",
+            "displayName": "Service - Windows Firewall",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchLogicalDiskPercentFreeSpace",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Logical Disk - Percent Free Space",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"% Free Space\" \n| where InstanceName <> \"HarddiskVolume1\" and InstanceName <> \"_Total\" and InstanceName <> \"C:\"\n| where TimeGenerated > ago(15m)\n| summarize PercentFree=avg(CounterValue) by Computer\n| where PercentFree < 10')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSvcDHCPClient",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Service - DHCP Client",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchHeartbeat",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Heartbeat per resource group > 3 minutes",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\r\nHeartbeat \r\n| where _ResourceId contains ResourceGroupName\r\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \r\n| where LastHeartbeat < ago(3m)')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSvcDNSClient",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Service - DNS Client",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DNS Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchLogicalCurDiskQueueLengthCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Logical Disk - Current Disk Queue Length - Critical",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\n| where LogicalDiskQueueLength  > 5')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchProcessorQueueCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Processor - Queue Length - Critical",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 5')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchProcessorQueueWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Processor - Queue Length - Warning",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize ProcQueueLength=avg(CounterValue) by Computer \n| where ProcQueueLength > 3 and ProcQueueLength < 5')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchMemoryPagesSec",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Memory - Pages per Sec",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 350 and PagesSec < 500')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSvcWindowsEventLog",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Service - Windows Event Log",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchLogicalDiskCurDiskQueueLengthWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Logical Disk - Current Disk Queue Length - Warning",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\n| where LogicalDiskQueueLength  > 3')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchMemoryPercentCommittedBytesInUseWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Memory - Percent Committed Bytes In Use - Warning",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize CommittedBytesUse=avg(CounterValue) by Computer\n| where CommittedBytesUse > 75 and CommittedBytesUse < 90')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchMemoryAvailableMBWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Memory - Available MB - Warning",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AvailMB=avg(CounterValue) by Computer\n| where AvailMB < 750 and AvailMB > 500')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchMemoryAvailableMBCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Memory - Available MB - Critical",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AvailMB=avg(CounterValue) by Computer\n| where AvailMB < 200')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchProcessorTimeTotalCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Processor - Time Total - Critical",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize ProcTotal=avg(CounterValue) by Computer \n| where ProcTotal > 85')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchProcessorTimeTotalWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Processor - Time Total - Warning",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize ProcTotal=avg(CounterValue) by Computer \n| where ProcTotal > 70 and ProcTotal < 85')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchLogicalDiskCurDiskQueueLength",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Logical Disk - Current Disk Queue Length",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\r\nPerf\r\n| where _ResourceId contains ResourceGroupName\r\n| where ObjectName == \"LogicalDisk\" \r\n| where CounterName == \"Current Disk Queue Length\" \r\n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\r\n| where TimeGenerated > ago(15m)\r\n| summarize LogicalDiskQueueLength=avg(CounterValue) by Computer, InstanceName\r\n| where LogicalDiskQueueLength  > 3')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSvcWinRM",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Service - WinRM",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchMemoryPagesSecCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Memory - Pages per Sec - Critical",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 500')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchLogicalDiskFreeMBonC",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Logical Disk - Free MB on C",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf \n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Free Megabytes\" \n| where InstanceName == \"C:\"\n| where TimeGenerated > ago(5m) \n| summarize FreeMB=avg(CounterValue) by Computer \n| where FreeMB < 5000')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchHeartbeatcritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Heartbeat alert - Critical",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nHeartbeat\n| where _ResourceId contains ResourceGroupName\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \n| where LastHeartbeat < ago(5m)')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSvcRPC",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Service - RPC",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+
+        {
+          "type": "savedSearches",
+          "name": "SearchMemoryCommittedBytesInUseCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Memory - Percent Committed Bytes In Use - Critical",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize CommittedBytesUse=avg(CounterValue) by Computer\n| where CommittedBytesUse > 90')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSvcServer",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Service - Server",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize Cnt=count() by Computer')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchMemoryPagesSecWarning",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Memory - Pages per Sec - Warning",
+            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize PagesSec=avg(CounterValue) by Computer\n| where PagesSec > 350 and PagesSec < 500')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchNetworkAzVnet2OnPrem",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Network - AzVnet2OnPrem",
+            "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2OnPrem\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchNetworkAzVnet2Web",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Network - AzVnet2Web",
+            "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2Web\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchNetworkAzVnet2AzVnet",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "Network - AzVnet2AzVnet",
+            "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2AzVnet\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('ADAssessment(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/ADAssessment(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('ADAssessment(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/ADAssessment",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/ADAssessment(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('AgentHealthAssessment(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/AgentHealthAssessment(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('AgentHealthAssessment(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/AgentHealthAssessment",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/AgentHealthAssessment(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('AlertManagement(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/AlertManagement(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('AlertManagement(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/AlertManagement",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/AlertManagement(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('AntiMalware(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/AntiMalware(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('AntiMalware(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/AntiMalware",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/AntiMalware(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('AzureActivity(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/AzureActivity(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('AzureActivity(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/AzureActivity",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/AzureActivity(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('DnsAnalytics(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/DnsAnalytics(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('DnsAnalytics(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/DnsAnalytics",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/DnsAnalytics(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('AzureAutomation(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/AzureAutomation(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('AzureAutomation(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/AzureAutomation",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/AzureAutomation(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('AzureNSGAnalytics(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/AzureNSGAnalytics(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('AzureNSGAnalytics(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/AzureNSGAnalytics",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/AzureNSGAnalytics(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('ChangeTracking(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/ChangeTracking(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('ChangeTracking(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/ChangeTracking",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/ChangeTracking(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('LogicAppsManagement(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/LogicAppsManagement(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('LogicAppsManagement(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/LogicAppsManagement",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/LogicAppsManagement(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('NetworkMonitoring(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/NetworkMonitoring(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('NetworkMonitoring(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/NetworkMonitoring",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/NetworkMonitoring(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('Office365(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/Office365(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('Office365(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/Office365",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/Office365(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('Security(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/Security(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('Security(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/Security",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/Security(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('ServiceDesk(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/ServiceDesk(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('ServiceDesk(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/ServiceDesk",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/ServiceDesk(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('ServiceMap(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/ServiceMap(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('ServiceMap(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/ServiceMap",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/ServiceMap(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('SQLAssessment(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/SQLAssessment(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('SQLAssessment(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/SQLAssessment",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/SQLAssessment(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('Updates(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/Updates(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('Updates(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/Updates",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/Updates(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('WireData2(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/WireData2(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('WireData2(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/WireData2",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/WireData2(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "StorageV2",
+      "name": "[variables('storageAccountName')]",
+      "apiVersion": "2018-07-01",
+      "location": "[parameters('Location')]",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "scale": null,
+      "properties": {
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "enabled": true
+            },
+            "blob": {
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Cool"
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "microsoft.operationalinsights/workspaces/linkedservices",
+      "name": "[concat(variables('workspaceName'), '/automation')]",
+      "apiVersion": "2015-11-01-preview",
+      "scale": null,
+      "properties": {
+        "resourceId": "[resourceId(concat('Microsoft.Automation/automationAccounts'), variables('automationAccountName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "StorageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    },
+    "AutomationAccountName": {
+      "type": "string",
+      "value": "[variables('automationAccountName')]"
+    },
+    "WorkspaceName": {
+      "type": "string",
+      "value": "[variables('workspaceName')]"
+    }
+  }
+}
