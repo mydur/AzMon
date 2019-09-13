@@ -239,7 +239,7 @@
     },
     {
       "type": "Microsoft.RecoveryServices/vaults/providers/locks",
-      "name": "[concat(variables('backupVaultName'), '/Microsoft.Authentication/recoveryserviceslock')]",
+      "name": "[concat(variables('backupVaultName'), '/Microsoft.Authorization/recoveryserviceslock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
         "[resourceId('Microsoft.Automation/automationAccounts', variables('backupVaultName'))]"

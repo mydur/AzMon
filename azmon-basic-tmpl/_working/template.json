@@ -123,7 +123,7 @@
     },
     {
       "type": "Microsoft.Automation/automationAccounts/providers/locks",
-      "name": "[concat(variables('automationAccountName'), '/Microsoft.Authentication/automationaccountlock')]",
+      "name": "[concat(variables('automationAccountName'), '/Microsoft.Authorization/automationaccountlock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
         "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
@@ -151,12 +151,12 @@
       "scale": null,
       "properties": {
         "sku": {
-          "name": "free"
+          "name": "PerGB2018"
         },
         "features": {
           "searchVersion": 1
         },
-        "retentionInDays": 7
+        "retentionInDays": 30
       },
       "dependsOn": [],
       "resources": [
@@ -1332,7 +1332,7 @@
     },
     {
       "type": "microsoft.operationalinsights/workspaces/providers/locks",
-      "name": "[concat(variables('workspaceName'), '/Microsoft.Authentication/workspacelock')]",
+      "name": "[concat(variables('workspaceName'), '/Microsoft.Authorization/workspacelock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
         "[resourceId('microsoft.operationalinsights/workspaces', variables('workspaceName'))]"
@@ -1388,7 +1388,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts/providers/locks",
-      "name": "[concat(variables('storageAccountName'), '/Microsoft.Authentication/storageaccountlock')]",
+      "name": "[concat(variables('storageAccountName'), '/Microsoft.Authorization/storageaccountlock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
