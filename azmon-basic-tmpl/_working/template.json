@@ -85,9 +85,9 @@
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.1.7",
-    "TemplateDate": "20190910",
-    "TemplateDescription": "Added subscription Activity Log as datasource",
+    "TemplateVersion": "1.1.8",
+    "TemplateDate": "20190913",
+    "TemplateDescription": "Added resource locks",
     "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -120,6 +120,18 @@
         }
       },
       "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Automation/automationAccounts/providers/locks",
+      "name": "[concat(variables('automationAccountName'), '/Microsoft.Authentication/automationaccountlock')]",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
+      ],
+      "properties": {
+        "level": "CannotDelete",
+        "notes": "Automation account should not be deleted."
+      }
     },
     {
       "type": "microsoft.operationalinsights/workspaces",
@@ -1319,6 +1331,18 @@
       ]
     },
     {
+      "type": "microsoft.operationalinsights/workspaces/providers/locks",
+      "name": "[concat(variables('workspaceName'), '/Microsoft.Authentication/workspacelock')]",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[resourceId('microsoft.operationalinsights/workspaces', variables('workspaceName'))]"
+      ],
+      "properties": {
+        "level": "CannotDelete",
+        "notes": "Workspace should not be deleted."
+      }
+    },
+    {
       "type": "Microsoft.Storage/storageAccounts",
       "sku": {
         "name": "Standard_LRS",
@@ -1361,6 +1385,18 @@
         "accessTier": "Cool"
       },
       "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/providers/locks",
+      "name": "[concat(variables('storageAccountName'), '/Microsoft.Authentication/storageaccountlock')]",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ],
+      "properties": {
+        "level": "CannotDelete",
+        "notes": "Storage account should not be deleted."
+      }
     },
     {
       "type": "microsoft.operationalinsights/workspaces/linkedservices",
