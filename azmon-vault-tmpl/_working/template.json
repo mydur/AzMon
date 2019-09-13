@@ -94,9 +94,9 @@
   },
   "variables": {
     "TemplateId": "azmon-vault",
-    "TemplateVersion": "1.0.9",
-    "TemplateDate": "20190822",
-    "TemplateDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
+    "TemplateVersion": "1.0.10",
+    "TemplateDate": "20190913",
+    "TemplateDescription": "Added resource locks",
     "TemplateUsage": "Used to create backup vault and initial configuration",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -236,6 +236,18 @@
           }
         }
       ]
+    },
+    {
+      "type": "Microsoft.RecoveryServices/vaults/providers/locks",
+      "name": "[concat(variables('backupVaultName'), '/Microsoft.Authentication/recoveryserviceslock')]",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Automation/automationAccounts', variables('backupVaultName'))]"
+      ],
+      "properties": {
+        "level": "CannotDelete",
+        "notes": "Backup vault should not be deleted."
+      }
     },
     {
       "name": "[concat(variables('backupVaultName'), '/vaultstorageconfig')]",
