@@ -3,13 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azmo"
+      "value": "azmon"
     },
     "VMRGName": {
       "value": "azmovm-test-rg"
     },
     "Environment": {
       "value": "test"
+    },
+    "dataRetention": {
+      "value": 60
     },
     "Location": {
       "value": "West Europe"

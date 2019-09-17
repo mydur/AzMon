@@ -1,1 +1,1 @@
-.\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmon-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonnwrules"
+.\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azm-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonnwrules"

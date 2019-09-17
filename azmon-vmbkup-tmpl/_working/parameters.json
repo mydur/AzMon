@@ -5,14 +5,14 @@
     "Project": {
       "value": "azmon"
     },
-    "Environement": {
+    "Environment": {
       "value": "test"
     },
     "existingVirtualMachinesResourceGroup": {
       "value": "azmonvm-test-rg"
     },
     "existingVirtualMachines": {
-      "value": ["montestvm01", "montestvm02"]
+      "value": ["azmontestvm01", "azmontestvm02"]
     },
     "existingRecoveryServicesVault": {
       "value": "azmon-test-bvlt"

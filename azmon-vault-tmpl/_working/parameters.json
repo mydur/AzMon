@@ -3,19 +3,19 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azmo"
+      "value": "azmon"
     },
     "Environment": {
       "value": "test"
     },
     "WorkspaceName": {
-      "value": "azmo-test-lana"
+      "value": "azmon-test-lana"
     },
     "WorkspaceRGName": {
-      "value": "azmo-test-rg"
+      "value": "azmon-test-rg"
     },
     "redundancyType": {
-      "value": "GeoRedundant"
+      "value": "LocallyRedundant"
     },
     "EndsOn": {
       "value": "99999999"

@@ -1,0 +1,407 @@
+1 -- Prerequisites
+
+1.1 -- Az Powershell module
+Make sure the Powershell Az module is installed. Best is that you uninstall the AzureRM module first (https://docs.microsoft.com/en-us/powershell/azure/uninstall-az-ps?view=azps-2.6.0#uninstall-the-azurerm-module). Then you can install the Az module (https://docs.microsoft.com/bs-latn-ba/powershell/azure/install-az-ps?view=azps-2.6.0).
+
+
+2 -- Global 
+
+2.1 -- Login to Azure
+Login to Azure via the following command-line:
+    
+>>> Connect-AzAccount -TenantId "9e087d00-55f5-4dc2-bcc4-cfdacca00ab5"
+
+Note:
+The -TenantId parameter makes sure you're using the right directory. The example above os for the contorso123.onmicrosoft.com directory.
+
+
+2.2 -- Deploy the tag policies (azgov-tagpolicies-tmpl)
+This is an optional step that deploys the tag enforcement policies for the following tags:
+- CreatedOn
+- CreatedBy
+- EndsOn
+- OwnedBy
+- Project
+- Environment
+- CostCenter
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azgov-tagpolicies-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azgov-tagpolicies-tmpl\_working
+>>> New-AzDeployment -Name "azmon-tagpolicies" -TemplateFile ".\template.json" -Location westeurope
+
+Note:
+This deployment is at the subscription level, hence the different way of deploying compared to the other templates that will follow.
+
+
+3 -- Basic Resource Group
+
+3.1 -- Log analytics workspace and other base resources (azmon-basic-tmpl)
+This is the template that deploys the base resources for the solution.
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-basic-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-basic-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmon-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmon"
+
+From the second command-line you may need to change the target resource group. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "VMRGName": {
+      "value": "azmovm-test-rg"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "dataRetention": {
+      "value": 60
+    },
+    "Location": {
+      "value": "West Europe"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
+
+Note:
+- The Project and Environment parameters are used to construct the name of the base resources. <Project>-<Environment>-<Suffix>
+- The VMRGName parameter is used to modify the stored queries so they are valid for a given resource group containing virtual machines that are being monitored.
+
+
+3.2 -- Service Health monitoring (azmon-svchealth-tmpl)
+The is the templae that deploys the service heath monitoring solution.
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-svchealth-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-svchealth-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmon-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonsvchealth"
+
+From the second command-line you may need to change the target resource group. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
+
+
+3.3 -- Network monitoring rules (azmon-nwrules-tmpl)
+This is the template that deploys the network monitoring rules.
+
+Note:
+For network monitoring to work some additinal manual actinos are required.
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-nwrules-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-nwrules-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmon-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonnwrules"
+
+From the second command-line you may need to change the target resource group. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "WorkspaceRGName": {
+      "value": "azmon-test-rg"
+    },
+    "WorkspaceName": {
+      "value": "azmon-test-lana"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
+
+
+
+3.4 -- Virtual machine monitoring workbook (azmon-vmworkbook-tmpl)
+This is the template that deploys a reporting wrokbook for virtual machines.
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-vmworkbook-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-vmworkbook-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmon-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonwbok"
+
+From the second command-line you may need to change the target resource group. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "WorkspaceName": {
+      "value": "azmon-test-lana"
+    },
+    "WorkspaceRGName": {
+      "value": "azmon-test-rg"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
+
+
+3.5 -- Backup monitoring solution for log analytics (azmon-backupsol-tmpl)
+This is the template that deploys the backup monitoring solution to our log analytics workspace.
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-backupsol-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-backupsol-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmon-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azbkupsol"
+
+From the second command-line you may need to change the target resource group. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "WorkspaceName": {
+      "value": "azmon-test-lana"
+    },
+    "Environment": {
+      "value": "test"
+    }
+  }
+}
+
+
+
+4 -- VM Resource Group
+
+4.1 -- Virtual machine monitoring rules (azmon-vmrules-tmpl)
+This is the template that deploys the virtual machine monitoring rules.
+
+The template.json can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-vmrules-tmpl\_working
+
+>>> C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-vmrules-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmonvm-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonvmrules"
+
+From the second command-line you may need to change the target resource group. The target resource group should be the one containing the virtual machines resources that need to be monitored. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "AZMONBasicRGName": {
+      "value": "azmon-test-rg"
+    },
+    "WorkspaceName": {
+      "value": "azmon-test-lana"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
+
+Note 1:
+The deploy.ps1 file has been modified to add a policy that deploys the MMA (Microsoft Monitoring Agent) to all virtual machines os the target resource group. The name of that policy is 'AzMon: Deploy Log Analytics Agent for Windows VMs in <resourcegroupname>'. Be sure you're a subscription owner for this to work.
+
+Note 2:
+This template should be re-used for every resource group that contains virtual machines that need to be monitored.
+
+
+4.2 -- Resource Health monitoring (azmon-rschealth-tmpl)
+This is the template that deploys the resource health monitoring rules for a give resource group.
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-rschealth-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-rschealth-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmonvm-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonrschealth"
+
+From the second command-line you may need to change the target resource group. The target resource group should be the one containing the virtual machines resources that need to be monitored. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
+
+Note 1:
+This template should be re-used for every resource group that contains virtual machines that need to be monitored.
+
+4.3 -- Backup infrastructure for virtual machine backup (azmon-vault-tmpl)
+This is the template that deploys the backup infrastructure resources.
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-vault-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-vault-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmonvm-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonvault"
+
+From the second command-line you may need to change the target resource group. The target resource group should be the one containing the virtual machines resources that need to be monitored. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "WorkspaceName": {
+      "value": "azmon-test-lana"
+    },
+    "WorkspaceRGName": {
+      "value": "azmon-test-rg"
+    },
+    "redundancyType": {
+      "value": "LocallyRedundant"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
+
+Note 1:
+This template should be re-used for every resource group that contains virtual machines that need to be monitored and require backup.
+
+Note 2:
+A sample virtual machine backup policy is created. This policy can be changed to suit your needs.
+
+
+4.4 -- Activate backup for specific virtual machines (azmon-vmbkup-tmpl)
+This template activiates backup for specific virtual machines based on a policy that was previously created.
+
+The template.json file can be found in C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-vmbkup-tmpl\_working
+
+>>> cd C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\azmon-vmbkup-tmpl\_working
+>>> .\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmonvm-test-rg" -resourceGroupLocation "westeurope" -deploymentName "azmonvmbkup"
+
+From the second command-line you may need to change the target resource group. The target resource group should be the one containing the virtual machines resources that need to be monitored. This template also comes with some parameters for which values are provided in the parameters.json file.
+
+Below is an example of the parameter.json file.
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environement": {
+      "value": "test"
+    },
+    "existingVirtualMachinesResourceGroup": {
+      "value": "azmonvm-test-rg"
+    },
+    "existingVirtualMachines": {
+      "value": ["azmontestvm01", "azmontestvm02"]
+    },
+    "existingRecoveryServicesVault": {
+      "value": "azmon-test-bvlt"
+    },
+    "existingBackupPolicy": {
+      "value": "vm-nightly0300"
+    }
+  }
+}
+
+
+Note 1:
+This template should be re-used for every resource group that contains virtual machines that need to be monitored and require backup.
+
+Note 2:
+If you want to add virtual machines to the backup then create a new parameter file with only the new virtual machines.
+
+Note 3:
+If you want to remove virtual machines from backup then this is a manual action.

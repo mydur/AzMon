@@ -14,15 +14,6 @@
     "WorkspaceName": {
       "value": "azmon-test-lana"
     },
-    "ActionGroupName": {
-      "value": "azmon03-test-agrp"
-    },
-    "ActionGroupShortName": {
-      "value": "azmon03"
-    },
-    "EmailAddress": {
-      "value": "rudy.michiels@getronics.com"
-    },
     "EndsOn": {
       "value": "99999999"
     },

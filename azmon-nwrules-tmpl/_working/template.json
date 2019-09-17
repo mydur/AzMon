@@ -31,27 +31,6 @@
         "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
-    "actionGroupName": {
-      "defaultValue": "",
-      "type": "String",
-      "metadata": {
-        "description": "Action group name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
-      }
-    },
-    "actionGroupShortName": {
-      "defaultValue": "",
-      "type": "String",
-      "metadata": {
-        "description": "Action group short (max 12 chars) name for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
-      }
-    },
-    "emailAddress": {
-      "defaultValue": "",
-      "type": "String",
-      "metadata": {
-        "description": "Email address to be added to action group for direct email notification -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
-      }
-    },
     "CreatedOn": {
       "defaultValue": "[utcNow()]",
       "type": "String"
@@ -71,17 +50,18 @@
   },
   "variables": {
     "TemplateId": "azmon-nwrules",
-    "TemplateVersion": "1.0.2",
-    "TemplateDate": "20190822",
-    "TemplateDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
+    "TemplateVersion": "1.0.3",
+    "TemplateDate": "20190913",
+    "TemplateDescription": "Changed action group to variable",
     "TemplateUsage": "Is used to create network monitoring rules.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
     "WorkspaceRGName": "[toLower(parameters('WorkspaceRGName'))]",
     "WorkspaceName": "[toLower(parameters('WorkspaceName'))]",
-    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
-    "actionGroupShortName": "[toLower(parameters('actionGroupShortName'))]"
+    "actionGroupName": "[concat('nwrules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupShortName": "[take(concat('nwrules', variables('Project')), 12)]",
+    "emailAddress": "dummy@nowhere.com"
   },
   "resources": [
     {
@@ -249,7 +229,7 @@
         "emailReceivers": [
           {
             "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
-            "emailAddress": "[parameters('EmailAddress')]"
+            "emailAddress": "[variables('EmailAddress')]"
           }
         ],
         "smsReceivers": [],

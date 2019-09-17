@@ -60,7 +60,7 @@
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
     "existingVirtualMachinesResourceGroup": "[toLower(parameters('existingVirtualMachinesResourceGroup'))]",
-    "existingVirtualMachines": "[toLower(parameters('existingVirtualMachines'))]",
+    "existingVirtualMachines": "[parameters('existingVirtualMachines')]",
     "existingRecoveryServicesVault": "[toLower(parameters('existingRecoveryServicesVault'))]",
     "existingBackupPolicy": "[toLower(parameters('existingBackupPolicy'))]",
     "backupFabric": "Azure",
