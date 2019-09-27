@@ -124,9 +124,7 @@
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
-      "properties": {
-        "upgradeDetails": {}
-      },
+      "properties": {},
       "sku": {
         "name": "RS0",
         "tier": "Standard"
@@ -469,5 +467,11 @@
         "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "BackupVaultName": {
+      "type": "string",
+      "value": "[variables('backupVaultName')]"
+    }
+  }
 }

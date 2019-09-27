@@ -6,13 +6,13 @@
       "value": "azmon"
     },
     "Environment": {
-      "value": "test"
+      "value": "prod"
     },
     "WorkspaceName": {
-      "value": "azmon-test-lana"
+      "value": "azmon-prod-lana"
     },
     "WorkspaceRGName": {
-      "value": "azmon-test-rg"
+      "value": "azmon-prod-rg"
     },
     "redundancyType": {
       "value": "LocallyRedundant"

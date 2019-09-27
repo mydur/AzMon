@@ -1433,6 +1433,10 @@
     "WorkspaceName": {
       "type": "string",
       "value": "[variables('workspaceName')]"
+    },
+    "WorkspaceId": {
+      "type": "string",
+      "value": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
     }
   }
 }

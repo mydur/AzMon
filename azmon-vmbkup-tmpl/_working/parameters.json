@@ -9,13 +9,13 @@
       "value": "test"
     },
     "existingVirtualMachinesResourceGroup": {
-      "value": "azmonvm-test-rg"
+      "value": "azmonvm-prod-rg"
     },
     "existingVirtualMachines": {
-      "value": ["azmontestvm01", "azmontestvm02"]
+      "value": ["azmonvmprod01", "azmonvmprod02"]
     },
     "existingRecoveryServicesVault": {
-      "value": "azmon-test-bvlt"
+      "value": "azmon-prod-bvlt"
     },
     "existingBackupPolicy": {
       "value": "vm-nightly0300"

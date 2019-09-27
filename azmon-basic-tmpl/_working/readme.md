@@ -17,6 +17,8 @@ To be able to re-use the template for different customers/projects the following
 
 - **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.
 - **VMRGName:** The resource group name that is used in the saved queries. This doesn't have to be an existing resource group as long as you don't use the saved queries.
+- **Environment:** Can be one of the following: dev-test-acc-prod.
+- **Location:** The region in which the deployment will take place.
 - **CreatedOn:** This paramters is in fact a variable that holds the current date and time to be added as a tag to the resources created by this template. Because of technical reasons this has to be a parameter and not a variable. The default value for the parameter is the outcome of the function [utcNow()]
 - **EndsOn:** This parameter provides an indication of when the created resource should be end-of-life. It helps when cleaning up your Azure resources to have an idea when a resource isn't used anymore. The format of the date provided is yyyymmdd. When there's no end date available you should use 99999999.
 - **CreatedBy:** A free text field to provide information about the person or team that created the resource. Isn't to be confused with the OwnedBy field.
