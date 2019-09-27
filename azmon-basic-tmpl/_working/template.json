@@ -24,6 +24,13 @@
         "description": "Can one of the following, dev-test-acc-prod"
       }
     },
+    "UniqueNumber": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Unique number to add to the name of the accounts."
+      }
+    },
     "dataRetention": {
       "type": "int",
       "defaultValue": 31,
@@ -102,9 +109,9 @@
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(replace(parameters('Environment'), '-', ''))]",
     "VMRGName": "[toLower(parameters('VMRGName'))]",
-    "storageAccountName": "[concat(variables('Project'), variables('Environment'), 'stor')]",
-    "automationAccountName": "[concat(variables('Project'), '-', variables('Environment'), '-auto')]",
-    "workspaceName": "[concat(variables('Project'), '-', variables('Environment'), '-lana')]"
+    "storageAccountName": "[concat(variables('Project'), parameters('UniqueNumber'), variables('Environment'), 'stor')]",
+    "automationAccountName": "[concat(variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-auto')]",
+    "workspaceName": "[concat(variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-lana')]"
   },
   "resources": [
     {

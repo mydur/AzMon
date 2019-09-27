@@ -11,6 +11,9 @@
     "Environment": {
       "value": "test"
     },
+    "UniqueNumber": {
+      "value": "9999"
+    },
     "dataRetention": {
       "value": 60
     },

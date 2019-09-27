@@ -8,6 +8,9 @@
     "Environment": {
       "value": "prod"
     },
+    "UniqueNumber": {
+      "value": "9999"
+    },
     "WorkspaceName": {
       "value": "azmon-prod-lana"
     },

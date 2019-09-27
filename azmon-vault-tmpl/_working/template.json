@@ -17,6 +17,13 @@
         "description": "Can be one of the following, dev-test-acc-prod"
       }
     },
+    "UniqueNumber": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Unique number to add to the name of the accounts."
+      }
+    },
     "workspaceName": {
       "type": "string",
       "defaultValue": "",
@@ -106,7 +113,7 @@
     "actionGroupName": "[concat('backup-', variables('Project'), '-', variables('Environment'), '-agrp')]",
     "actionGroupShortName": "[take(concat('bkup', variables('Project')), 12)]",
     "emailAddress": "dummy@nowhere.com",
-    "backupVaultName": "[concat(variables('Project'), '-', variables('Environment'), '-bvlt')]"
+    "backupVaultName": "[concat(variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-bvlt')]"
   },
   "resources": [
     {
