@@ -1,0 +1,149 @@
+[
+  {
+    "comment": "AzGov: Append OwnedBy tag on resource groups.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+    "parameters": {
+      "tagName": {
+        "value": "OwnedBy"
+      },
+      "tagValue": {
+        "value": "Default"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append OwnedBy tag on resources and get value from resource group.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+    "parameters": {
+      "tagName": {
+        "value": "OwnedBy"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append CreatedBy tag on resource groups.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+    "parameters": {
+      "tagName": {
+        "value": "CreatedBy"
+      },
+      "tagValue": {
+        "value": "Default"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append CreatedBy tag on resources and get value from resource group.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+    "parameters": {
+      "tagName": {
+        "value": "CreatedBy"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append CreatedOn tag on resource groups.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+    "parameters": {
+      "tagName": {
+        "value": "CreatedOn"
+      },
+      "tagValue": {
+        "value": "yyyymmdd"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append CreatedOn tag on resources and get value from resource group.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+    "parameters": {
+      "tagName": {
+        "value": "CreatedOn"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append EndsOn tag on resource groups.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+    "parameters": {
+      "tagName": {
+        "value": "EndsOn"
+      },
+      "tagValue": {
+        "value": "yyyymmdd"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append EndsOn tag on resources and get value from resource group.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+    "parameters": {
+      "tagName": {
+        "value": "EndsOn"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append Project tag on resource groups.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+    "parameters": {
+      "tagName": {
+        "value": "Project"
+      },
+      "tagValue": {
+        "value": "Default"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append Project tag on resources and get value from resource group.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+    "parameters": {
+      "tagName": {
+        "value": "Project"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append Environment tag on resource groups.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+    "parameters": {
+      "tagName": {
+        "value": "Environment"
+      },
+      "tagValue": {
+        "value": "Default"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append Environment tag on resources and get value from resource group.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+    "parameters": {
+      "tagName": {
+        "value": "Environment"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append CostCenter tag on resource groups.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/49c88fc8-6fd1-46fd-a676-f12d1d3a4c71",
+    "parameters": {
+      "tagName": {
+        "value": "CostCenter"
+      },
+      "tagValue": {
+        "value": "Default"
+      }
+    }
+  },
+  {
+    "comment": "AzGov: Append CostCenter tag on resources and get value from resource group.",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/9ea02ca2-71db-412d-8b00-7c7ca9fcd32d",
+    "parameters": {
+      "tagName": {
+        "value": "CostCenter"
+      }
+    }
+  }
+]
