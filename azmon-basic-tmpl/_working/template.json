@@ -1444,6 +1444,10 @@
     "WorkspaceId": {
       "type": "string",
       "value": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+    },
+    "AutomationAccountId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
     }
   }
 }

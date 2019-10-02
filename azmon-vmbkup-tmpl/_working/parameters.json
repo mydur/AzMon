@@ -6,19 +6,16 @@
       "value": "azmon"
     },
     "Environment": {
-      "value": "test"
-    },
-    "existingVirtualMachinesResourceGroup": {
-      "value": "azmonvm-prod-rg"
+      "value": "prod"
     },
     "existingVirtualMachines": {
-      "value": ["azmonvmprod01", "azmonvmprod02"]
-    },
-    "existingRecoveryServicesVault": {
-      "value": "azmon-prod-bvlt"
+      "value": ["azmonvmprod01"]
     },
     "existingBackupPolicy": {
       "value": "vm-nightly0300"
+    },
+    "UniqueNumber": {
+      "value": "6579"
     }
   }
 }
