@@ -18,7 +18,12 @@
     },
     "Environment": {
       "type": "string",
-      "allowedValues": ["dev", "test", "acc", "prod"],
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
       "defaultValue": "test",
       "metadata": {
         "description": "Can one of the following, dev-test-acc-prod"
@@ -101,9 +106,9 @@
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.1.9",
-    "TemplateDate": "20190913",
-    "TemplateDescription": "Changed pricing tier for lana",
+    "TemplateVersion": "1.2.0",
+    "TemplateDate": "20191004",
+    "TemplateDescription": "Added saved search for maintenance mode",
     "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -135,7 +140,8 @@
           "name": "Free"
         }
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
     },
     {
       "type": "Microsoft.Automation/automationAccounts/providers/locks",
@@ -174,7 +180,8 @@
         },
         "retentionInDays": "[parameters('dataRetention')]"
       },
-      "dependsOn": [],
+      "dependsOn": [
+      ],
       "resources": [
         {
           "apiVersion": "2015-11-01-preview",
@@ -521,7 +528,8 @@
             "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
           ],
           "properties": {
-            "containers": [],
+            "containers": [
+            ],
             "tables": [
               "WADWindowsEventLogsTable",
               "WADPerformanceCountersTable"
@@ -531,6 +539,20 @@
               "key": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-06-15').key1]"
             }
           }
+        },
+        {
+          "type": "savedSearches",
+          "name": "MaintenanceModeOngoing",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Monitoring",
+            "displayName": "MaintenanceMode Ongoing",
+            "query": "ConfigurationChange\r\n| where TimeGenerated > ago(60d)\r\n| where ConfigChangeType == \"WindowsServices\" \r\n| where SvcDisplayName == \"Maintenance Mode Ongoing\" \r\n| where ChangeCategory == \"Added\" or ChangeCategory == \"Removed\" \r\n| order by Computer , TimeGenerated asc\r\n| project Computer , ChangeCategory , TimeGenerated \r\n| summarize arg_max(TimeGenerated,*) by Computer\r\n| where ChangeCategory == \"Added\" \r\n| project Computer \r\n| distinct Computer",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
         },
         {
           "type": "savedSearches",
@@ -1382,8 +1404,10 @@
       "properties": {
         "networkAcls": {
           "bypass": "AzureServices",
-          "virtualNetworkRules": [],
-          "ipRules": [],
+          "virtualNetworkRules": [
+          ],
+          "ipRules": [
+          ],
           "defaultAction": "Allow"
         },
         "supportsHttpsTrafficOnly": true,
@@ -1400,7 +1424,8 @@
         },
         "accessTier": "Cool"
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
     },
     {
       "type": "Microsoft.Storage/storageAccounts/providers/locks",
