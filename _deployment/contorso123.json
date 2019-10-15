@@ -1,0 +1,28 @@
+{
+  "General": {
+    "CompanyName": "Contorso 123",
+    "CompanyDomain": "contorso123.onmicrosoft.com",
+    "TenantID": "9e087d00-55f5-4dc2-bcc4-cfdacca00ab5",
+    "Environment": "prod",
+    "TagEndsOn": "99999999",
+    "TagCostCenter": "Default",
+    "UniqueNumber": "2437"
+  },
+  "Basic": {
+    "WorkspaceDataRetention": 60
+  },
+  "VMRules": {
+    "VMRGName": "azmonvm-prod-rg"
+  },
+  "Vault": {
+    "instantRpRetentionRangeInDays": 2,
+    "dailyRetentionDurationCount": 30,
+    "weeklyRetentionDurationCount": 12,
+    "monthlyRetentionDurationCount": 60,
+    "yearlyRetentionDurationCount": 10,
+    "redundancyType": "LocallyRedundant"
+  },
+  "VMBkUp": {
+    "existingVirtualMachines": ["azmonvmprod01", "azmonvmprod02"]
+  }
+}
