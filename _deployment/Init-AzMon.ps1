@@ -248,18 +248,6 @@ $AutoAcctId = $AzMonBasic.properties.outputs.automationaccountid.value
 # ------------------------
 # Most Azure resources emit logs that can be capture by a log analytics workspace. In this section we configure diagnostics settings for some AzGov and AzMon resources.
 # AzGov.Keyvault
-$KeyvDiagSet = @'
-[
-    {
-        \"category\": \"AuditEvent\",
-        \"enabled\": true,
-        \"retentionPolicy\": {
-            \"enabled\": false,
-            \"days\": 0
-        }
-    }
-]
-'@
 $KeyvDiagSet = '[{ \"category\": \"AuditEvent\", \"enabled\": true, \"retentionPolicy\": { \"enabled\": false, \"days\": 0 }}]'
 $KeyvaultId = (az keyvault show --name "$KeyvaultName" --resource-group "$KeyvaultRGName" | ConvertFrom-Json).id
 $KeyvDiagnostics = (az monitor diagnostic-settings create `
