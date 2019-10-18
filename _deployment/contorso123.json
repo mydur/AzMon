@@ -1,60 +1,63 @@
 {
-  "General": {
-    "CompanyName": "Contorso 123",
-    "CompanyDomain": "contorso123.onmicrosoft.com",
-    "TenantID": "9e087d00-55f5-4dc2-bcc4-cfdacca00ab5",
-    "Environment": "prod",
-    "TagEndsOn": "99999999",
-    "TagCostCenter": "Default",
-    "UniqueNumber": "2437"
-  },
-  "Basic": {
-    "WorkspaceDataRetention": 60
-  },
-  "VMRules": {
-    "VMRGName": "azmonvm-prod-rg"
-  },
-  "Vault": {
-    "instantRpRetentionRangeInDays": 2,
-    "dailyRetentionDurationCount": 30,
-    "weeklyRetentionDurationCount": 12,
-    "monthlyRetentionDurationCount": 60,
-    "yearlyRetentionDurationCount": 10,
-    "redundancyType": "LocallyRedundant"
-  },
-  "VMBkUp": {
-    "existingVirtualMachines": ["azmonvmprod01", "azmonvmprod02"]
-  },
-  "Outputs": {
-    "GovSetDefId": "tbd",
-    "GovKeyvaultId": "tbd",
-    "GovAssignmentId": "tbd",
-    "GovResGroupId": "tbd",
-    "GovStorAcctId": "tbd",
-    "GovAutoAcctId": "tbd",
-    "azMonBasicTmpl": "tbd",
-    "workspaceId": "tbd",
-    "workspaceName": "azmon2437-prod-lana",
-    "autoAcctName": "tbd",
-    "autoAcctId": "tbd",
-    "storAcctName": "tbd",
-    "azMonNonAzureVMsTmpl": "tbd",
-    "nonAzureVMsActionGroupId": "tbd",
-    "azMonSvcHealthTmpl": "tbd",
-    "svcHealthActionGroupId": "tbd",
-    "azMonNWRulesTmpl": "tbd",
-    "nwRulesActionGroupId": "tbd",
-    "azMonVMWorkbookTmpl": "tbd",
-    "azMonBackupSolTmpl": "tbd",
-    "azMonVMRulesTmpl": "tbd",
-    "vmRulesActionGroupId": "tbd",
-    "VMRoleAssignment": "tbd",
-    "LANARoleAssignment": "tbd",
-    "azMonRSCHealthTmpl": "tbd",
-    "rscHealthActionGroupId": "tbd",
-    "azMonVaultTmpl": "tbd",
-    "backupVaultName": "tbd",
-    "backupVaultId": "tbd",
-    "vaultActionGroupId": "tbd"
-  }
+    "General":  {
+                    "CompanyName":  "Contorso 123",
+                    "CompanyDomain":  "contorso123.onmicrosoft.com",
+                    "TenantID":  "9e087d00-55f5-4dc2-bcc4-cfdacca00ab5",
+                    "Environment":  "prod",
+                    "TagEndsOn":  "99999999",
+                    "TagCostCenter":  "Default",
+                    "UniqueNumber":  "2437"
+                },
+    "Basic":  {
+                  "WorkspaceDataRetention":  60
+              },
+    "VMRules":  {
+                    "VMRGName":  "azmonvm-prod-rg"
+                },
+    "Vault":  {
+                  "instantRpRetentionRangeInDays":  2,
+                  "dailyRetentionDurationCount":  30,
+                  "weeklyRetentionDurationCount":  12,
+                  "monthlyRetentionDurationCount":  60,
+                  "yearlyRetentionDurationCount":  10,
+                  "redundancyType":  "LocallyRedundant"
+              },
+    "VMBkUp":  {
+                   "existingVirtualMachines":  [
+                                                   "azmonvmprod01",
+                                                   "azmonvmprod02"
+                                               ]
+               },
+    "Outputs":  {
+                    "GovSetDefId":  "tbd",
+                    "GovKeyvaultId":  "tbd",
+                    "GovAssignmentId":  "tbd",
+                    "GovResGroupId":  "tbd",
+                    "GovStorAcctId":  "tbd",
+                    "GovAutoAcctId":  "tbd",
+                    "azMonBasicTmpl":  "tbd",
+                    "workspaceId":  "tbd",
+                    "workspaceName":  "azmon2437-prod-lana",
+                    "autoAcctName":  "tbd",
+                    "autoAcctId":  "tbd",
+                    "storAcctName":  "tbd",
+                    "azMonNonAzureVMsTmpl":  "Succeeded",
+                    "nonAzureVMsActionGroupId":  "/subscriptions/a53c5946-e76d-4ca2-bee2-57cfbb3eee7a/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/nonazure-azmon-prod-agrp",
+                    "azMonSvcHealthTmpl":  "tbd",
+                    "svcHealthActionGroupId":  "tbd",
+                    "azMonNWRulesTmpl":  "tbd",
+                    "nwRulesActionGroupId":  "tbd",
+                    "azMonVMWorkbookTmpl":  "tbd",
+                    "azMonBackupSolTmpl":  "tbd",
+                    "azMonVMRulesTmpl":  "tbd",
+                    "vmRulesActionGroupId":  "tbd",
+                    "VMRoleAssignment":  "tbd",
+                    "LANARoleAssignment":  "tbd",
+                    "azMonRSCHealthTmpl":  "tbd",
+                    "rscHealthActionGroupId":  "tbd",
+                    "azMonVaultTmpl":  "tbd",
+                    "backupVaultName":  "tbd",
+                    "backupVaultId":  "tbd",
+                    "vaultActionGroupId":  "tbd"
+                }
 }
