@@ -84,7 +84,6 @@ $TagEnvironment = $Environment
 $TagProject = "AzGov"
 $Rnd = (Get-Random -Maximum 9999 -Minimum 1000).ToString()
 $ParametersJSON.General.UniqueNumber = "$Rnd"
-$ParametersJSON | ConvertTo-Json | Out-File -FilePath $ParametersFile -Force -Encoding ascii
 $KeyVaultName = "azgov$Rnd-$Environment-keyv"
 $StorAcctName = ("azgov$Rnd" + $Environment + "stor").ToLower()
 $StorAcctSKU = "Standard_LRS"
@@ -140,6 +139,7 @@ $CreateSetDefinition = (az policy set-definition create `
                 --definitions "$TagPoliciesJSONFile") `
 | ConvertFrom-Json
 ("Policy set-definition ID: " + $CreateSetDefinition.id)
+$ParametersJSON.Outputs.GovSetDefId = $CreateSetDefinition.id
 
 # 2. CREATE AN ASSIGNMENT FOR THE INITIATIVE
 # ------------------------------------------
@@ -152,6 +152,7 @@ $CreateAssignment = (az policy assignment create `
                 --scope "/subscriptions/$SubscriptionID") `
 | ConvertFrom-Json
 ("Assignment ID: " + $CreateAssignment.id)
+$ParametersJSON.Outputs.GovAssignmentId = $CreateAssignment.id
 
 # 3. CREATE A RESOURCE GROUP FOR ALL AZGOV RESOURCES
 # --------------------------------------------------
@@ -163,6 +164,7 @@ $ResourceGroup = (az group create `
                 --tags CreatedBy="$UserDisplayName" OwnedBy="$TagOwnedBy" CostCenter="$TagCostCenter" CreatedOn="$TagCreatedOn" EndsOn="$TagEndsOn" Environment="$TagEnvironment" Project="$TagProject") `
 | ConvertFrom-Json
 ("Resource Group: " + $ResourceGroup.id)
+$ParametersJSON.Outputs.GovResGroupId = $ResourceGroup.id)
 
 # 4. CREATE A KEY VAULT
 # ---------------------
@@ -185,6 +187,7 @@ $KeyvautLock = (az resource lock create `
                 --resource-group "$ResourceGroupName" `
                 --resource-type "Microsoft.KeyVault/vaults") `
 | ConvertFrom-Json
+$ParametersJSON.Outputs.GovKeyvaultId = $KeyvaultID
 
 # 5. CREATE SERVICE PRINCIPALS
 # ----------------------------
@@ -314,6 +317,7 @@ $StorAcctLock = (az resource lock create `
                 --resource-group "$ResourceGroupName" `
                 --resource-type "Microsoft.Storage/storageAccounts") `
 | ConvertFrom-Json
+$ParametersJSON.Outputs.GovStorAcctId = $StorAcctID
 
 # 7. AUTOMATION ACCOUNT
 # ---------------------
@@ -325,3 +329,7 @@ $AutoAcct = (az group deployment create `
                 --parameters "Environment=$Environment" "Location=$Location" "UniqueNumber=$Rnd") `
 | ConvertFrom-Json
 ("Automation Account: " + $AutoAcct.id)
+$ParametersJSON.Outputs.GovAutoAcctId = $AutoAcct.id
+
+# The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
+$ParametersJSON | ConvertTo-Json | Out-File -FilePath "$ParametersFile" -Force -Encoding ascii

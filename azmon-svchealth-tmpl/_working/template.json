@@ -11,7 +11,12 @@
     },
     "Environment": {
       "type": "string",
-      "allowedValues": ["dev", "test", "acc", "prod"],
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
       "defaultValue": "test",
       "metadata": {
         "description": "Can one of the following, dev-test-acc-prod"
@@ -111,7 +116,9 @@
             {
               "field": "properties.impactedServices[*].ImpactedRegions[*].RegionName",
               "equals": null,
-              "containsAny": ["West Europe"]
+              "containsAny": [
+                "West Europe"
+              ]
             }
           ]
         },
@@ -197,7 +204,9 @@
             {
               "field": "properties.impactedServices[*].ImpactedRegions[*].RegionName",
               "equals": null,
-              "containsAny": ["West Europe"]
+              "containsAny": [
+                "West Europe"
+              ]
             }
           ]
         },
@@ -234,16 +243,31 @@
             "emailAddress": "[variables('EmailAddress')]"
           }
         ],
-        "smsReceivers": [],
-        "webhookReceivers": [],
-        "itsmReceivers": [],
-        "azureAppPushReceivers": [],
-        "automationRunbookReceivers": [],
-        "voiceReceivers": [],
-        "logicAppReceivers": [],
-        "azureFunctionReceivers": []
+        "smsReceivers": [
+        ],
+        "webhookReceivers": [
+        ],
+        "itsmReceivers": [
+        ],
+        "azureAppPushReceivers": [
+        ],
+        "automationRunbookReceivers": [
+        ],
+        "voiceReceivers": [
+        ],
+        "logicAppReceivers": [
+        ],
+        "azureFunctionReceivers": [
+        ]
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
     }
-  ]
+  ],
+  "outputs": {
+    "ActionGroupId": {
+      "type": "string",
+      "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+    }
+  }
 }

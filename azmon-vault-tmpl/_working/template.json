@@ -11,7 +11,12 @@
     },
     "Environment": {
       "type": "string",
-      "allowedValues": ["dev", "test", "acc", "prod"],
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
       "defaultValue": "test",
       "metadata": {
         "description": "Can be one of the following, dev-test-acc-prod"
@@ -41,7 +46,13 @@
     "instantRpRetentionRangeInDays": {
       "type": "int",
       "defaultValue": 2,
-      "allowedValues": [1, 2, 3, 4, 5],
+      "allowedValues": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
       "metadata": {
         "description": "Number of days Instant Recovery Point should be retained"
       }
@@ -77,7 +88,10 @@
     "redundancyType": {
       "type": "string",
       "defaultValue": "LocallyRedundant",
-      "allowedValues": ["LocallyRedundant", "GeoRedundant"],
+      "allowedValues": [
+        "LocallyRedundant",
+        "GeoRedundant"
+      ],
       "metadata": {
         "description": "Redundancy type for the storage where backup is stored (LocallyRedundant or GeoRedundant)"
       }
@@ -131,7 +145,8 @@
         "Project": "[parameters('Project')]",
         "Environment": "[parameters('Environment')]"
       },
-      "properties": {},
+      "properties": {
+      },
       "sku": {
         "name": "RS0",
         "tier": "Standard"
@@ -151,12 +166,16 @@
             "schedulePolicy": {
               "scheduleRunFrequency": "Daily",
               "scheduleRunDays": null,
-              "scheduleRunTimes": ["03:00"],
+              "scheduleRunTimes": [
+                "03:00"
+              ],
               "schedulePolicyType": "SimpleSchedulePolicy"
             },
             "retentionPolicy": {
               "dailySchedule": {
-                "retentionTimes": ["03:00"],
+                "retentionTimes": [
+                  "03:00"
+                ],
                 "retentionDuration": {
                   "count": 180,
                   "durationType": "Days"
@@ -181,20 +200,28 @@
             "schedulePolicy": {
               "scheduleRunFrequency": "Daily",
               "scheduleRunDays": null,
-              "scheduleRunTimes": ["05:00"],
+              "scheduleRunTimes": [
+                "05:00"
+              ],
               "schedulePolicyType": "SimpleSchedulePolicy"
             },
             "retentionPolicy": {
               "dailySchedule": {
-                "retentionTimes": ["05:00"],
+                "retentionTimes": [
+                  "05:00"
+                ],
                 "retentionDuration": {
                   "count": "[parameters('dailyRetentionDurationCount')]",
                   "durationType": "Days"
                 }
               },
               "weeklySchedule": {
-                "daysOfTheWeek": ["Sunday"],
-                "retentionTimes": ["05:00"],
+                "daysOfTheWeek": [
+                  "Sunday"
+                ],
+                "retentionTimes": [
+                  "05:00"
+                ],
                 "retentionDuration": {
                   "count": "[parameters('weeklyRetentionDurationCount')]",
                   "durationType": "Weeks"
@@ -211,7 +238,9 @@
                   ]
                 },
                 "retentionScheduleWeekly": null,
-                "retentionTimes": ["05:00"],
+                "retentionTimes": [
+                  "05:00"
+                ],
                 "retentionDuration": {
                   "count": "[parameters('monthlyRetentionDurationCount')]",
                   "durationType": "Months"
@@ -219,7 +248,9 @@
               },
               "yearlySchedule": {
                 "retentionScheduleFormatType": "Daily",
-                "monthsOfYear": ["January"],
+                "monthsOfYear": [
+                  "January"
+                ],
                 "retentionScheduleDaily": {
                   "daysOfTheMonth": [
                     {
@@ -229,7 +260,9 @@
                   ]
                 },
                 "retentionScheduleWeekly": null,
-                "retentionTimes": ["05:00"],
+                "retentionTimes": [
+                  "05:00"
+                ],
                 "retentionDuration": {
                   "count": "[parameters('yearlyRetentionDurationCount')]",
                   "durationType": "Years"
@@ -292,7 +325,8 @@
             }
           }
         ],
-        "metrics": []
+        "metrics": [
+        ]
       }
     },
     {
@@ -319,16 +353,25 @@
             "emailAddress": "[variables('EmailAddress')]"
           }
         ],
-        "smsReceivers": [],
-        "webhookReceivers": [],
-        "itsmReceivers": [],
-        "azureAppPushReceivers": [],
-        "automationRunbookReceivers": [],
-        "voiceReceivers": [],
-        "logicAppReceivers": [],
-        "azureFunctionReceivers": []
+        "smsReceivers": [
+        ],
+        "webhookReceivers": [
+        ],
+        "itsmReceivers": [
+        ],
+        "azureAppPushReceivers": [
+        ],
+        "automationRunbookReceivers": [
+        ],
+        "voiceReceivers": [
+        ],
+        "logicAppReceivers": [
+        ],
+        "azureFunctionReceivers": [
+        ]
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
     },
     {
       "name": "[concat('AzBackup - ', variables('backupVaultName'), ' - Job failure')]",
@@ -479,6 +522,14 @@
     "BackupVaultName": {
       "type": "string",
       "value": "[variables('backupVaultName')]"
+    },
+    "BackupVaultId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.RecoveryServices/vaults', variables('backupVaultName'))]"
+    },
+    "ActionGroupId": {
+      "type": "string",
+      "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
     }
   }
 }

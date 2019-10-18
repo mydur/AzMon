@@ -24,5 +24,37 @@
   },
   "VMBkUp": {
     "existingVirtualMachines": ["azmonvmprod01", "azmonvmprod02"]
+  },
+  "Outputs": {
+    "GovSetDefId": "tbd",
+    "GovKeyvaultId": "tbd",
+    "GovAssignmentId": "tbd",
+    "GovResGroupId": "tbd",
+    "GovStorAcctId": "tbd",
+    "GovAutoAcctId": "tbd",
+    "azMonBasicTmpl": "tbd",
+    "workspaceId": "tbd",
+    "workspaceName": "azmon2437-prod-lana",
+    "autoAcctName": "tbd",
+    "autoAcctId": "tbd",
+    "storAcctName": "tbd",
+    "azMonNonAzureVMsTmpl": "tbd",
+    "nonAzureVMsActionGroupId": "tbd",
+    "azMonSvcHealthTmpl": "tbd",
+    "svcHealthActionGroupId": "tbd",
+    "azMonNWRulesTmpl": "tbd",
+    "nwRulesActionGroupId": "tbd",
+    "azMonVMWorkbookTmpl": "tbd",
+    "azMonBackupSolTmpl": "tbd",
+    "azMonVMRulesTmpl": "tbd",
+    "vmRulesActionGroupId": "tbd",
+    "VMRoleAssignment": "tbd",
+    "LANARoleAssignment": "tbd",
+    "azMonRSCHealthTmpl": "tbd",
+    "rscHealthActionGroupId": "tbd",
+    "azMonVaultTmpl": "tbd",
+    "backupVaultName": "tbd",
+    "backupVaultId": "tbd",
+    "vaultActionGroupId": "tbd"
   }
 }
