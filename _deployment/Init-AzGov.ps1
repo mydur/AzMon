@@ -63,10 +63,10 @@ $TenantID = $ParametersJSON.General.TenantID
 $Environment = $ParametersJSON.General.Environment
 $TagEndsOn = $ParametersJSON.General.TagEndsOn
 $TagCostCenter = $ParametersJSON.General.TagCostCenter
+$LocationDisplayName = $ParametersJSON.General.LocationDisplayName
 # Probably no change needed...
 $AzGovLocalPath = "C:\Getronics\AzGov"
 $GithubBaseFolder = "https://github.com/mydur/ARMtemplates/raw/master/"
-$Location = "westeurope"
 $ResourceGroupName = "azgov-$Environment-rg"
 $TagPoliciesJSONFile = ($AzGovLocalPath + "\tagpolicies.json")
 $TagPoliciesSetdName = "azgov-tagpolicies-setd"
@@ -124,6 +124,7 @@ else {
         $UserDisplayName = $Login.user.name
 }
 }
+$Location = (Get-AzLocation | ? { $_.DisplayName -eq "$LocationDisplayName" }).Location
 
 ##########################################################################
 # MAIN

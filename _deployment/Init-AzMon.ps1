@@ -82,9 +82,9 @@ $Environment = $ParametersJSON.General.Environment
 $TagEndsOn = $ParametersJSON.General.TagEndsOn
 $TagCostCenter = $ParametersJSON.General.TagCostCenter
 $UniqueNumber = $ParametersJSON.General.UniqueNumber
+$LocationDisplayName = $ParametersJSON.General.LocationDisplayName
 $VMResourceGroupName = $ParametersJSON.VMRules.VMRGName
 # Probably no change needed...
-$Location = "westeurope"
 $ResourceGroupName = ("azmon-$Environment-rg").ToLower()
 $Workspacename = $ParametersJSON.Outputs.workspaceName
 $KeyvaultName = "azgov$UniqueNumber-$Environment-keyv"
@@ -176,6 +176,7 @@ $PSCreds = New-Object System.Management.Automation.PSCredential(("http://azps-" 
 Connect-AzAccount -ServicePrincipal -Credential $PSCreds -Tenant $TenantID
 $SubscriptionID = $Login.id
 $SubscriptionName = $Login.name
+$Location = (Get-AzLocation | ? { $_.DisplayName -eq "$LocationDisplayName" }).Location
 #
 ##########################################################################
 # DeployBaseSetup
@@ -240,7 +241,7 @@ $AzMonBasic = (az group deployment create `
                 "VMRGName=$VMResourceGroupName " `
                 "Environment=$Environment" `
                 "dataRetention=$WorkspaceDataRetention" `
-                "Location=West Europe" `
+                "Location=$LocationLong" `
                 "CreatedOn=$TagCreatedOn" `
                 "EndsOn=$TagEndsOn" `
                 "CreatedBy=$UserDisplayName" `
