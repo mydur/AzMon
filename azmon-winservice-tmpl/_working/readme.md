@@ -1,12 +1,14 @@
-# azmon-vmrules-tmpl
+# azmon-winservice-tmpl
 
-The purpose of this template is to deploy a set of Alert Rules and an Action Group to be used in the alert rules.
+The purpose of this template is to deploy an alert rule to monitor a give Windows service. The service to monitor is provided in a parameter to the template. You need to give the short name as well as the display name for the rule to work. Also the name of the action to use when forwarding the alert needs to be provided as a parameter. However, the latter has a default value: vmrules-azmon-prod-agrp
 
 To be able to re-use the template the following parameters were introduced:
 
-- **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.
+- **svcShortName:** The short name of the service to monitor. This one is used to build the name of the rule.
+- **svcDisplayName:** The display name of the service to monitor. This one is used in the query.
 - **WorkspaceRGName:** The resource group in which the log analytics workspace was installed by the azmon-basic-tmpl template.
 - **WorkspaceName:** The actual name of the log analytics workspace that can be found in the resource group of which the name is stored in AZMONBasicRGName.
+- **actionGroupName:** The name of the action group to use when an alert has to be forwarded. Please note that this action group needs to exist before deploying the template.
 - **CreatedOn:** This paramters is in fact a variable that holds the current date and time to be added as a tag to the resources created by this template. Because of technical reasons this has to be a parameter and not a variable. The default value for the parameter is the outcome of the function [utcNow()]
 - **EndsOn:** This parameter provides an indication of when the created resource should be end-of-life. It helps when cleaning up your Azure resources to have an idea when a resource isn't used anymore. The format of the date provided is yyyymmdd. When there's no end date available you should use 99999999.
 - **CreatedBy:** A free text field to provide information about the person or team that created the resource. Isn't to be confused with the OwnedBy field.
@@ -24,8 +26,7 @@ Tags are very important in Azure Governance as they help you in filtering the re
 - **CreatedBy:** A free text field to provide information about the person or team that created the resource. Isn't to be confused with the OwnedBy field.
 - **OwnedBy:** A free text field to provide information about the person or team that owns the resource. Isn't to be confused with the CreatedBy field.
 
-> As you probably noticed the resource group in which the virtual machines live that need to be monitored is not one of the parameters. That's because these alert rules are created in the same resource group as the virtual machines and the name of the target resource group can be obtained via a function in the template.
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-vmrules-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-winservice-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a><br />
