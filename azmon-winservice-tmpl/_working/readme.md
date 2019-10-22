@@ -1,7 +1,4 @@
-# azmon-nonazurevms-tmpl
-
---- UNDER CONSTRUCTION ---
-
+# azmon-vmrules-tmpl
 
 The purpose of this template is to deploy a set of Alert Rules and an Action Group to be used in the alert rules.
 
