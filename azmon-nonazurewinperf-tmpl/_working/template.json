@@ -1,0 +1,193 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "perfObject": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Performance ObjectName (ex. Processor)"
+      }
+    },
+    "perfCounter": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Performance CounterName (ex. % Processor Time)"
+      }
+    },
+    "perfInstance": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Performance InstanceName (ex. _Total)"
+      }
+    },
+    "warningThreshold": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Warning Threshold"
+      }
+    },
+    "criticalThreshold": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Critical Threshold"
+      }
+    },
+    "AZMONBasicRGName": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "workspaceName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "actionGroupName": {
+      "defaultValue": "vmrules-azmon-prod-agrp",
+      "type": "String",
+      "metadata": {
+        "description": "Name of the action group to use for alert forwarding."
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-nonazurewinperf",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20191023",
+    "TemplateDescription": "Initial version",
+    "TemplateUsage": "Is used to create a single Windows service monitoring rule.",
+    "TemplateDocumentation": "<Name of document.>",
+    "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
+    "workspaceName": "[toLower(parameters('workspaceName'))]",
+    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
+    "perfCounter": "[replace(parameters('perfCounter'),'%', 'pct')]",
+    "criticalRuleName": "[concat(parameters('perfObject'), ' - ', variables('perfCounter'), ' - ', parameters('perfInstance'), ' - Critical (NonAzure)')]",
+    "warningRuleName": "[concat(parameters('perfObject'), ' - ', variables('perfCounter'), ' - ', parameters('perfInstance'), ' - Warning (NonAzure)')]",
+    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('criticalRuleName')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[variables('criticalRuleName')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('Perf\n| where _ResourceId == \"\"\n| where ObjectName == \"', parameters('perfObject'), '\" \n| where CounterName == \"', parameters('perfCounter'), '\"\n| where InstanceName == \"', parameters('perfInstance'), '\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > ', parameters('criticalThreshold'))]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "0",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": "[parameters('criticalThreshold')]",
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 1,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+      ]
+    },
+    {
+      "name": "[variables('warningRuleName')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[variables('warningRuleName')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('Perf\n| where _ResourceId contains \"\"\n| where ObjectName == \"', parameters('perfObject'), '\"\n| where CounterName == \"', parameters('perfCounter'), '\"\n| where InstanceName == \"', parameters('perfInstance'), '\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < ', parameters('criticalThreshold'))]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": "[parameters('warningThreshold')]",
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 1,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+      ]
+    }
+  ],
+  "outputs": {
+    "CriticalRuleName": {
+      "type": "string",
+      "value": "[variables('criticalRuleName')]"
+    },
+    "WarningRuleName": {
+      "type": "string",
+      "value": "[variables('warningRuleName')]"
+    }
+  }
+}

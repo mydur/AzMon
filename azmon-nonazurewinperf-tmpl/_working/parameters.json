@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "perfObject": {
+      "value": "Processor"
+    },
+    "perfCounter": {
+      "value": "% Processor Time"
+    },
+    "perfInstance": {
+      "value": "_Total"
+    },
+    "criticalThreshold": {
+      "value": 80
+    },
+    "warningThreshold": {
+      "value": 50
+    },
+    "AZMONBasicRGName": {
+      "value": "azmon-prod-rg"
+    },
+    "WorkspaceName": {
+      "value": "azmon2437-prod-lana"
+    },
+    "actionGroupName": {
+      "value": "vmrules-azmon-prod-agrp"
+    }
+  }
+}
