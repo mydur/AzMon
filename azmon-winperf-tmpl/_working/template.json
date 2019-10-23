@@ -1,0 +1,121 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "svcShortName": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Short name of the service to monitor."
+      }
+    },
+    "svcDisplayName": {
+      "type": "string",
+      "allowedValues": [
+      ],
+      "defaultValue": "",
+      "metadata": {
+        "description": "Display name of the servie to monitor."
+      }
+    },
+    "AZMONBasicRGName": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "workspaceName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "actionGroupName": {
+      "defaultValue": "vmrules-azmon-prod-agrp",
+      "type": "String",
+      "metadata": {
+        "description": "Name of the action group to use for alert forwarding."
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-winservice",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20191022",
+    "TemplateDescription": "Initial version",
+    "TemplateUsage": "Is used to create a single Windows service monitoring rule.",
+    "TemplateDocumentation": "<Name of document.>",
+    "svcShortName": "[parameters('svcShortName')]",
+    "svcDisplayName": "[parameters('svcDisplayName')]",
+    "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
+    "workspaceName": "[toLower(parameters('workspaceName'))]",
+    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
+    "ruleName": "[concat('Service - ', variables('svcShortName'), ' (', resourceGroup().name, ')')]",
+    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+  },
+  "resources": [
+    {
+      "name": "[variables('ruleName')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[variables('ruleName')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"', variables('svcDisplayName'), '\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 5
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 0,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+      ]
+    }
+  ],
+  "outputs": {
+    "RuleName": {
+      "type": "string",
+      "value": "[variables('ruleName')]"
+    }
+  }
+}
