@@ -2,11 +2,23 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "svcShortName": {
-      "value": "EventLog"
+    "perfObject": {
+      "value": "Processor"
     },
-    "svcDisplayName": {
-      "value": "Windows Event Log"
+    "perfCounter": {
+      "value": "% Processor Time"
+    },
+    "perfInstance": {
+      "value": "_Total"
+    },
+    "criticalThreshold": {
+      "value": 80
+    },
+    "warningThreshold": {
+      "value": 50
+    },
+    "resourceFilter": {
+      "value": "azmonvmprod01"
     },
     "AZMONBasicRGName": {
       "value": "azmon-prod-rg"
