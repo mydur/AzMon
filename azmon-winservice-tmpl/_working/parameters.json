@@ -3,10 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "svcShortName": {
-      "value": "EventLog"
+      "value": "W3SVC"
     },
     "svcDisplayName": {
-      "value": "Windows Event Log"
+      "value": "World Wide Web Publishing-service"
+    },
+    "resourceFilter": {
+      "value": "azmonvmprod01"
     },
     "AZMONBasicRGName": {
       "value": "azmon-prod-rg"

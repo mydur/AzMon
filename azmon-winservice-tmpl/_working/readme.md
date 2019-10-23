@@ -8,6 +8,7 @@ To be able to re-use the template the following parameters were introduced:
 
 - **svcShortName:** The short name of the service to monitor. This one is used to build the name of the rule.
 - **svcDisplayName:** The display name of the service to monitor. This one is used in the query.
+- **resourceFilter:** String to filter the _ResourceId field on. This can be the computername or resourcegroup name. This text is also used to create the name of the rule. (Default = resourcegroup name)
 - **WorkspaceRGName:** The resource group in which the log analytics workspace was installed by the azmon-basic-tmpl template.
 - **WorkspaceName:** The actual name of the log analytics workspace that can be found in the resource group of which the name is stored in AZMONBasicRGName.
 - **actionGroupName:** The name of the action group to use when an alert has to be forwarded. Please note that this action group needs to exist before deploying the template.
