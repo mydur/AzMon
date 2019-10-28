@@ -105,7 +105,7 @@
     }
   },
   "variables": {
-    "TemplateId": "azmon-linuxbasic",
+    "TemplateId": "azmon-basiclinux",
     "TemplateVersion": "1.0.0",
     "TemplateDate": "20191021",
     "TemplateDescription": "Initial version",
@@ -167,6 +167,125 @@
               },
               {
                 "severity": "err"
+              },
+              {
+                "severity": "warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LinuxSyslogDaemon",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+            "syslogName": "daemon",
+            "syslogSeverities": [
+              {
+                "severity": "emerg"
+              },
+              {
+                "severity": "alert"
+              },
+              {
+                "severity": "crit"
+              },
+              {
+                "severity": "err"
+              },
+              {
+                "severity": "warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LinuxSyslogCron",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+            "syslogName": "cron",
+            "syslogSeverities": [
+              {
+                "severity": "emerg"
+              },
+              {
+                "severity": "alert"
+              },
+              {
+                "severity": "crit"
+              },
+              {
+                "severity": "err"
+              },
+              {
+                "severity": "warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LinuxSyslogAuth",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+            "syslogName": "auth",
+            "syslogSeverities": [
+              {
+                "severity": "emerg"
+              },
+              {
+                "severity": "alert"
+              },
+              {
+                "severity": "crit"
+              },
+              {
+                "severity": "err"
+              },
+              {
+                "severity": "warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "LinuxSyslogSyslog",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "LinuxSyslog",
+          "properties": {
+            "syslogName": "syslog",
+            "syslogSeverities": [
+              {
+                "severity": "emerg"
+              },
+              {
+                "severity": "alert"
+              },
+              {
+                "severity": "crit"
+              },
+              {
+                "severity": "err"
+              },
+              {
+                "severity": "warning"
               }
             ]
           }
@@ -362,6 +481,300 @@
           "properties": {
             "state": "Enabled"
           }
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogDaemonWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - daemon - Warning",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogDaemonCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - daemon - Critical",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogKernCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - kern - Critical",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogKernWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - kern - Warning",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogCronWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - cron - Warning",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogCronCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - cron - Critical",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogAuthWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - auth - Warning",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogAuthCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - auth - Critical",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogSyslogWarning",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - syslog - Warning",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogSyslogCritical",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Syslog - syslog - Critical",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogDaemonNtpd",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Daemon State - ntpd",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"ntpd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogDaemonCrond",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Daemon State - crond",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"crond\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogDaemonSshd",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Daemon State - sshd",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"sshd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogDaemonSyslogd",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Daemon State - syslogd",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"syslogd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSyslogDaemonAuditd",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Daemon State - auditd",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"auditd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchPerfMemorypctAvail",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Perf Memory pct Available",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 5')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchPerfMemorypctAvailSwap",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Perf Memory pct Available Swap Space",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 5')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchPerfMemoryPagesPerSec",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Perf Memory Pages per Sec",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue > 500')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchPerfLogDiskPctUsedRoot",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Perf Logical Disk pct Used Root",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue > 95')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchPerfLogDiskFreeMBRoot",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Perf Logical Disk Free MB Root",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 500')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchPerfProcessorIOWait",
+          "apiVersion": "2017-03-15-preview",
+          "properties": {
+            "category": "Getronics Linux Monitoring",
+            "displayName": "Linux Perf Processor IO Wait Time",
+            "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > 85')]",
+            "version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
         }
       ]
     }
