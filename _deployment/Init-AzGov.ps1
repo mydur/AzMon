@@ -165,7 +165,7 @@ $ResourceGroup = (az group create `
                 --tags CreatedBy="$UserDisplayName" OwnedBy="$TagOwnedBy" CostCenter="$TagCostCenter" CreatedOn="$TagCreatedOn" EndsOn="$TagEndsOn" Environment="$TagEnvironment" Project="$TagProject") `
 | ConvertFrom-Json
 ("Resource Group: " + $ResourceGroup.id)
-$ParametersJSON.Outputs.GovResGroupId = $ResourceGroup.id)
+$ParametersJSON.Outputs.GovResGroupId = $ResourceGroup.id
 
 # 4. CREATE A KEY VAULT
 # ---------------------

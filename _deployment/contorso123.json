@@ -39,6 +39,8 @@
     "autoAcctName": "tbd",
     "autoAcctId": "tbd",
     "storAcctName": "tbd",
+    "azMonBasicLinuxTmpl": "tbd",
+    "azMonVMLinuxRulesTmpl": "tbd",
     "azMonNonAzureVMsTmpl": "Succeeded",
     "nonAzureVMsActionGroupId": "/subscriptions/a53c5946-e76d-4ca2-bee2-57cfbb3eee7a/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/nonazure-azmon-prod-agrp",
     "azMonSvcHealthTmpl": "tbd",
