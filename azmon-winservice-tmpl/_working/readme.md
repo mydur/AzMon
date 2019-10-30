@@ -1,6 +1,6 @@
 # azmon-winservice-tmpl
 
-The purpose of this template is to deploy an alert rule to monitor a give Windows service. The service to monitor is provided in a parameter to the template. You need to give the short name as well as the display name for the rule to work. Also the name of the action to use when forwarding the alert needs to be provided as a parameter. However, the latter has a default value: vmrules-azmon-prod-agrp
+The purpose of this template is to deploy an alert rule to monitor a given Windows service. The service to monitor is provided in a parameter to the template. You need to give the short name as well as the display name for the rule to work. Also the name of the action group to use when forwarding the alert needs to be provided as a parameter. However, the latter has a default value: vmrules-azmon-prod-agrp
 
 The target resource group for the deployment is the resource group containing the virtual machines that need to be monitored.
 

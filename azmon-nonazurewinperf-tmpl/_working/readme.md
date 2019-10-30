@@ -1,6 +1,6 @@
 # azmon-nonazurewinperf-tmpl
 
-The purpose of this template is to deploy performance counter based alert rules for Non-Azure VMs. Two rules will be deployed, one for Critical alert level and the other for Warning alert level. Both alert rules will be of the metric measurement type which means that an alert is generated for each computer that falls within the defined criteria. Performance object, counter and instance can be specified via parameters as well as the critical and warning thresholds. Filtering is not possible which means that all NonAzure VMs will be affected by the rules.
+The purpose of this template is to deploy performance counter based alert rules for Non-Azure VMs. Two rules will be deployed, one for Critical alert level and the other for Warning alert level. Both alert rules will be of the metric measurement type which means that an alert is generated for each computer that falls within the defined criteria. Performance object, counter and instance can be specified via parameters as well as the critical and warning thresholds.  Filtering is only possible on computername and this must be an exact match. Also the name of the action group to use when forwarding the alert needs to be provided as a parameter. However, the latter has a default value: nonazure-azmon-prod-agrp
 
 The target resource group for the deployment is the resource group containing the base resources for the service (probably azmon-prod-rg).
 
@@ -11,6 +11,7 @@ To be able to re-use the template the following parameters were introduced:
 - **perfInstance:** Performance instance to monitor (ex. _Total).
 - **warningThreshold:** Threshold for the warning alert.
 - **criticalThreshold:** THreshold for the critical alert.
+- **resourceFilter:** Enter the computername for which you want to add monitoring (must be exact match!)
 - **WorkspaceRGName:** The resource group in which the log analytics workspace was installed by the azmon-basic-tmpl template.
 - **WorkspaceName:** The actual name of the log analytics workspace that can be found in the resource group of which the name is stored in AZMONBasicRGName.
 - **actionGroupName:** The name of the action group to use when an alert has to be forwarded. Please note that this action group needs to exist before deploying the template.

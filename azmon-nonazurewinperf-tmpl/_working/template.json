@@ -37,22 +37,29 @@
         "description": "Critical Threshold"
       }
     },
+    "resourceFilter": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Enter the computername for which you want to add monitoring (must be exact match!)"
+      }
+    },
     "AZMONBasicRGName": {
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+        "description": "Resource group name where basic monitoring was deployed"
       }
     },
     "workspaceName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+        "description": "Workspace name where basic monitoring is running"
       }
     },
     "actionGroupName": {
-      "defaultValue": "vmrules-azmon-prod-agrp",
+      "defaultValue": "nonazure-azmon-prod-agrp",
       "type": "String",
       "metadata": {
         "description": "Name of the action group to use for alert forwarding."
@@ -74,8 +81,9 @@
     "workspaceName": "[toLower(parameters('workspaceName'))]",
     "actionGroupName": "[toLower(parameters('actionGroupName'))]",
     "perfCounter": "[replace(parameters('perfCounter'),'%', 'pct')]",
-    "criticalRuleName": "[concat(parameters('perfObject'), ' - ', variables('perfCounter'), ' - ', parameters('perfInstance'), ' - Critical (NonAzure)')]",
-    "warningRuleName": "[concat(parameters('perfObject'), ' - ', variables('perfCounter'), ' - ', parameters('perfInstance'), ' - Warning (NonAzure)')]",
+    "resourceFilter": "[toLower(parameters('resourceFilter'))]",
+    "criticalRuleName": "[concat(parameters('perfObject'), ' - ', variables('perfCounter'), ' - ', parameters('perfInstance'), ' - Critical (', variables('resourceFilter'), ')')]",
+    "warningRuleName": "[concat(parameters('perfObject'), ' - ', variables('perfCounter'), ' - ', parameters('perfInstance'), ' - Warning (', variables('resourceFilter'), ')')]",
     "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
@@ -96,7 +104,7 @@
         "description": "[variables('criticalRuleName')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('Perf\n| where _ResourceId == \"\"\n| where ObjectName == \"', parameters('perfObject'), '\" \n| where CounterName == \"', parameters('perfCounter'), '\"\n| where InstanceName == \"', parameters('perfInstance'), '\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > ', parameters('criticalThreshold'))]",
+          "query": "[concat('Perf\n| where _ResourceId == \"\"\n| where Computer == \"', variables('resourceFilter'), '\"\n| where ObjectName == \"', parameters('perfObject'), '\" \n| where CounterName == \"', parameters('perfCounter'), '\"\n| where InstanceName == \"', parameters('perfInstance'), '\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > ', parameters('criticalThreshold'))]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -105,7 +113,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 15
         },
         "action": {
           "severity": "0",
@@ -145,7 +153,7 @@
         "description": "[variables('warningRuleName')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('Perf\n| where _ResourceId contains \"\"\n| where ObjectName == \"', parameters('perfObject'), '\"\n| where CounterName == \"', parameters('perfCounter'), '\"\n| where InstanceName == \"', parameters('perfInstance'), '\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < ', parameters('criticalThreshold'))]",
+          "query": "[concat('Perf\n| where _ResourceId == \"\"\n| where Computer == \"', variables('resourceFilter'), '\"\n| where ObjectName == \"', parameters('perfObject'), '\"\n| where CounterName == \"', parameters('perfCounter'), '\"\n| where InstanceName == \"', parameters('perfInstance'), '\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < ', parameters('criticalThreshold'))]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -154,7 +162,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 15
         },
         "action": {
           "severity": "1",

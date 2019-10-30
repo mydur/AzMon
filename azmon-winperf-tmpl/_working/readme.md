@@ -1,6 +1,6 @@
 # azmon-winperf-tmpl
 
-The purpose of this template is to deploy performance counter based alert rules. Two rules will be deployed, one for Critical alert level and the other for Warning alert level. Both alert rules will be of the metric measurement type which means that an alert is generated for each computer that falls within the defined criteria. Performance object, counter and instance can be specified via parameters as well as the critical and warning thresholds. Filtering is also possible by providing a string that will be compared against the resource id. This string can for example contain a computername or resourcegroup name.
+The purpose of this template is to deploy performance counter based alert rules. Two rules will be deployed, one for Critical alert level and the other for Warning alert level. Both alert rules will be of the metric measurement type which means that an alert is generated for each computer that falls within the defined criteria. Performance object, counter and instance can be specified via parameters as well as the critical and warning thresholds. Filtering is also possible by providing a string that will be compared against the resource id. This string can for example contain a computername or resourcegroup name. Also the name of the action group to use when forwarding the alert needs to be provided as a parameter. However, the latter has a default value: vmrules-azmon-prod-agrp
 
 The target resource group for the deployment is the resource group containing the virtual machines that need to be monitored.
 

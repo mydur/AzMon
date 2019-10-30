@@ -1,6 +1,6 @@
 # azmon-nonazurewinservice-tmpl
 
-The purpose of this template is to deploy an alert rule to monitor a give Windows service. The service to monitor is provided in a parameter to the template. You need to give the short name as well as the display name for the rule to work. Also the name of the action to use when forwarding the alert needs to be provided as a parameter. However, the latter has a default value: nonazure-azmon-prod-agrp
+The purpose of this template is to deploy an alert rule to monitor a give Windows service. The service to monitor is provided in a parameter to the template. You need to give the short name as well as the display name for the rule to work. Filtering is only possible on computername and this must be an exact match. Also the name of the action to use when forwarding the alert needs to be provided as a parameter. However, the latter has a default value: nonazure-azmon-prod-agrp
 
 The target resource group for the deployment is the resource group containing the workspace and other base resources (probably 'azmon-prod-rg')
 
@@ -8,6 +8,7 @@ To be able to re-use the template the following parameters were introduced:
 
 - **svcShortName:** The short name of the service to monitor. This one is used to build the name of the rule.
 - **svcDisplayName:** The display name of the service to monitor. This one is used in the query.
+- **resourceFilter:** Enter the computername for which you want to add monitoring (must be exact match!)
 - **WorkspaceRGName:** The resource group in which the log analytics workspace was installed by the azmon-basic-tmpl template.
 - **WorkspaceName:** The actual name of the log analytics workspace that can be found in the resource group of which the name is stored in AZMONBasicRGName.
 - **actionGroupName:** The name of the action group to use when an alert has to be forwarded. Please note that this action group needs to exist before deploying the template.

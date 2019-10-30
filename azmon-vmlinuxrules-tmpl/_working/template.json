@@ -64,8 +64,8 @@
     "Environment": "[toLower(parameters('Environment'))]",
     "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
     "workspaceName": "[toLower(parameters('workspaceName'))]",
-    "actionGroupName": "[concat('vmrlinuxules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
-    "actionGroupShortName": "[take(concat('vmrlinux', variables('Project')), 12)]",
+    "actionGroupName": "[concat('vmlinuxrules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupShortName": "[take(concat('vmlinux', variables('Project')), 12)]",
     "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
@@ -112,7 +112,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -167,7 +167,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -222,7 +222,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -277,7 +277,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -332,7 +332,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -387,7 +387,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -442,7 +442,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -497,7 +497,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -552,7 +552,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -607,7 +607,7 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 1,
+            "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
@@ -1310,8 +1310,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 5,
+          "timeWindowInMinutes": 15
         },
         "action": {
           "severity": "1",

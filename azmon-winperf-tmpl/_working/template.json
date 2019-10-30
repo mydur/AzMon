@@ -113,7 +113,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 15
         },
         "action": {
           "severity": "0",
@@ -162,7 +162,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 15
         },
         "action": {
           "severity": "1",

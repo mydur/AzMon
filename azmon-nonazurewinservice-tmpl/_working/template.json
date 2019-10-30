@@ -11,25 +11,30 @@
     },
     "svcDisplayName": {
       "type": "string",
-      "allowedValues": [
-      ],
       "defaultValue": "",
       "metadata": {
         "description": "Display name of the servie to monitor."
+      }
+    },
+    "resourceFilter": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Enter the computername for which you want to add monitoring (must be exact match!)"
       }
     },
     "AZMONBasicRGName": {
       "defaultValue": "",
       "type": "string",
       "metadata": {
-        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+        "description": "Resource group name where basic monitoring was deployed"
       }
     },
     "workspaceName": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
-        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+        "description": "Workspace name where basic monitoring is running"
       }
     },
     "actionGroupName": {
@@ -53,10 +58,11 @@
     "TemplateDocumentation": "<Name of document.>",
     "svcShortName": "[parameters('svcShortName')]",
     "svcDisplayName": "[parameters('svcDisplayName')]",
+    "resourceFilter": "[toLower(parameters('resourceFilter'))]",
     "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
     "workspaceName": "[toLower(parameters('workspaceName'))]",
     "actionGroupName": "[toLower(parameters('actionGroupName'))]",
-    "ruleName": "[concat('Service - ', variables('svcShortName'), ' (', resourceGroup().name, ')')]",
+    "ruleName": "[concat('Service - ', variables('svcShortName'), ' (', variables('resourceFilter'), ')')]",
     "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
@@ -77,7 +83,7 @@
         "description": "[variables('ruleName')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('ConfigurationChange\n| where _ResourceId == \"\"\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"', variables('svcDisplayName'), '\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('ConfigurationChange\n| where _ResourceId == \"\"\n| where Computer == \"', variables('resourceFilter'), '\"\n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"', variables('svcDisplayName'), '\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [

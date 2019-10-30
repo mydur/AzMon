@@ -17,6 +17,9 @@
     "warningThreshold": {
       "value": 50
     },
+    "resourceFilter": {
+      "value": ""
+    },
     "AZMONBasicRGName": {
       "value": "azmon-prod-rg"
     },
