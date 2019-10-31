@@ -102,6 +102,8 @@ $TagProject = "AzMon"
 $AzMonLocalPath = "C:\Getronics\AzMon"
 $GithubBaseFolder = "https://github.com/mydur/ARMtemplates/raw/master/"
 $VMWorkbookName = "azmon-$Environment-wbok"
+$RBOKAlertLifeCycleAckThreshold = 3     # Number of days without changes after which alert is set to Acknowledged
+$RBOKAlertLifeCycleCloseThreshold = 20  # Number of days without changes after which alert is set to Closed
 
 
 ##########################################################################
@@ -144,6 +146,10 @@ New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -It
 $TemplateFolder = "azmon-basiclinux-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+# Runbooks
+New-Item -Path ($AzMonLocalPath + "\_deployment") -ItemType Directory -ErrorAction SilentlyContinue
+$FileName = "azmon-alertlifecycle-rbok.ps1"
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + "_deployment/" + $FileName) | Out-File -FilePath ($AzMonLocalPath + "\_deployment\" + $FileName) -Force -Encoding ascii
 #
 ##########################################################################
 # LOGIN TO AZURE
@@ -271,6 +277,26 @@ $AutoAcctName = $AzMonBasic.properties.outputs.automationaccountname.value
 $ParametersJSON.Outputs.autoAcctName = $AutoAcctName
 $AutoAcctId = $AzMonBasic.properties.outputs.automationaccountid.value
 #
+# AUTOMATION RUNBOOKS
+# -------------------
+# General configuration
+New-AzAutomationVariable -Name "General_SubscriptionId" -Value $SubscriptionId -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
+New-AzAutomationVariable -Name "General_TenantId" -Value $TenantId -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
+New-AzAutomationVariable -Name "General_ClientId" -Value ((Get-AzADServicePrincipal -DisplayName ("azps-" + $Environment + "-aada")).ApplicationId.Guid) -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $True
+New-AzAutomationVariable -Name "General_ClientSecret" -Value $AzPSAadaSecret -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $True
+# Schedules
+$TimeZone = ([System.TimeZoneInfo]::Local).Id
+$StartTime = (Get-Date "06:00:00").AddDays(1)
+$ScheduleName = "daily-0600"
+New-AzAutomationSchedule -Name $ScheduleName -StartTime $StartTime -DayInterval 1 -TimeZone $TimeZone -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName
+# azmon-alertlifecycle-rbok
+$RunbookName = "azmon-alertlifecycle-rbok"
+$RunbookDescription = "Manage the lifecycle of an alert New-Acknowledged-Closed."
+$RunbookPath = ($AzMonLocalPath + "\_deployment\" + $RunbookName + ".ps1")
+New-AzAutomationVariable -Name "AlertLifeCycle_AckThreshold" -Value $RBOKAlertLifeCycleAckThreshold -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
+New-AzAutomationVariable -Name "AlertLifeCycle_CloseThreshold" -Value $RBOKAlertLifeCycleCloseThreshold -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
+Import-AzAutomationRunbook -Path $RunbookPath -Name $RunbookName -Description $RunbookDescription -Type PowerShell -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Force -Published
+Register-AzAutomationScheduledRunbook -Name $RunbookName -ScheduleName $ScheduleName -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName
 #
 # DIAGNOSTICS SETTINGS
 # ------------------------
