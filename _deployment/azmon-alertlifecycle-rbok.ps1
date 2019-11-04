@@ -24,14 +24,12 @@ foreach ($Alert in $Alerts.value) {
 
     If (($DiffInDays -gt $ClosedThreshold) -and ($Alert.properties.essentials.alertState -eq "Acknowledged")) {
         $AlertStateApiUri = "https://management.azure.com" + $Alert.id + "/changestate?api-version=2018-05-05&newState=Closed"
-        $AlertStateApiUri
         $AlertState = Invoke-RestMethod -Method Post -Uri $AlertStateApiUri -Headers $Headers
         $NumClosed += 1
     }
 
     If (($DiffInDays -gt $AckThreshold) -and ($Alert.properties.essentials.alertState -eq "New")) {
         $AlertStateApiUri = "https://management.azure.com" + $Alert.id + "/changestate?api-version=2018-05-05&newState=Acknowledged"
-        $AlertStateApiUri
         $AlertState = Invoke-RestMethod -Method Post -Uri $AlertStateApiUri -Headers $Headers
         $NumAcked += 1
     }
