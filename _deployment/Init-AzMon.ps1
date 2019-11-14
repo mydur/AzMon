@@ -89,6 +89,7 @@ $TagCostCenter = $ParametersJSON.General.TagCostCenter
 $UniqueNumber = $ParametersJSON.General.UniqueNumber
 $LocationDisplayName = $ParametersJSON.General.LocationDisplayName
 $VMResourceGroupName = $ParametersJSON.VMRules.VMRGName
+$dataPerDayThresholdMB = $ParametersJSON.Basic.dataPerDayThresholdMB
 # Probably no change needed...
 $ResourceGroupName = ("azmon-$Environment-rg").ToLower()
 $WorkspaceName = $ParametersJSON.Outputs.workspaceName
@@ -110,6 +111,9 @@ $RBOKAlertLifeCycleCloseThreshold = 20  # Number of days without changes after w
 # DOWNLOAD TEMPLATE FILES
 ##########################################################################
 $TemplateFolder = "azmon-basic-tmpl/_working"
+New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+$TemplateFolder = "azmon-basicrules-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 $TemplateFolder = "azmon-svchealth-tmpl/_working"
@@ -171,16 +175,16 @@ else {
                         --tenant "$TenantID" `
                         --use-device-code) `
         | ConvertFrom-Json
-$UserNameUPN = $Login.user.name
-$UserDetails = (az ad user show `
-                --id "$UsernameUPN") `
-| ConvertFrom-Json
-If ($UserDetails) {
-        $UserDisplayName = $UserDetails.displayName
-}
-else {
-        $UserDisplayName = $Login.user.name
-}
+        $UserNameUPN = $Login.user.name
+        $UserDetails = (az ad user show `
+                        --id "$UsernameUPN") `
+        | ConvertFrom-Json
+        If ($UserDetails) {
+                $UserDisplayName = $UserDetails.displayName
+        }
+        else {
+                $UserDisplayName = $Login.user.name
+        }
 }
 $AzPSAadaKeyv = (az keyvault secret show `
                 --vault-name $KeyvaultName `
@@ -232,218 +236,246 @@ If ($DeployBaseSetup) {
                         "OwnedBy=$TagOwnedBy" `
                         "Project=$TagProject") `
         | ConvertFrom-Json
-("Resource Group: " + $ResourceGroup.id)
-#
-#
-# BASIC (azmon-basic-tmpl)
-# ---------------------------
-# The purpose of this template is to deploy a basic setup of Azure Monitor. It contains the following resources:
-# - Log Analytics workspace
-# - Automation Account
-# - Storage Account
-# For the storage account and automation account there's no initial configuration but the log analytics workspace has initial configurations set in the template for the following:
-# - Datasources
-# - Saved searches
-# - Solutions
-# - Linked services
-# The template also contains an 'outputs' section of which the output is captured in variables listed below.
-("azmon-basic-tmpl...")
-$WorkspaceDataRetention = $ParametersJSON.Basic.WorkspaceDataRetention
-$AzMonBasic = (az group deployment create `
-                --resource-group "$ResourceGroupName" `
-                --template-file ($AzMonLocalPath + "\azmon-basic-tmpl\_working\template.json") `
-                --name "azmon-basic" `
-                --parameters `
-                "Project=$TagProject" `
-                "VMRGName=$VMResourceGroupName " `
-                "Environment=$Environment" `
-                "dataRetention=$WorkspaceDataRetention" `
-                "Location=$LocationLong" `
-                "CreatedOn=$TagCreatedOn" `
-                "EndsOn=$TagEndsOn" `
-                "CreatedBy=$UserDisplayName" `
-                "OwnedBy=$TagOwnedBy" `
-                "UniqueNumber=$UniqueNumber") `
-| ConvertFrom-Json
-("azmon-basic-tmpl: " + $AzMonBasic.properties.provisioningState + " (" + $AzMonBasic.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonBasicTmpl = $AzMonBasic.properties.provisioningState
-$WorkspaceName = $AzMonBasic.properties.outputs.workspacename.value
-$ParametersJSON.Outputs.workspaceName = $WorkspaceName
-$WorkspaceId = $AzMonBasic.properties.outputs.workspaceid.value
-$ParametersJSON.Outputs.workspaceID = $WorkspaceId
-$StorAcctName = $AzMonBasic.properties.outputs.storageaccountname.value
-$ParametersJSON.Outputs.storAcctName = $StorAcctName
-$AutoAcctName = $AzMonBasic.properties.outputs.automationaccountname.value
-$ParametersJSON.Outputs.autoAcctName = $AutoAcctName
-$AutoAcctId = $AzMonBasic.properties.outputs.automationaccountid.value
-#
-# AUTOMATION RUNBOOKS
-# -------------------
-# General configuration
-New-AzAutomationVariable -Name "General_SubscriptionId" -Value $SubscriptionId -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
-New-AzAutomationVariable -Name "General_TenantId" -Value $TenantId -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
-New-AzAutomationVariable -Name "General_ClientId" -Value ((Get-AzADServicePrincipal -DisplayName ("azps-" + $Environment + "-aada")).ApplicationId.Guid) -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $True
-New-AzAutomationVariable -Name "General_ClientSecret" -Value $AzPSAadaSecret -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $True
-# Schedules
-$TimeZone = ([System.TimeZoneInfo]::Local).Id
-$StartTime = (Get-Date "06:00:00").AddDays(1)
-$ScheduleName = "daily-0600"
-New-AzAutomationSchedule -Name $ScheduleName -StartTime $StartTime -DayInterval 1 -TimeZone $TimeZone -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName
-# azmon-alertlifecycle-rbok
-$RunbookName = "azmon-alertlifecycle-rbok"
-$RunbookDescription = "Manage the lifecycle of an alert New-Acknowledged-Closed."
-$RunbookPath = ($AzMonLocalPath + "\_deployment\" + $RunbookName + ".ps1")
-New-AzAutomationVariable -Name "AlertLifeCycle_AckThreshold" -Value $RBOKAlertLifeCycleAckThreshold -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
-New-AzAutomationVariable -Name "AlertLifeCycle_CloseThreshold" -Value $RBOKAlertLifeCycleCloseThreshold -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
-Import-AzAutomationRunbook -Path $RunbookPath -Name $RunbookName -Description $RunbookDescription -Type PowerShell -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Force -Published
-Register-AzAutomationScheduledRunbook -Name $RunbookName -ScheduleName $ScheduleName -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName
-#
-# DIAGNOSTICS SETTINGS
-# ------------------------
-# Most Azure resources emit logs that can be capture by a log analytics workspace. In this section we configure diagnostics settings for some AzGov and AzMon resources.
-# AzGov.Keyvault
-$KeyvDiagSet = '[{ \"category\": \"AuditEvent\", \"enabled\": true, \"retentionPolicy\": { \"enabled\": false, \"days\": 0 }}]'
-$KeyvaultId = (az keyvault show --name "$KeyvaultName" --resource-group "$KeyvaultRGName" | ConvertFrom-Json).id
-$KeyvDiagnostics = (az monitor diagnostic-settings create `
-                --name "$WorkspaceName" `
-                --resource "$KeyvaultId" `
-                --workspace "$WorkspaceId" `
-                --logs "$KeyvDiagSet") `
-| ConvertFrom-Json
-("$KeyvaultName diagnostic settings: " + $KeyvDiagnostics.id)
-# AzMon.AutomationAccount
-$AutoAcctDiagSet = '[{ \"category\": \"JobLogs\", \"enabled\": true, \"retentionPolicy\": { \"enabled\": false, \"days\": 0 }}]'
-$AutoAcctDiagnostics = (az monitor diagnostic-settings create `
-                --name "$WorkspaceName" `
-                --resource "$AutoAcctId" `
-                --workspace "$WorkspaceId" `
-                --logs "$AutoAcctDiagSet") `
-| ConvertFrom-Json
-("$AutoAcctName diagnostic settings: " + $AutoAcctDiagnostics.id)
-# AzGov.AutomationAccount
-$AzGovAutoAcctId = $AutoAcctId -replace "azmon", "azgov"
-$AzGovAutoAcctName = $AutoAcctName -replace "azmon", "azgov"
-$AutoAcctDiagnostics = (az monitor diagnostic-settings create `
-                --name "$WorkspaceName" `
-                --resource "$AzGovAutoAcctId" `
-                --workspace "$WorkspaceId" `
-                --logs "$AutoAcctDiagSet") `
-| ConvertFrom-Json
-("$AzGovAutoAcctName diagnostic settings: " + $AutoAcctDiagnostics.id)
-#
-#
-# SVCHEALTH (azmon-svchealth-tmpl)
-# -----------------------------------
-# Azure is comprised of managed services that are offered to the customer. These services hosted in Azure all run of course on hardware. It is Microsoft's task to monitor that hardware and also the software that delivers the service to the customer. We can't and shouldn't monitor the hardware or the software that hosts the services but we should at least be aware of the health state of the different services.
-# This template aims to notify us when a service has issues or when there's planned downtime or maintenance scheduled.
-# Alert rules created in this template also need a target to work against. In this case this will be at the subscription level. Two alert rules will be created, one for Incidents and one for Information.
-("azmon-svchealth-tmpl...")
-$AzMonSvcHealth = (az group deployment create `
-                --resource-group "$ResourceGroupName" `
-                --template-file ($AzMonLocalPath + "\azmon-svchealth-tmpl\_working\template.json") `
-                --name "azmon-svchealth" `
-                --parameters `
-                "Project=$TagProject" `
-                "Environment=$Environment" `
-                "CreatedOn=$TagCreatedOn" `
-                "EndsOn=$TagEndsOn" `
-                "CreatedBy=$UserDisplayName" `
-                "OwnedBy=$TagOwnedBy") `
-| ConvertFrom-Json
-("azmon-svchealth-tmpl: " + $AzMonSvcHealth.properties.provisioningState + " (" + $AzMonSvcHealth.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonSvcHealthTmpl = $AzMonSvcHealth.properties.provisioningState
-$SvcHealthActionGroupId = $AzMonSvcHealth.properties.outputs.ActionGroupId.value
-$ParametersJSON.Outputs.svcHealthActionGroupId = $SvcHealthActionGroupId
-#
-#
-# NWRULES (azmon-nwrules-tmpl)
-# -------------------------------
-# The purpose of this template is to deploy network monitoring alert rules that are used to alert if one or more of the three tests detected network issues. These tests are:
-# - AzVnet2OnPrem: Azure VNet to on-premise infrastructure communication.
-# - AzVnet2Web: Azure VNet to internet communication.
-# - AzVnet2AzVnet: Azure VNet to Azure VNet communication
-# These tests need to be configured manually in the log analytics workspace via a set of steps that are separately available.
-("azmon-nwrules-tmpl...")
-$AzMonNWRules = (az group deployment create `
-                --resource-group "$ResourceGroupName" `
-                --template-file ($AzMonLocalPath + "\azmon-nwrules-tmpl\_working\template.json") `
-                --name "azmon-nwrules" `
-                --parameters `
-                "Project=$TagProject" `
-                "Environment=$Environment" `
-                "WorkspaceRGName=$ResourceGroupName" `
-                "workspaceName=$WorkspaceName" `
-                "CreatedOn=$TagCreatedOn" `
-                "EndsOn=$TagEndsOn" `
-                "CreatedBy=$UserDisplayName" `
-                "OwnedBy=$TagOwnedBy") `
-| ConvertFrom-Json
-("azmon-nwrules-tmpl: " + $AzMonNWRules.properties.provisioningState + " (" + $AzMonNWRules.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonNWRulesTmpl = $AzMonNWRules.properties.provisioningState
-$NWRulesActionGroupId = $AzMonNWRules.properties.outputs.ActionGroupId.value
-$ParametersJSON.Outputs.nwRulesActionGroupId = $NWRulesActionGroupId
-#
-#
-# VMWORKBOOK (azmon-vmworkbook-tmpl)
-# -------------------------------------
-# The vmworkbook template is used to deploy an Azure monitor workbook to report on computer health and base performance counters. The location or region where the workbook is deployed is the same as the one where the target resource group is located. As a resource group it's best to select the same resource group as the one where the log analytics workspace was deployed.
-("azmon-vmworkbook-tmpl...")
-$TemplateContents = Get-Content -Path ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json")
-$NewTemplateContents = $TemplateContents -replace "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a", $SubscriptionID -replace "azmon-prod-mydur", $VMWorkbookName -replace "azmon2437-prod-lana", $WorkspaceName -replace "azmon-prod-rg", $ResourceGroupName
-$NewTemplateContents | Out-File -FilePath ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json") -Force  -Encoding ascii
-$AzMonVMWorkbook = (az group deployment create `
-                --resource-group "$ResourceGroupName" `
-                --template-file ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json") `
-                --name "azmon-vmworkbook" ) `
-| ConvertFrom-Json
-("azmon-vmworkbook-tmpl: " + $AzMonVMWorkbook.properties.provisioningState + " (" + $AzMonVMWorkbook.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonVMWorkbookTmpl = $AzMonVMWorkbook.properties.provisioningState
-#
-#
-# BACKUPSOL (azmon-backupsol-tmpl)
-# -----------------------------------
-# The template deploys an additional solution to the log analytics workspace to monitor Azure backup.
-("azmon-backupsol-tmpl...")
-$AzMonBackupSol = (az group deployment create `
-                --resource-group "$ResourceGroupName" `
-                --template-file ($AzMonLocalPath + "\azmon-backupsol-tmpl\_working\template.json") `
-                --name "azmon-backupsol" `
-                --parameters `
-                "Environment=$Environment" `
-                "workspaceName=$WorkspaceName" `
-                "Location=$Location") `
-| ConvertFrom-Json
-("azmon-backupsol-tmpl: " + $AzMonBackupSol.properties.provisioningState + " (" + $AzMonBackupSol.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonBackupSolTmpl = $AzMonBackupSol.properties.provisioningState
-#
-# CREATE SERVICE PRINCIPAL
-# ---------------------------
-# AZMON
-("$AzMonAadaName...")
-$AzMonAada = (az ad sp create-for-rbac `
-                --name "$AzMonAadaName" `
-                --years 3) `
-| ConvertFrom-Json
-($AzMonAada.displayName + ": " + $AzMonAada.appId)
-$AzMonAadaKeyv = (az keyvault secret set `
-                --vault-name "$KeyvaultName" `
-                --name "$AzMonAadaName" `
-                --description "Password" `
-                --value $AzMonAada.password) `
-| ConvertFrom-Json
-($AzMonAada.displayName + " keyvault secret: " + $AzMonAadaKeyv.id)
-$AzMonAadaSP = (az ad sp show `
-                --id $AzMonAada.name) `
-| ConvertFrom-Json
-$AzMonAadaKeyvPol = (az keyvault set-policy `
-                --name "$KeyvaultName" `
-                --resource-group "$KeyvaultRGName" `
-                --object-id $AzMonAadaSP.objectId `
-                --secret-permissions get list `
-                --storage-permissions get getsas list listsas `
-                --certificate-permissions get getissuers list listissuers `
-                --key-permissions get list) `
-| ConvertFrom-Json
+        ("Resource Group: " + $ResourceGroup.id)
+        #
+        #
+        # BASIC (azmon-basic-tmpl)
+        # ---------------------------
+        # The purpose of this template is to deploy a basic setup of Azure Monitor. It contains the following resources:
+        # - Log Analytics workspace
+        # - Automation Account
+        # - Storage Account
+        # For the storage account and automation account there's no initial configuration but the log analytics workspace has initial configurations set in the template for the following:
+        # - Datasources
+        # - Saved searches
+        # - Solutions
+        # - Linked services
+        # The template also contains an 'outputs' section of which the output is captured in variables listed below.
+        ("azmon-basic-tmpl...")
+        $WorkspaceDataRetention = $ParametersJSON.Basic.WorkspaceDataRetention
+        $AzMonBasic = (az group deployment create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-basic-tmpl\_working\template.json") `
+                        --name "azmon-basic" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "VMRGName=$VMResourceGroupName " `
+                        "Environment=$Environment" `
+                        "dataRetention=$WorkspaceDataRetention" `
+                        "Location=$LocationLong" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy" `
+                        "UniqueNumber=$UniqueNumber") `
+        | ConvertFrom-Json
+        ("azmon-basic-tmpl: " + $AzMonBasic.properties.provisioningState + " (" + $AzMonBasic.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonBasicTmpl = $AzMonBasic.properties.provisioningState
+        $WorkspaceName = $AzMonBasic.properties.outputs.workspacename.value
+        $ParametersJSON.Outputs.workspaceName = $WorkspaceName
+        $WorkspaceId = $AzMonBasic.properties.outputs.workspaceid.value
+        $ParametersJSON.Outputs.workspaceID = $WorkspaceId
+        $StorAcctName = $AzMonBasic.properties.outputs.storageaccountname.value
+        $ParametersJSON.Outputs.storAcctName = $StorAcctName
+        $AutoAcctName = $AzMonBasic.properties.outputs.automationaccountname.value
+        $ParametersJSON.Outputs.autoAcctName = $AutoAcctName
+        $AutoAcctId = $AzMonBasic.properties.outputs.automationaccountid.value
+        #
+        # AUTOMATION RUNBOOKS
+        # -------------------
+        # General configuration
+        New-AzAutomationVariable -Name "General_SubscriptionId" -Value $SubscriptionId -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
+        New-AzAutomationVariable -Name "General_TenantId" -Value $TenantId -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
+        New-AzAutomationVariable -Name "General_ClientId" -Value ((Get-AzADServicePrincipal -DisplayName ("azps-" + $Environment + "-aada")).ApplicationId.Guid) -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $True
+        New-AzAutomationVariable -Name "General_ClientSecret" -Value $AzPSAadaSecret -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $True
+        # Schedules
+        $TimeZone = ([System.TimeZoneInfo]::Local).Id
+        $StartTime = (Get-Date "06:00:00").AddDays(1)
+        $ScheduleName = "daily-0600"
+        New-AzAutomationSchedule -Name $ScheduleName -StartTime $StartTime -DayInterval 1 -TimeZone $TimeZone -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName
+        # azmon-alertlifecycle-rbok
+        $RunbookName = "azmon-alertlifecycle-rbok"
+        $RunbookDescription = "Manage the lifecycle of an alert New-Acknowledged-Closed."
+        $RunbookPath = ($AzMonLocalPath + "\_deployment\" + $RunbookName + ".ps1")
+        New-AzAutomationVariable -Name "AlertLifeCycle_AckThreshold" -Value $RBOKAlertLifeCycleAckThreshold -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
+        New-AzAutomationVariable -Name "AlertLifeCycle_CloseThreshold" -Value $RBOKAlertLifeCycleCloseThreshold -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Encrypted $False
+        Import-AzAutomationRunbook -Path $RunbookPath -Name $RunbookName -Description $RunbookDescription -Type PowerShell -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName -Force -Published
+        Register-AzAutomationScheduledRunbook -Name $RunbookName -ScheduleName $ScheduleName -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutoAcctName
+        #
+        #
+        # WORKSPACE MONITORING
+        # ----------------------
+        # This template deploys a set of rules and action group that all contribute to the monitoring of the workspace and the service itself. The areas that are being monitored are:
+        #       - Workspace data usage: If data ingestion is above a threshold for 2 consecutive days then an alert is raised and this should be investigated.
+        #
+        ("azmon-basicrules-tmpl...")
+        $AzMonBasicRules = (az group deployment create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-basicrules-tmpl\_working\template.json") `
+                        --name "azmon-basicrules" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "AZMONBasicRGName=$ResourceGroupName" `
+                        "workspaceName=$WorkspaceName" `
+                        "dataPerDayThresholdMB=$dataPerDayThresholdMB" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-basicrules-tmpl: " + $AzMonBasicRules.properties.provisioningState + " (" + $AzMonBasicRules.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonBasicRulesTmpl = $AzMonBasicRules.properties.provisioningState
+        $BasicRulesActionGroupId = $AzMonBasicRules.properties.outputs.ActionGroupId.value
+        $ParametersJSON.Outputs.basicRulesActionGroupId = $BasicRulesActionGroupId
+        #
+        #
+        # DIAGNOSTICS SETTINGS
+        # ------------------------
+        # Most Azure resources emit logs that can be capture by a log analytics workspace. In this section we configure diagnostics settings for some AzGov and AzMon resources.
+        # AzGov.Keyvault
+        $KeyvDiagSet = '[{ \"category\": \"AuditEvent\", \"enabled\": true, \"retentionPolicy\": { \"enabled\": false, \"days\": 0 }}]'
+        $KeyvaultId = (az keyvault show --name "$KeyvaultName" --resource-group "$KeyvaultRGName" | ConvertFrom-Json).id
+        $KeyvDiagnostics = (az monitor diagnostic-settings create `
+                        --name "$WorkspaceName" `
+                        --resource "$KeyvaultId" `
+                        --workspace "$WorkspaceId" `
+                        --logs "$KeyvDiagSet") `
+        | ConvertFrom-Json
+        ("$KeyvaultName diagnostic settings: " + $KeyvDiagnostics.id)
+        # AzMon.AutomationAccount
+        $AutoAcctDiagSet = '[{ \"category\": \"JobLogs\", \"enabled\": true, \"retentionPolicy\": { \"enabled\": false, \"days\": 0 }}]'
+        $AutoAcctDiagnostics = (az monitor diagnostic-settings create `
+                        --name "$WorkspaceName" `
+                        --resource "$AutoAcctId" `
+                        --workspace "$WorkspaceId" `
+                        --logs "$AutoAcctDiagSet") `
+        | ConvertFrom-Json
+        ("$AutoAcctName diagnostic settings: " + $AutoAcctDiagnostics.id)
+        # AzGov.AutomationAccount
+        $AzGovAutoAcctId = $AutoAcctId -replace "azmon", "azgov"
+        $AzGovAutoAcctName = $AutoAcctName -replace "azmon", "azgov"
+        $AutoAcctDiagnostics = (az monitor diagnostic-settings create `
+                        --name "$WorkspaceName" `
+                        --resource "$AzGovAutoAcctId" `
+                        --workspace "$WorkspaceId" `
+                        --logs "$AutoAcctDiagSet") `
+        | ConvertFrom-Json
+        ("$AzGovAutoAcctName diagnostic settings: " + $AutoAcctDiagnostics.id)
+        #
+        #
+        # SVCHEALTH (azmon-svchealth-tmpl)
+        # -----------------------------------
+        # Azure is comprised of managed services that are offered to the customer. These services hosted in Azure all run of course on hardware. It is Microsoft's task to monitor that hardware and also the software that delivers the service to the customer. We can't and shouldn't monitor the hardware or the software that hosts the services but we should at least be aware of the health state of the different services.
+        # This template aims to notify us when a service has issues or when there's planned downtime or maintenance scheduled.
+        # Alert rules created in this template also need a target to work against. In this case this will be at the subscription level. Two alert rules will be created, one for Incidents and one for Information.
+        ("azmon-svchealth-tmpl...")
+        $AzMonSvcHealth = (az group deployment create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-svchealth-tmpl\_working\template.json") `
+                        --name "azmon-svchealth" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-svchealth-tmpl: " + $AzMonSvcHealth.properties.provisioningState + " (" + $AzMonSvcHealth.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonSvcHealthTmpl = $AzMonSvcHealth.properties.provisioningState
+        $SvcHealthActionGroupId = $AzMonSvcHealth.properties.outputs.ActionGroupId.value
+        $ParametersJSON.Outputs.svcHealthActionGroupId = $SvcHealthActionGroupId
+        #
+        #
+        # NWRULES (azmon-nwrules-tmpl)
+        # -------------------------------
+        # The purpose of this template is to deploy network monitoring alert rules that are used to alert if one or more of the three tests detected network issues. These tests are:
+        # - AzVnet2OnPrem: Azure VNet to on-premise infrastructure communication.
+        # - AzVnet2Web: Azure VNet to internet communication.
+        # - AzVnet2AzVnet: Azure VNet to Azure VNet communication
+        # These tests need to be configured manually in the log analytics workspace via a set of steps that are separately available.
+        ("azmon-nwrules-tmpl...")
+        $AzMonNWRules = (az group deployment create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-nwrules-tmpl\_working\template.json") `
+                        --name "azmon-nwrules" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "WorkspaceRGName=$ResourceGroupName" `
+                        "workspaceName=$WorkspaceName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-nwrules-tmpl: " + $AzMonNWRules.properties.provisioningState + " (" + $AzMonNWRules.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonNWRulesTmpl = $AzMonNWRules.properties.provisioningState
+        $NWRulesActionGroupId = $AzMonNWRules.properties.outputs.ActionGroupId.value
+        $ParametersJSON.Outputs.nwRulesActionGroupId = $NWRulesActionGroupId
+        #
+        #
+        # VMWORKBOOK (azmon-vmworkbook-tmpl)
+        # -------------------------------------
+        # The vmworkbook template is used to deploy an Azure monitor workbook to report on computer health and base performance counters. The location or region where the workbook is deployed is the same as the one where the target resource group is located. As a resource group it's best to select the same resource group as the one where the log analytics workspace was deployed.
+        ("azmon-vmworkbook-tmpl...")
+        $TemplateContents = Get-Content -Path ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json")
+        $NewTemplateContents = $TemplateContents -replace "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a", $SubscriptionID -replace "azmon-prod-mydur", $VMWorkbookName -replace "azmon2437-prod-lana", $WorkspaceName -replace "azmon-prod-rg", $ResourceGroupName
+        $NewTemplateContents | Out-File -FilePath ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json") -Force  -Encoding ascii
+        $AzMonVMWorkbook = (az group deployment create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json") `
+                        --name "azmon-vmworkbook" ) `
+        | ConvertFrom-Json
+        ("azmon-vmworkbook-tmpl: " + $AzMonVMWorkbook.properties.provisioningState + " (" + $AzMonVMWorkbook.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonVMWorkbookTmpl = $AzMonVMWorkbook.properties.provisioningState
+        #
+        #
+        # BACKUPSOL (azmon-backupsol-tmpl)
+        # -----------------------------------
+        # The template deploys an additional solution to the log analytics workspace to monitor Azure backup.
+        ("azmon-backupsol-tmpl...")
+        $AzMonBackupSol = (az group deployment create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-backupsol-tmpl\_working\template.json") `
+                        --name "azmon-backupsol" `
+                        --parameters `
+                        "Environment=$Environment" `
+                        "workspaceName=$WorkspaceName" `
+                        "Location=$Location") `
+        | ConvertFrom-Json
+        ("azmon-backupsol-tmpl: " + $AzMonBackupSol.properties.provisioningState + " (" + $AzMonBackupSol.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonBackupSolTmpl = $AzMonBackupSol.properties.provisioningState
+        #
+        # CREATE SERVICE PRINCIPAL
+        # ---------------------------
+        # AZMON
+        ("$AzMonAadaName...")
+        $AzMonAada = (az ad sp create-for-rbac `
+                        --name "$AzMonAadaName" `
+                        --years 3) `
+        | ConvertFrom-Json
+        ($AzMonAada.displayName + ": " + $AzMonAada.appId)
+        $AzMonAadaKeyv = (az keyvault secret set `
+                        --vault-name "$KeyvaultName" `
+                        --name "$AzMonAadaName" `
+                        --description "Password" `
+                        --value $AzMonAada.password) `
+        | ConvertFrom-Json
+        ($AzMonAada.displayName + " keyvault secret: " + $AzMonAadaKeyv.id)
+        $AzMonAadaSP = (az ad sp show `
+                        --id $AzMonAada.name) `
+        | ConvertFrom-Json
+        $AzMonAadaKeyvPol = (az keyvault set-policy `
+                        --name "$KeyvaultName" `
+                        --resource-group "$KeyvaultRGName" `
+                        --object-id $AzMonAadaSP.objectId `
+                        --secret-permissions get list `
+                        --storage-permissions get getsas list listsas `
+                        --certificate-permissions get getissuers list listissuers `
+                        --key-permissions get list) `
+        | ConvertFrom-Json
 } # End of DeployBaseSetup
 #
 #
@@ -469,8 +501,8 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
                         "OwnedBy=$TagOwnedBy" `
                         "UniqueNumber=$UniqueNumber") `
         | ConvertFrom-Json
-("azmon-basiclinux-tmpl: " + $AzMonBasicLinux.properties.provisioningState + " (" + $AzMonBasicLinux.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonBasicLinuxTmpl = $AzMonBasicLinux.properties.provisioningState
+        ("azmon-basiclinux-tmpl: " + $AzMonBasicLinux.properties.provisioningState + " (" + $AzMonBasicLinux.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonBasicLinuxTmpl = $AzMonBasicLinux.properties.provisioningState
 } # End of IncludeLinux for base setup
 #
 #
@@ -500,10 +532,10 @@ If ($NonAzureVMs) {
                         "CreatedBy=$UserDisplayName" `
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
-("azmon-nonazurevms-tmpl: " + $AzMonOnpremRules.properties.provisioningState + " (" + $AzMonOnpremRules.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonNonAzureVMsTmpl = $AzMonOnpremRules.properties.provisioningState
-$NonAzureVMsActionGroupId = $AzMonOnpremRules.properties.outputs.ActionGroupId.value
-$ParametersJSON.Outputs.nonAzureVMsActionGroupId = $NonAzureVMsActionGroupId
+        ("azmon-nonazurevms-tmpl: " + $AzMonOnpremRules.properties.provisioningState + " (" + $AzMonOnpremRules.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonNonAzureVMsTmpl = $AzMonOnpremRules.properties.provisioningState
+        $NonAzureVMsActionGroupId = $AzMonOnpremRules.properties.outputs.ActionGroupId.value
+        $ParametersJSON.Outputs.nonAzureVMsActionGroupId = $NonAzureVMsActionGroupId
 } # End of NonAzureVMs
 #
 #
@@ -529,110 +561,110 @@ If ($AddVMResGroup) {
                         --name "$VMResourceGroupName" `
                         --location "$Location") `
         | ConvertFrom-Json
-("VM Resource Group: " + $VMResourceGroup.id)
-#
-#
-# VMRULES (azmon-vmrules-tmpl)
-# -------------------------------
-# This template is used to deploy a set of monitoring rules that will be used for all virtual machines in the resource group. These alert rules are stored in the resource group together with the virtual machines so that when the resource group gets decomissioned the alert rules are deleted also. Remember that we use log analytics to monitor the virtual machines and that before a virtual machines can be monitored by a log analytics workspace an agent needs to be installed on the virtual machine that reports to the workspace. That's why in this section of the script we also enable a policy-set (initiative) that is used to deploy the Microsoft Monitoring Agent (MMA) to all supported virtual machines in the resource group. The scope for the policy is the resource group which means that we will have a policy for every resource group containing virtual machines to be monitored. The policy contains a DeployIfNotExist action which means that we need credentials to perform the actual deployment. We leave it to Azure to create a managed identity for us but we need to give that identity rights to perform its actions. Two roles are given to the managed identity:
-# - Contributor - scoped to resoruce group containing virtual machines
-# - Log Analytics Contributor - scoped to resource group containig the log analytics workspace
-("azmon-vmrules-tmpl...")
-$AzMonVMRules = (az group deployment create `
-                --resource-group "$VMResourceGroupName" `
-                --template-file ($AzMonLocalPath + "\azmon-vmrules-tmpl\_working\template.json") `
-                --name "azmon-vmrules" `
-                --parameters `
-                "Project=$TagProject" `
-                "Environment=$Environment" `
-                "AZMONBasicRGName=$ResourceGroupName" `
-                "workspaceName=$WorkspaceName" `
-                "CreatedOn=$TagCreatedOn" `
-                "EndsOn=$TagEndsOn" `
-                "CreatedBy=$UserDisplayName" `
-                "OwnedBy=$TagOwnedBy") `
-| ConvertFrom-Json
-("azmon-vmrules-tmpl: " + $AzMonVMRules.properties.provisioningState + " (" + $AzMonVMRules.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonVMRulesTmpl = $AzMonVMRules.properties.provisioningState
-$VMRulesActionGroupId = $AzMonVMRules.properties.outputs.ActionGroupId.value
-$ParametersJSON.Outputs.vmRulesActionGroupId = $VMRulesActionGroupId
-$AssignmentDisplayName = "AzMon: Deploy Log Analytics Agent for Windows VMs in " + $VMResourceGroupName
-$AssignmentName = "DeployWinMMA(" + $VMResourceGroupName + ")"
-$PolicySetDef = Get-AzPolicySetDefinition -Id "/providers/Microsoft.Authorization/policySetDefinitions/55f3eceb-5573-4f18-9695-226972c6d74a" -ApiVersion "2019-01-01"
-$PolicyParams = @{'logAnalytics_1' = $WorkspaceId }
-$Assignment = New-AzPolicyAssignment -Name "$AssignmentName" -DisplayName "$AssignmentDisplayName" -Scope $VMResourceGroup.id -PolicySetDefinition $PolicySetDef -Location $Location -PolicyParameterObject $PolicyParams -AssignIdentity -ApiVersion "2019-01-01"
-$VMRoleAssignment = (az role assignment create `
-                --role Contributor `
-                --assignee-object-id $Assignment.Identity.PrincipalId `
-                --scope $VMResourceGroup.id) `
-| ConvertFrom-Json
-("VM Role assignment: " + $VMRoleAssignment.id)
-$ParametersJSON.Outputs.VMRoleAssignment = $VMRoleAssignment.id
-$RoleAssignment = (az role assignment create `
-                --role "Log Analytics Contributor" `
-                --assignee-object-id $Assignment.Identity.PrincipalId `
-                --scope $ResourceGroup.id) `
-| ConvertFrom-Json
-("LANA Role assignment: " + $RoleAssignment.id)
-$ParametersJSON.Outputs.LANARoleAssignment = $RoleAssignment.id
-#
-#
-# RSCHEALTH (azmon-rschealth-tmpl)
-# ------------------------------------
-# The purpose of this template is to put all resources (alert rules and action groups) in place to monitor health of resources. Not every type of Azure resource emits health information but for those types who do this is an easy way to be kept aware of the health state of your individual resources.
-("azmon-rschealth-tmpl...")
-$AzMonRscHealth = (az group deployment create `
-                --resource-group "$VMResourceGroupName" `
-                --template-file ($AzMonLocalPath + "\azmon-rschealth-tmpl\_working\template.json") `
-                --name "azmon-rschealth" `
-                --parameters `
-                "Project=$TagProject" `
-                "Environment=$Environment" `
-                "CreatedOn=$TagCreatedOn" `
-                "EndsOn=$TagEndsOn" `
-                "CreatedBy=$UserDisplayName" `
-                "OwnedBy=$TagOwnedBy") `
-| ConvertFrom-Json
-("azmon-rschealth-tmpl: " + $AzMonRscHealth.properties.provisioningState + " (" + $AzMonRscHealth.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonRSCHealthTmpl = $AzMonRSCHealth.properties.provisioningState
-$RscHealthActionGroupId = $AzMonRscHealth.properties.outputs.ActionGroupId.value
-$ParametersJSON.Outputs.rscHealthActionGroupId = $RscHealthActionGroupId
-#
-#
-# VAULT (azmon-vault-tmpl)
-# ----------------------------
-# This template is used to deploy a Azure Recovery Services vault together with diagnostics sent to a log analytics workspace. To complete the monitoring you must make sure that the backup solution is also configured in the choosen log analytics workspace.
-("azmon-vault-tmpl...")
-$instantRpRetentionRangeInDays = $ParametersJSON.Vault.instantRpRetentionRangeInDays
-$dailyRetentionDurationCount = $ParametersJSON.Vault.dailyRetentionDurationCount
-$weeklyRetentionDurationCount = $ParametersJSON.Vault.weeklyRetentionDurationCount
-$monthlyRetentionDurationCount = $ParametersJSON.Vault.monthlyRetentionDurationCount
-$yearlyRetentionDurationCount = $ParametersJSON.Vault.yearlyRetentionDurationCount
-$redundancyType = $ParametersJSON.Vault.redundancyType
-$AzMonVault = (az group deployment create `
-                --resource-group "$VMResourceGroupName" `
-                --template-file ($AzMonLocalPath + "\azmon-vault-tmpl\_working\template.json") `
-                --name "azmon-vault" `
-                --parameters `
-                "Project=$TagProject" `
-                "Environment=$Environment" `
-                "workspaceRGName=$ResourceGroupName" `
-                "workspaceName=$WorkspaceName" `
-                "redundancyType=$redundancyType" `
-                "CreatedOn=$TagCreatedOn" `
-                "EndsOn=$TagEndsOn" `
-                "CreatedBy=$UserDisplayName" `
-                "OwnedBy=$TagOwnedBy" `
-                "UniqueNumber=$UniqueNumber") `
-| ConvertFrom-Json
-("azmon-vault-tmpl: " + $AzMonVault.properties.provisioningState + " (" + $AzMonVault.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonVaultTmpl = $AzMonVault.properties.provisioningState
-$BackupVaultName = $AzMonVault.properties.outputs.BackupVaultName.value
-$ParametersJSON.Outputs.backupVaultName = $BackupVaultName
-$BackupVaultId = $AzMonVault.properties.outputs.BackupVaultId.value
-$ParametersJSON.Outputs.backupVaultId = $BackupVaultId
-$VaultActionGroupId = $AzMonVault.properties.outputs.ActionGroupId.value
-$ParametersJSON.Outputs.vaultActionGroupId = $VaultActionGroupId
+        ("VM Resource Group: " + $VMResourceGroup.id)
+        #
+        #
+        # VMRULES (azmon-vmrules-tmpl)
+        # -------------------------------
+        # This template is used to deploy a set of monitoring rules that will be used for all virtual machines in the resource group. These alert rules are stored in the resource group together with the virtual machines so that when the resource group gets decomissioned the alert rules are deleted also. Remember that we use log analytics to monitor the virtual machines and that before a virtual machines can be monitored by a log analytics workspace an agent needs to be installed on the virtual machine that reports to the workspace. That's why in this section of the script we also enable a policy-set (initiative) that is used to deploy the Microsoft Monitoring Agent (MMA) to all supported virtual machines in the resource group. The scope for the policy is the resource group which means that we will have a policy for every resource group containing virtual machines to be monitored. The policy contains a DeployIfNotExist action which means that we need credentials to perform the actual deployment. We leave it to Azure to create a managed identity for us but we need to give that identity rights to perform its actions. Two roles are given to the managed identity:
+        # - Contributor - scoped to resoruce group containing virtual machines
+        # - Log Analytics Contributor - scoped to resource group containig the log analytics workspace
+        ("azmon-vmrules-tmpl...")
+        $AzMonVMRules = (az group deployment create `
+                        --resource-group "$VMResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-vmrules-tmpl\_working\template.json") `
+                        --name "azmon-vmrules" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "AZMONBasicRGName=$ResourceGroupName" `
+                        "workspaceName=$WorkspaceName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-vmrules-tmpl: " + $AzMonVMRules.properties.provisioningState + " (" + $AzMonVMRules.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonVMRulesTmpl = $AzMonVMRules.properties.provisioningState
+        $VMRulesActionGroupId = $AzMonVMRules.properties.outputs.ActionGroupId.value
+        $ParametersJSON.Outputs.vmRulesActionGroupId = $VMRulesActionGroupId
+        $AssignmentDisplayName = "AzMon: Deploy Log Analytics Agent for Windows VMs in " + $VMResourceGroupName
+        $AssignmentName = "DeployWinMMA(" + $VMResourceGroupName + ")"
+        $PolicySetDef = Get-AzPolicySetDefinition -Id "/providers/Microsoft.Authorization/policySetDefinitions/55f3eceb-5573-4f18-9695-226972c6d74a" -ApiVersion "2019-01-01"
+        $PolicyParams = @{'logAnalytics_1' = $WorkspaceId }
+        $Assignment = New-AzPolicyAssignment -Name "$AssignmentName" -DisplayName "$AssignmentDisplayName" -Scope $VMResourceGroup.id -PolicySetDefinition $PolicySetDef -Location $Location -PolicyParameterObject $PolicyParams -AssignIdentity -ApiVersion "2019-01-01"
+        $VMRoleAssignment = (az role assignment create `
+                        --role Contributor `
+                        --assignee-object-id $Assignment.Identity.PrincipalId `
+                        --scope $VMResourceGroup.id) `
+        | ConvertFrom-Json
+        ("VM Role assignment: " + $VMRoleAssignment.id)
+        $ParametersJSON.Outputs.VMRoleAssignment = $VMRoleAssignment.id
+        $RoleAssignment = (az role assignment create `
+                        --role "Log Analytics Contributor" `
+                        --assignee-object-id $Assignment.Identity.PrincipalId `
+                        --scope $ResourceGroup.id) `
+        | ConvertFrom-Json
+        ("LANA Role assignment: " + $RoleAssignment.id)
+        $ParametersJSON.Outputs.LANARoleAssignment = $RoleAssignment.id
+        #
+        #
+        # RSCHEALTH (azmon-rschealth-tmpl)
+        # ------------------------------------
+        # The purpose of this template is to put all resources (alert rules and action groups) in place to monitor health of resources. Not every type of Azure resource emits health information but for those types who do this is an easy way to be kept aware of the health state of your individual resources.
+        ("azmon-rschealth-tmpl...")
+        $AzMonRscHealth = (az group deployment create `
+                        --resource-group "$VMResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-rschealth-tmpl\_working\template.json") `
+                        --name "azmon-rschealth" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-rschealth-tmpl: " + $AzMonRscHealth.properties.provisioningState + " (" + $AzMonRscHealth.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonRSCHealthTmpl = $AzMonRSCHealth.properties.provisioningState
+        $RscHealthActionGroupId = $AzMonRscHealth.properties.outputs.ActionGroupId.value
+        $ParametersJSON.Outputs.rscHealthActionGroupId = $RscHealthActionGroupId
+        #
+        #
+        # VAULT (azmon-vault-tmpl)
+        # ----------------------------
+        # This template is used to deploy a Azure Recovery Services vault together with diagnostics sent to a log analytics workspace. To complete the monitoring you must make sure that the backup solution is also configured in the choosen log analytics workspace.
+        ("azmon-vault-tmpl...")
+        $instantRpRetentionRangeInDays = $ParametersJSON.Vault.instantRpRetentionRangeInDays
+        $dailyRetentionDurationCount = $ParametersJSON.Vault.dailyRetentionDurationCount
+        $weeklyRetentionDurationCount = $ParametersJSON.Vault.weeklyRetentionDurationCount
+        $monthlyRetentionDurationCount = $ParametersJSON.Vault.monthlyRetentionDurationCount
+        $yearlyRetentionDurationCount = $ParametersJSON.Vault.yearlyRetentionDurationCount
+        $redundancyType = $ParametersJSON.Vault.redundancyType
+        $AzMonVault = (az group deployment create `
+                        --resource-group "$VMResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-vault-tmpl\_working\template.json") `
+                        --name "azmon-vault" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "workspaceRGName=$ResourceGroupName" `
+                        "workspaceName=$WorkspaceName" `
+                        "redundancyType=$redundancyType" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy" `
+                        "UniqueNumber=$UniqueNumber") `
+        | ConvertFrom-Json
+        ("azmon-vault-tmpl: " + $AzMonVault.properties.provisioningState + " (" + $AzMonVault.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonVaultTmpl = $AzMonVault.properties.provisioningState
+        $BackupVaultName = $AzMonVault.properties.outputs.BackupVaultName.value
+        $ParametersJSON.Outputs.backupVaultName = $BackupVaultName
+        $BackupVaultId = $AzMonVault.properties.outputs.BackupVaultId.value
+        $ParametersJSON.Outputs.backupVaultId = $BackupVaultId
+        $VaultActionGroupId = $AzMonVault.properties.outputs.ActionGroupId.value
+        $ParametersJSON.Outputs.vaultActionGroupId = $VaultActionGroupId
 } # End AddVMResGroup
 #
 #
@@ -685,8 +717,8 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
                         "CreatedBy=$UserDisplayName" `
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
-("azmon-vmlinuxrules-tmpl: " + $AzMonVMLinuxRules.properties.provisioningState + " (" + $AzMonVMLinuxRules.properties.correlationId + ")")
-$ParametersJSON.Outputs.azMonVMLinuxRulesTmpl = $AzMonVMLinuxRules.properties.provisioningState
+        ("azmon-vmlinuxrules-tmpl: " + $AzMonVMLinuxRules.properties.provisioningState + " (" + $AzMonVMLinuxRules.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonVMLinuxRulesTmpl = $AzMonVMLinuxRules.properties.provisioningState
 } # End of IncludeLinux for VM rules
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.

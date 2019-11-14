@@ -10,7 +10,8 @@
     "LocationDisplayName": "West Europe"
   },
   "Basic": {
-    "WorkspaceDataRetention": 60
+    "WorkspaceDataRetention": 60,
+    "dataPerDayThresholdMB": 1536
   },
   "VMRules": {
     "VMRGName": "azmonvm-prod-rg"
@@ -39,6 +40,8 @@
     "autoAcctName": "tbd",
     "autoAcctId": "tbd",
     "storAcctName": "tbd",
+    "azMonBasicRulesTmpl": "tbd",
+    "basicRulesActionGroupId": "tbd",
     "azMonBasicLinuxTmpl": "tbd",
     "azMonVMLinuxRulesTmpl": "tbd",
     "azMonNonAzureVMsTmpl": "Succeeded",
