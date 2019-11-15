@@ -47,13 +47,14 @@
 # PARAMS
 ##########################################################################
 param (
-        [string]$ParametersFile = "C:\Users\rudym\OneDrive\00.GTN\09.Azure\GTN\ARMtemplates\_deployment\contorso123.json",
+        [string]$ParametersFile,
         [switch]$CheckPrereqs,
         [switch]$DeployBaseSetup,
         [switch]$AddVMResGroup,
         [switch]$IncludeVMBkUp,
         [switch]$NonAzureVms,
-        [switch]$IncludeLinux
+        [switch]$IncludeLinux,
+        [switch]$IncludeDRM
 )
 
 ##########################################################################
@@ -144,6 +145,10 @@ $TemplateFolder = "azmon-vmbkup-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/parameters.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\parameters.json") -Force -Encoding ascii
+$TemplateFolder = "azmon-delegatedrights-tmpl/_working"
+New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/parameters.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\parameters.json") -Force -Encoding ascii
 $TemplateFolder = "azmon-vmlinuxrules-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
@@ -167,8 +172,11 @@ $FileName = "azmon-alertlifecycle-rbok.ps1"
 $CurrentCLIUser = (az ad signed-in-user show) | ConvertFrom-Json
 If ($CurrentCLIUser) {
         ("Continuing with user " + $CurrentCLIUser.userPrincipalName + " (press CTRL+C to abort and logout with az logout before restarting)")
-        Start-Sleep -s 15
+        Start-Sleep -Seconds 5
         $UserDisplayName = $CurrentCLIUser.displayName
+        $CurrentCLIUserAccount = (az account show) | ConvertFrom-Json
+        $SubscriptionID = $CurrentCLIUserAccount.id
+        $SubscriptionName = $CurrentCLIUserAccount.name
 }
 else {
         $Login = (az login `
@@ -262,7 +270,7 @@ If ($DeployBaseSetup) {
                         "VMRGName=$VMResourceGroupName " `
                         "Environment=$Environment" `
                         "dataRetention=$WorkspaceDataRetention" `
-                        "Location=$LocationLong" `
+                        "Location=$LocationDisplayName" `
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `
@@ -494,7 +502,7 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
                         "VMRGName=$VMResourceGroupName " `
                         "Environment=$Environment" `
                         "dataRetention=$WorkspaceDataRetention" `
-                        "Location=$LocationLong" `
+                        "Location=$LocationDisplayName" `
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `
@@ -599,6 +607,7 @@ If ($AddVMResGroup) {
                         --scope $VMResourceGroup.id) `
         | ConvertFrom-Json
         ("VM Role assignment: " + $VMRoleAssignment.id)
+        Start-Sleep -Seconds 15
         $ParametersJSON.Outputs.VMRoleAssignment = $VMRoleAssignment.id
         $RoleAssignment = (az role assignment create `
                         --role "Log Analytics Contributor" `
@@ -650,6 +659,11 @@ If ($AddVMResGroup) {
                         "Environment=$Environment" `
                         "workspaceRGName=$ResourceGroupName" `
                         "workspaceName=$WorkspaceName" `
+                        "instantRpRetentionRangeInDays=$instantRpRetentionRangeInDays" `
+                        "dailyRetentionDurationCount=$dailyRetentionDurationCount" `
+                        "weeklyRetentionDurationCount=$weeklyRetentionDurationCount" `
+                        "monthlyRetentionDurationCount=$monthlyRetentionDurationCount" `
+                        "yearlyRetentionDurationCount=$yearlyRetentionDurationCount" `
                         "redundancyType=$redundancyType" `
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
@@ -711,7 +725,7 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
                         "Project=$TagProject" `
                         "Environment=$Environment" `
                         "AZMONBasicRGName=$ResourceGroupName" `
-                        "WorkspaceName=$WorkspaceName" `
+                        "workspaceName=$WorkspaceName" `
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `
@@ -720,6 +734,29 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
         ("azmon-vmlinuxrules-tmpl: " + $AzMonVMLinuxRules.properties.provisioningState + " (" + $AzMonVMLinuxRules.properties.correlationId + ")")
         $ParametersJSON.Outputs.azMonVMLinuxRulesTmpl = $AzMonVMLinuxRules.properties.provisioningState
 } # End of IncludeLinux for VM rules
+#
+#
+##########################################################################
+# Delegated Resource Management (DRM)
+##########################################################################
+#
+# tbd
+if ($IncludeDRM) {
+        ("azmon-delegaterights-tmpl...")
+        $ContributorGroupId = $ParametersJSON.DRM.ContributorGroupId
+        $TemplateContents = Get-Content -Path ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json")
+        $NewTemplateContents = $TemplateContents -replace "###TenantID###", $TenantID -replace "###ContributorGroupId###", $ContributorGroupId
+        $NewTemplateContents | Out-File -FilePath ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json") -Force  -Encoding ascii
+        $AzMonDRM = (az group deployment create `
+                        --location "$Location" `
+                        --template-file ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\template.json") `
+                        --parameters ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json") `
+                        --name "azmon-delegatedrights" ) `
+        | ConvertFrom-Json
+        ("azmon-delegatedrights-tmpl: " + $AzMonDRM.properties.provisioningState + " (" + $AzMonDRM.properties.correlationId + ")")
+        $ParametersJSON.Outputs.AzMonDRMTmpl = $AzMonDRM.properties.provisioningState
+} # End -IncludeDRM
+#
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
 $ParametersJSON | ConvertTo-Json | Out-File -FilePath "$ParametersFile" -Force -Encoding ascii
