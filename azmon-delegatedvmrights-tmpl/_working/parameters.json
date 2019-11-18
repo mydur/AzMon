@@ -14,19 +14,16 @@
     "authorizations": {
       "value": [
         {
-          "principalId": "###ContributorGroupId###",
+          "principalId": "###VMContributorGroupId###",
           "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
-          "principalIdDisplayName": "DRM-AzMon-Contributor"
+          "principalIdDisplayName": "DRM-AzMonVM-Contributor"
         }
       ]
     },
     "resourceGroups": {
       "value": [
         {
-          "rgName": "azgov-prod-rg"
-        },
-        {
-          "rgName": "azmon-prod-rg"
+          "rgName": "###VMResGroup###"
         }
       ]
     }

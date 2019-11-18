@@ -26,10 +26,13 @@
                 This switch indicates that the template deployment to configure virtual machine backup also takes place. Make sure the list of virtual machines to add to the backup is correct. If one of the virtual machines listed in the parameters file has not been deployed yet the template deployment will fail at that machine. All other virtual machines listed before the missing one will be added to the backup.
          
         .PARAMETER NonAzureVMs
-                This switch indicates that that the rules to monitor non-Azure VMs will be deployed to the same resource group as where the workspace is hosted.
+                This switch indicates that the rules to monitor non-Azure VMs will be deployed to the same resource group as where the workspace is hosted.
 
         .PARAMETER IncludeLinux
-                This switch indicates that that the rules to monitor non-Azure VMs will be deployed to the same resource group as where the workspace is hosted.
+                This switch indicates that the rules to monitor non-Azure VMs will be deployed to the same resource group as where the workspace is hosted.
+
+        .PARAMETER IncludeDRM
+                This switch indicates that the delegated rights for azgov-prod-rg and azmon-prod-rg should be enabled (Azure Lighthouse). DRM stands for Delegated Resource Management.
 	
 	.NOTES
 		Title:          Init-AzMon.ps1
@@ -146,6 +149,10 @@ New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -It
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/parameters.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\parameters.json") -Force -Encoding ascii
 $TemplateFolder = "azmon-delegatedrights-tmpl/_working"
+New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/parameters.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\parameters.json") -Force -Encoding ascii
+$TemplateFolder = "azmon-delegatedvmrights-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/parameters.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\parameters.json") -Force -Encoding ascii
@@ -484,6 +491,25 @@ If ($DeployBaseSetup) {
                         --certificate-permissions get getissuers list listissuers `
                         --key-permissions get list) `
         | ConvertFrom-Json
+        #
+        # INCLUDE DRM
+        # -------------
+        if ($IncludeDRM) {
+                ("azmon-delegatedrights-tmpl...")
+                $ContributorGroupId = $ParametersJSON.DRM.ContributorGroupId
+                $MSPTenantId = $ParametersJSON.DRM.MSPTenantId 
+                $TemplateContents = Get-Content -Path ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json")
+                $NewTemplateContents = $TemplateContents -replace "###MSPTenantID###", $MSPTenantID -replace "###ContributorGroupId###", $ContributorGroupId
+                $NewTemplateContents | Out-File -FilePath ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json") -Force  -Encoding ascii
+                $AzMonDRM = (az deployment create `
+                                --location "$Location" `
+                                --template-file ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\template.json") `
+                                --parameters ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json") `
+                                --name "azmon-delegatedrights" ) `
+                | ConvertFrom-Json
+                ("azmon-delegatedrights-tmpl: " + $AzMonDRM.properties.provisioningState + " (" + $AzMonDRM.properties.correlationId + ")")
+                $ParametersJSON.Outputs.AzMonDRMTmpl = $AzMonDRM.properties.provisioningState
+        } # End -IncludeDRM
 } # End of DeployBaseSetup
 #
 #
@@ -679,6 +705,25 @@ If ($AddVMResGroup) {
         $ParametersJSON.Outputs.backupVaultId = $BackupVaultId
         $VaultActionGroupId = $AzMonVault.properties.outputs.ActionGroupId.value
         $ParametersJSON.Outputs.vaultActionGroupId = $VaultActionGroupId
+        #
+        # INCLUDE DRM
+        # -------------
+        if ($IncludeDRM) {
+                ("azmon-delegatedvmrights-tmpl...")
+                $VMContributorGroupId = $ParametersJSON.DRM.VMContributorGroupId
+                $MSPTenantId = $ParametersJSON.DRM.MSPTenantId 
+                $TemplateContents = Get-Content -Path ($AzMonLocalPath + "\azmon-delegatedvmrights-tmpl\_working\parameters.json")
+                $NewTemplateContents = $TemplateContents -replace "###MSPTenantID###", $MSPTenantID -replace "###VMContributorGroupId###", $VMContributorGroupId -replace "###VMResGroup###", $VMResourceGroupName
+                $NewTemplateContents | Out-File -FilePath ($AzMonLocalPath + "\azmon-delegatedvmrights-tmpl\_working\parameters.json") -Force  -Encoding ascii
+                $AzMonVMDRM = (az deployment create `
+                                --location "$Location" `
+                                --template-file ($AzMonLocalPath + "\azmon-delegatedvmrights-tmpl\_working\template.json") `
+                                --parameters ($AzMonLocalPath + "\azmon-delegatedvmrights-tmpl\_working\parameters.json") `
+                                --name "azmon-delegatedvmrights" ) `
+                | ConvertFrom-Json
+                ("azmon-delegatedvmrights-tmpl: " + $AzMonVMDRM.properties.provisioningState + " (" + $AzMonVMDRM.properties.correlationId + ")")
+                $ParametersJSON.Outputs.AzMonVMDRMTmpl = $AzMonVMDRM.properties.provisioningState
+        } # End -IncludeDRM
 } # End AddVMResGroup
 #
 #
@@ -741,21 +786,7 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
 ##########################################################################
 #
 # tbd
-if ($IncludeDRM) {
-        ("azmon-delegaterights-tmpl...")
-        $ContributorGroupId = $ParametersJSON.DRM.ContributorGroupId
-        $TemplateContents = Get-Content -Path ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json")
-        $NewTemplateContents = $TemplateContents -replace "###TenantID###", $TenantID -replace "###ContributorGroupId###", $ContributorGroupId
-        $NewTemplateContents | Out-File -FilePath ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json") -Force  -Encoding ascii
-        $AzMonDRM = (az group deployment create `
-                        --location "$Location" `
-                        --template-file ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\template.json") `
-                        --parameters ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json") `
-                        --name "azmon-delegatedrights" ) `
-        | ConvertFrom-Json
-        ("azmon-delegatedrights-tmpl: " + $AzMonDRM.properties.provisioningState + " (" + $AzMonDRM.properties.correlationId + ")")
-        $ParametersJSON.Outputs.AzMonDRMTmpl = $AzMonDRM.properties.provisioningState
-} # End -IncludeDRM
+
 #
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.

@@ -28,7 +28,9 @@
     "existingVirtualMachines": ["azmonvmprod01"]
   },
   "DRM": {
-    "ContributorGroupId": "2e600b14-11df-4195-9daa-69c960f8904e"
+    "MSPTenantId": "9e087d00-55f5-4dc2-bcc4-cfdacca00ab5",
+    "ContributorGroupId": "2e600b14-11df-4195-9daa-69c960f8904e",
+    "VMContributorGroupId": "ed26fa2c-35e8-45fb-b84f-b72ead1a1a9d"
   },
   "Outputs": {
     "GovSetDefId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/providers/Microsoft.Authorization/policySetDefinitions/azgov-tagpolicies-setd",
@@ -65,6 +67,6 @@
     "backupVaultName": "azmon7752-prod-bvlt",
     "backupVaultId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azmonvm-prod-rg/providers/Microsoft.RecoveryServices/vaults/azmon7752-prod-bvlt",
     "vaultActionGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmonvm-prod-rg/providers/microsoft.insights/actionGroups/backup-azmon-prod-agrp",
-    "AzMonDRMTmpl": "tbd"
+    "AzMonDRMTmpl": "Succeeded"
   }
 }

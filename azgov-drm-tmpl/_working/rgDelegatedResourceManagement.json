@@ -5,7 +5,7 @@
     "mspOfferName": {
       "type": "string",
       "metadata": {
-        "description": "Specify the name of the Offer from the Managed Service Provider"
+        "description": "Specify the name of the offer from the Managed Service Provider"
       }
     },
     "mspOfferDescription": {
@@ -26,18 +26,13 @@
         "description": "Specify an array of objects, containing tuples of Azure Active Directory principalId, a Azure roleDefinitionId, and an optional principalIdDisplayName. The roleDefinition specified is granted to the principalId in the provider's Active Directory and the principalIdDisplayName is visible to customers."
       }
     },
-    "resourceGroups": {
-      "type": "array"
+    "rgName": {
+      "type": "string"
     }
   },
   "variables": {
-    "TemplateId": "azmon-delegatedrights",
-    "TemplateVersion": "1.0.0",
-    "TemplateDate": "20191115",
-    "TemplateDescription": "Initial version",
-    "TemplateUsage": "Is used to delegate rights on AzMon and AzGov to service provider.",
-    "TemplateDocumentation": "<Name of document.>",
-    "mspRegistrationName": "[guid(parameters('mspOfferName'))]"
+    "mspRegistrationName": "[guid(parameters('mspOfferName'))]",
+    "mspAssignmentName": "[guid(parameters('rgName'))]"
   },
   "resources": [
     {
@@ -54,12 +49,8 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2018-05-01",
-      "name": "[concat('rgAssignment', copyIndex())]",
-      "resourceGroup": "[parameters('resourceGroups')[copyIndex()].rgName]",
-      "copy": {
-        "name": "deploymentCopy",
-        "count": "[length(parameters('resourceGroups'))]"
-      },
+      "name": "rgAssignment",
+      "resourceGroup": "[parameters('rgName')]",
       "dependsOn": [
         "[resourceId('Microsoft.ManagedServices/registrationDefinitions/', variables('mspRegistrationName'))]"
       ],
@@ -68,13 +59,12 @@
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
-          "parameters": {
-          },
+          "parameters": {},
           "resources": [
             {
               "type": "Microsoft.ManagedServices/registrationAssignments",
               "apiVersion": "2019-06-01",
-              "name": "[guid(parameters('resourceGroups')[copyIndex()].rgName)]",
+              "name": "[variables('mspAssignmentName')]",
               "properties": {
                 "registrationDefinitionId": "[resourceId('Microsoft.ManagedServices/registrationDefinitions/', variables('mspRegistrationName'))]"
               }
