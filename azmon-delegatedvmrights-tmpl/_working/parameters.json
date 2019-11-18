@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "mspOfferName": {
-      "value": "Getronics - Azure Monitoring Service"
+      "value": "Getronics - VM Management Service"
     },
     "mspOfferDescription": {
-      "value": "Getronics - Azure Monitoring Service"
+      "value": "Getronics - VM Management Service"
     },
     "managedByTenantId": {
       "value": "###MSPTenantID###"

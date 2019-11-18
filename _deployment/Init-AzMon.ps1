@@ -781,13 +781,5 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
 } # End of IncludeLinux for VM rules
 #
 #
-##########################################################################
-# Delegated Resource Management (DRM)
-##########################################################################
-#
-# tbd
-
-#
-#
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
 $ParametersJSON | ConvertTo-Json | Out-File -FilePath "$ParametersFile" -Force -Encoding ascii
