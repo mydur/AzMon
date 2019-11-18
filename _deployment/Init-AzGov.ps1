@@ -29,7 +29,7 @@
 # PARAMS
 ##########################################################################
 param (
-        [string]$ParametersFile = "C:\Getronics\contorso123.json",
+        [string]$ParametersFile,
         [switch]$CheckPrereqs
 )
 
@@ -106,23 +106,26 @@ $TemplateFile = "azgov-autoacct-tmpl/_working/automationaccount.json"
 $CurrentCLIUser = (az ad signed-in-user show) | ConvertFrom-Json
 If ($CurrentCLIUser) {
         ("Continuing with user " + $CurrentCLIUser.userPrincipalName + " (press CTRL+C to abort and logout with az logout before restarting)")
-        Start-Sleep -15
+        Start-Sleep -Seconds 10
         $UserDisplayName = $CurrentCLIUser.displayName
+        $CurrentCLIUserAccount = (az account show) | ConvertFrom-Json
+        $SubscriptionID = $CurrentCLIUserAccount.id
+        $SubscriptionName = $CurrentCLIUserAccount.name
 }
 else {
         $Login = (az login `
                         --tenant "$TenantID" `
                         --use-device-code) `
         | ConvertFrom-Json
-$SubscriptionID = $Login.id
-$SubscriptionName = $Login.name
-$UserDetails = (az ad signed-in-user show) | ConvertFrom-Json
-If ($UserDetails) {
-        $UserDisplayName = $UserDetails.displayName
-}
-else {
-        $UserDisplayName = $Login.user.name
-}
+        $SubscriptionID = $Login.id
+        $SubscriptionName = $Login.name
+        $UserDetails = (az ad signed-in-user show) | ConvertFrom-Json
+        If ($UserDetails) {
+                $UserDisplayName = $UserDetails.displayName
+        }
+        else {
+                $UserDisplayName = $Login.user.name
+        }
 }
 $Location = (Get-AzLocation | ? { $_.DisplayName -eq "$LocationDisplayName" }).Location
 
@@ -189,7 +192,8 @@ $KeyvautLock = (az resource lock create `
                 --resource-type "Microsoft.KeyVault/vaults") `
 | ConvertFrom-Json
 $ParametersJSON.Outputs.GovKeyvaultId = $KeyvaultID
-
+#
+#
 # 5. CREATE SERVICE PRINCIPALS
 # ----------------------------
 # AZCOPY
@@ -295,8 +299,8 @@ $AzAutoAadaKeyvPol = (az keyvault set-policy `
                 --certificate-permissions get getissuers list listissuers `
                 --key-permissions get list) `
 | ConvertFrom-Json
-
-
+#
+#
 # 6. STORAGE ACCOUNT
 # ------------------
 # This storage account can be used to store all things related to managing an Azure environment. To start this storage account doesn't contain any data.
@@ -319,7 +323,8 @@ $StorAcctLock = (az resource lock create `
                 --resource-type "Microsoft.Storage/storageAccounts") `
 | ConvertFrom-Json
 $ParametersJSON.Outputs.GovStorAcctId = $StorAcctID
-
+#
+#
 # 7. AUTOMATION ACCOUNT
 # ---------------------
 # This is the automation account that will be used to run automation scripts used for governance. To start this automation account doesn't contain any runbooks.
@@ -331,6 +336,6 @@ $AutoAcct = (az group deployment create `
 | ConvertFrom-Json
 ("Automation Account: " + $AutoAcct.id)
 $ParametersJSON.Outputs.GovAutoAcctId = $AutoAcct.id
-
+#
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
 $ParametersJSON | ConvertTo-Json | Out-File -FilePath "$ParametersFile" -Force -Encoding ascii
