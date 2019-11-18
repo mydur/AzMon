@@ -111,7 +111,7 @@
           "timeWindowInMinutes": 2880
         },
         "action": {
-          "severity": "0",
+          "severity": "1",
           "aznsAction": {
             "actionGroup": [
               "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
