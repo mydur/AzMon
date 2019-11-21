@@ -106,7 +106,7 @@ $TemplateFile = "azgov-autoacct-tmpl/_working/automationaccount.json"
 $CurrentCLIUser = (az ad signed-in-user show) | ConvertFrom-Json
 If ($CurrentCLIUser) {
         ("Continuing with user " + $CurrentCLIUser.userPrincipalName + " (press CTRL+C to abort and logout with az logout before restarting)")
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 5
         $UserDisplayName = $CurrentCLIUser.displayName
         $CurrentCLIUserAccount = (az account show) | ConvertFrom-Json
         $SubscriptionID = $CurrentCLIUserAccount.id
@@ -329,7 +329,7 @@ $ParametersJSON.Outputs.GovStorAcctId = $StorAcctID
 # ---------------------
 # This is the automation account that will be used to run automation scripts used for governance. To start this automation account doesn't contain any runbooks.
 $AutoAcct = (az group deployment create `
-                --resource-group "azgov-prod-rg" `
+                --resource-group "$ResourceGroupName" `
                 --template-file "c:\getronics\azgov\automationaccount.json" `
                 --name "azgov-automationacct" `
                 --parameters "Environment=$Environment" "Location=$Location" "UniqueNumber=$Rnd") `
