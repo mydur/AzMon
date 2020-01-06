@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "k8sdeploy"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "K8SClusterName": {
+      "value": "deploy-test-k8s"
+    },
+    "K8SResourceGroup": {
+      "value": "k8sdeploy-test-rg"
+    },
+    "AMLWorkspaceName": {
+      "value": "azom2437-prod-lana"
+    },
+    "AMLResourceGroup": {
+      "value": "azmon-prod-rg"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}

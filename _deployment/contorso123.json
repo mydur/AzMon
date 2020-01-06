@@ -27,6 +27,15 @@
   "VMBkUp": {
     "existingVirtualMachines": ["azmonvmprod02"]
   },
+  "DRM": {
+    "MSPTenantId": "9e087d00-55f5-4dc2-bcc4-cfdacca00ab5",
+    "ContributorGroupId": "2e600b14-11df-4195-9daa-69c960f8904e",
+    "VMContributorGroupId": "ed26fa2c-35e8-45fb-b84f-b72ead1a1a9d"
+  },
+  "K8S": {
+    "ClusterName": "workshop-test-k8s",
+    "ClusterRGName": "k8sworkshop-test-rg"
+  },
   "Outputs": {
     "GovSetDefId": "tbd",
     "GovKeyvaultId": "tbd",
@@ -61,6 +70,10 @@
     "azMonVaultTmpl": "tbd",
     "backupVaultName": "tbd",
     "backupVaultId": "tbd",
-    "vaultActionGroupId": "tbd"
+    "vaultActionGroupId": "tbd",
+    "azMonDRMTmpl": "Succeeded",
+    "azMonVMDRMTmpl": "Succeeded",
+    "azMonK8SRulesTmpl": "tbd",
+    "K8SClusterName": "tbd"
   }
 }

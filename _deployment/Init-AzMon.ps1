@@ -34,16 +34,20 @@
         .PARAMETER IncludeDRM
                 This switch indicates that the delegated rights for azgov-prod-rg and azmon-prod-rg should be enabled (Azure Lighthouse). DRM stands for Delegated Resource Management.
 	
+        .PARAMETER IncludeK8S
+                This switch indicates that the monitoring for a Kubernetes cluster should be enabled and configured.
+	
 	.NOTES
 		Title:          Init-AzMon.ps1
 		Author:         Rudy Michiels
                 Created:        2019-10-17
-                Version:        0.3
+                Version:        0.4
 		ChangeLog:
                         2019-09-26      Initial version
                         2019-09-30      Added -IncludeVMBkUp switch parameter
                         2019-10-17      Added -NonAzureVMs switch parameter
-                        2019-10-25      Added -IncludeLinux switch parameter   
+                        2019-10-25      Added -IncludeLinux switch parameter  
+                        2019-12-20      Added -IncludeK8S switch parameter 
 #>
 
 ##########################################################################
@@ -57,7 +61,8 @@ param (
         [switch]$IncludeVMBkUp,
         [switch]$NonAzureVms,
         [switch]$IncludeLinux,
-        [switch]$IncludeDRM
+        [switch]$IncludeDRM,
+        [switch]$IncludeK8S
 )
 
 ##########################################################################
@@ -160,6 +165,9 @@ $TemplateFolder = "azmon-vmlinuxrules-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 $TemplateFolder = "azmon-basiclinux-tmpl/_working"
+New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+$TemplateFolder = "azmon-k8srules-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 # Runbooks
@@ -780,6 +788,35 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
         $ParametersJSON.Outputs.azMonVMLinuxRulesTmpl = $AzMonVMLinuxRules.properties.provisioningState
 } # End of IncludeLinux for VM rules
 #
+#
+##########################################################################
+# IncludeK8S (K8S rules)
+##########################################################################
+#
+If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
+        $K8SClusterName = $ParametersJSON.K8S.ClusterName
+        $K8SClusterRGName = $ParametersJSON.K8S.ClusterRGName
+        ("azmon-k8srules-tmpl...")
+        $AzMonK8SRules = (az group deployment create `
+                        --resource-group "$K8SClusterRGName" `
+                        --template-file ($AzMonLocalPath + "\azmon-k8srules-tmpl\_working\template.json") `
+                        --name "azmon-k8srules" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "K8SClusterName=$K8SClusterName" `
+                        "K8SResourceGroup=$K8SClusterRGName" `
+                        "AMLWorkspaceName=$WorkspaceName" `
+                        "AMLResourceGroup=$ResourceGroupName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-k8srules-tmpl: " + $AzMonK8SRules.properties.provisioningState + " (" + $AzMonK8SRules.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonK8SRulesTmpl = $AzMonK8SRules.properties.provisioningState
+        $ParametersJSON.Outputs.K8SClusterName = $K8SClusterName  
+}
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
 $ParametersJSON | ConvertTo-Json | Out-File -FilePath "$ParametersFile" -Force -Encoding ascii
