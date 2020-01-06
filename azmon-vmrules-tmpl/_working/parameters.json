@@ -3,16 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "azmon"
+      "value": "azmonk8s"
     },
     "Environment": {
-      "value": "test"
+      "value": "prod"
     },
     "AZMONBasicRGName": {
-      "value": "azmon-test-rg"
+      "value": "azmon-prod-rg"
     },
     "WorkspaceName": {
-      "value": "azmon-test-lana"
+      "value": "azmon2437-prod-lana"
     },
     "EndsOn": {
       "value": "99999999"
