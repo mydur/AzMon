@@ -1,0 +1,480 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "ASRVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "AKS Cluster Resource Name"
+      }
+    },
+    "ASRVaultRGName": {
+      "type": "string",
+      "metadata": {
+        "description": "AKS Cluster Resource Group"
+      }
+    },
+    "RPOCritical": {
+      "type": "int",
+      "metadata": {
+        "description": "Critical value for RPO in seconds"
+      }
+    },
+    "RPOWarning": {
+      "type": "int",
+      "metadata": {
+        "description": "Warning value for RPO in seconds"
+      }
+    },
+    "TestFailoverMissingThreshold": {
+      "type": "int",
+      "metadata": {
+        "description": "Threshold value for number of machines with missing test failover"
+      }
+    },
+    "AMLWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Name"
+      }
+    },
+    "AMLWorkspaceRGName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Resource Group"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-asrrules",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20200219",
+    "TemplateDescription": "Initial version",
+    "TemplateUsage": "Deploy the ASR alerting rules and activate monitoring",
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "AMLRG": "[toLower(parameters('AMLWorkspaceRGName'))]",
+    "AMLName": "[toLower(parameters('AMLWorkspaceName'))]",
+    "ASRRG": "[toLower(parameters('ASRVaultRGName'))]",
+    "ASRName": "[toLower(parameters('ASRVaultName'))]",
+    "actionGroupName": "[concat('asrrules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupShortName": "[take(concat('asrrules', variables('Project')), 12)]",
+    "alertTag": "[concat('hidden-link:', '/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
+    "emailAddress": "dummy@nowhere.com"
+  },
+  "resources": [
+    {
+      "name": "[concat('ASR - Replication health - Critical (', parameters('ASRVaultName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('ASR - Replication health - Critical (', parameters('ASRVaultName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRName'), '\" \n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 30
+        },
+        "action": {
+          "severity": "0",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 1,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('ASR - Replication health - Warning (', parameters('ASRVaultName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('ASR - Replication health - Warning (', parameters('ASRVaultName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRName'), '\" \n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
+        },
+        "action": {
+          "severity": "0",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 1,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('ASR - RPO breaches - Warning (', parameters('ASRVaultName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('ASR - RPO breaches - Warning (', parameters('ASRVaultName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"   \n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', variables('ASRName'), '\" \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s  \n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
+        },
+        "action": {
+          "severity": "0",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 2,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('ASR - RPO breaches - Critical (', parameters('ASRVaultName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('ASR - RPO breaches - Critical (', parameters('ASRVaultName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"   \n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', variables('ASRName'), '\" \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s  \n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 30
+        },
+        "action": {
+          "severity": "0",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 1,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('ASR - Too many test failovers missing - Warning (', parameters('ASRVaultName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "description": "[concat('ASR - Too many test failovers missing - Critical (', parameters('ASRVaultName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', variables('ASRName'), '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 1440,
+          "timeWindowInMinutes": 1440
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('ActionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": "[parameters('TestFailoverMissingThreshold')]"
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('ActionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('ASR - Job failures - Critical (', parameters('ASRVaultName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "name": "[concat('ASR - Job failures - Critical (', parameters('ASRVaultName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', variables('ASRName'), '\" \n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": 30,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "0",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 1,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[variables('actionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "groupShortName": "[variables('actionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[variables('emailAddress')]"
+          }
+        ],
+        "smsReceivers": [
+        ],
+        "webhookReceivers": [
+        ],
+        "itsmReceivers": [
+        ],
+        "azureAppPushReceivers": [
+        ],
+        "automationRunbookReceivers": [
+        ],
+        "voiceReceivers": [
+        ],
+        "logicAppReceivers": [
+        ],
+        "azureFunctionReceivers": [
+        ]
+      },
+      "dependsOn": [
+      ]
+    }
+  ],
+  "outputs": {
+    "ActionGroupId": {
+      "type": "string",
+      "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+    }
+  }
+}

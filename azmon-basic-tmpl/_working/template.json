@@ -253,6 +253,36 @@
         {
           "apiVersion": "2015-11-01-preview",
           "type": "datasources",
+          "name": "ASRSourceVmChurnRate",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "ASRAnalytics",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "SourceVmChurnRate "
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "ASRSourceVmThrpRate ",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "ASRAnalytics",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "SourceVmThrpRate  "
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
           "name": "PerfMemoryPagesSec",
           "dependsOn": [
             "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"

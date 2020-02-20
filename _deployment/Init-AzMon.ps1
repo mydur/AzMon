@@ -62,7 +62,8 @@ param (
         [switch]$NonAzureVms,
         [switch]$IncludeLinux,
         [switch]$IncludeDRM,
-        [switch]$IncludeK8S
+        [switch]$IncludeK8S,
+        [switch]$IncludeASR
 )
 
 ##########################################################################
@@ -816,6 +817,46 @@ If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
         ("azmon-k8srules-tmpl: " + $AzMonK8SRules.properties.provisioningState + " (" + $AzMonK8SRules.properties.correlationId + ")")
         $ParametersJSON.Outputs.azMonK8SRulesTmpl = $AzMonK8SRules.properties.provisioningState
         $ParametersJSON.Outputs.K8SClusterName = $K8SClusterName  
+}
+#
+#
+##########################################################################
+# IncludeASR (ASR rules)
+##########################################################################
+#
+If ($IncludeASR -and $WorkspaceName -ne "tbd") {
+        $ASRVaultName = $ParametersJSON.ASR.VaultName
+        $ASRVaultRGName = $ParametersJSON.ASR.VaultRGName
+        ("azmon-asrrules-tmpl...")
+        $AzMonASRRules = (az group deployment create `
+                        --resource-group "$ASRVaultRGName" `
+                        --template-file ($AzMonLocalPath + "\azmon-asrrules-tmpl\_working\template.json") `
+                        --name "azmon-asrrules" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "ASRVaultName=$ASRVaultName" `
+                        "ASRResourceGroup=$ASRVaultRGName" `
+                        "AMLWorkspaceName=$WorkspaceName" `
+                        "AMLResourceGroup=$ResourceGroupName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-asrrules-tmpl: " + $AzMonASRRules.properties.provisioningState + " (" + $AzMonASRRules.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonASRRulesTmpl = $AzMonASRRules.properties.provisioningState
+        $ParametersJSON.Outputs.ASRVaultName = $ASRVaultName
+
+        $ASRDiagSet = '[{ \"category\": \"AzureSiteRecoveryJobs\", \"enabled\": true, \"category\": \"AzureSiteRecoveryEvents\", \"enabled\": true, \"category\": \"AzureSiteRecoveryReplicatedItems\", \"enabled\": true, \"category\": \"AzureSiteRecoveryReplicationStats\", \"enabled\": true, \"category\": \"AzureSiteRecoveryRecoveryPoints\", \"enabled\": true, \"category\": \"AzureSiteRecoveryReplicationDataUploadRate\", \"enabled\": true, \"category\": \"AzureSiteRecoveryProtectedDiskDataChurn\", \"enabled\": true, \"retentionPolicy\": { \"enabled\": false, \"days\": 0 }}]'
+        $ASRVaultId = (az backup vault show --name "$ASRVaultName" --resource-group "$ASRVaultRGName" | ConvertFrom-Json).id
+        $ASRDiagnostics = (az monitor diagnostic-settings create `
+                        --name "$WorkspaceName" `
+                        --resource "$ASRVaultId" `
+                        --workspace "$WorkspaceId" `
+                        --logs "$ASRDiagSet") `
+        | ConvertFrom-Json
+        ("$ASRVaultName diagnostic settings: " + $ASRDiagnostics.id)
 }
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.

@@ -36,6 +36,10 @@
     "ClusterName": "workshop-test-k8s",
     "ClusterRGName": "k8sworkshop-test-rg"
   },
+  "ASR": {
+    "VaultName": "workshop-test-k8s",
+    "VaultRGName": "k8sworkshop-test-rg"
+  },
   "Outputs": {
     "GovSetDefId": "tbd",
     "GovKeyvaultId": "tbd",
