@@ -65,9 +65,9 @@
   },
   "variables": {
     "TemplateId": "azmon-k8srules",
-    "TemplateVersion": "1.0.0",
-    "TemplateDate": "20191219",
-    "TemplateDescription": "Initial version",
+    "TemplateVersion": "1.0.1",
+    "TemplateDate": "20200221",
+    "TemplateDescription": "Revision of freq and period",
     "TemplateUsage": "Deploy the K8S alerting rules and activate monitoring for the cluster",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -125,7 +125,7 @@
         "description": "[concat('K8S - Pods that are failing or recovered from failure (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where ObjectKind =~ \"Pod\"\r\n| where Reason =~ \"BackOff\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where ObjectKind =~ \"Pod\"\r\n| where Reason =~ \"BackOff\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -133,8 +133,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 30,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -145,10 +145,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 20,
+            "threshold": 15,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -180,7 +180,7 @@
         "description": "[concat('K8S - Pods are being evicted (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason =~ \"Evicted\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason =~ \"Evicted\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -188,8 +188,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 30,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -203,7 +203,7 @@
             "threshold": 10,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -235,7 +235,7 @@
         "description": "[concat('K8S - Storage related issues have been detected (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason =~ \"FailedMount\" or Reason =~ \"FailedAttachVolume\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), Computer ')]",
+          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason =~ \"FailedMount\" or Reason =~ \"FailedAttachVolume\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer ')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -243,8 +243,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 30,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -258,7 +258,7 @@
             "threshold": 10,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -290,7 +290,7 @@
         "description": "[concat('K8S - Scheduler unable to find node to run pod (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason =~ \"FailedScheduling\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), ClusterName')]",
+          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason =~ \"FailedScheduling\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), ClusterName')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -298,8 +298,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 30,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -313,7 +313,7 @@
             "threshold": 10,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "ClusterName"
             }
@@ -345,7 +345,7 @@
         "description": "[concat('K8S - Node not ready or not schedulable (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason =~ \"NodeNotReady\" or Reason =~ \"NodeNotSchedulable\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), Computer ')]",
+          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason =~ \"NodeNotReady\" or Reason =~ \"NodeNotSchedulable\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer ')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -353,8 +353,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 30,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -368,7 +368,7 @@
             "threshold": 10,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -400,7 +400,7 @@
         "description": "[concat('K8S - Too many failures detected in short time-span (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason contains \"Fail\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), ClusterName')]",
+          "query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\"\r\n| where Reason contains \"Fail\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), ClusterName')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -408,8 +408,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 30,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -423,7 +423,7 @@
             "threshold": 25,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "ClusterName"
             }
@@ -455,7 +455,7 @@
         "description": "[concat('K8S - Nodes average CPU utilization in percent (Warning) (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet capacityCounterName = \"cpuCapacityNanoCores\";\r\nlet usageCounterName = \"cpuUsageNanoCores\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| where AggregatedValue <= 90 \r\n| order by TimeGenerated asc')]",
+          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet capacityCounterName = \"cpuCapacityNanoCores\";\r\nlet usageCounterName = \"cpuUsageNanoCores\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| where AggregatedValue <= 90 \r\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -463,8 +463,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -510,7 +510,7 @@
         "description": "[concat('K8S - Nodes average CPU utilization in percent (Critical) (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet capacityCounterName = \"cpuCapacityNanoCores\";\r\nlet usageCounterName = \"cpuUsageNanoCores\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| order by TimeGenerated asc')]",
+          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet capacityCounterName = \"cpuCapacityNanoCores\";\r\nlet usageCounterName = \"cpuUsageNanoCores\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -518,8 +518,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -565,7 +565,7 @@
         "description": "[concat('K8S - Nodes average memory utilization in percent (Warning) (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet capacityCounterName = \"memoryCapacityBytes\";\r\nlet usageCounterName = \"memoryRssBytes\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| where AggregatedValue <= 95\r\n| order by TimeGenerated asc ')]",
+          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet capacityCounterName = \"memoryCapacityBytes\";\r\nlet usageCounterName = \"memoryRssBytes\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| where AggregatedValue <= 95\r\n| order by TimeGenerated asc ')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -573,8 +573,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -620,7 +620,7 @@
         "description": "[concat('K8S - Nodes average memory utilization in percent (Critical) (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet capacityCounterName = \"memoryCapacityBytes\";\r\nlet usageCounterName = \"memoryRssBytes\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n//| where AggregatedValue <= 95\r\n| order by TimeGenerated asc ')]",
+          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet capacityCounterName = \"memoryCapacityBytes\";\r\nlet usageCounterName = \"memoryRssBytes\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', parameters('K8SClusterName'), '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n//| where AggregatedValue <= 95\r\n| order by TimeGenerated asc ')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -628,8 +628,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -675,7 +675,7 @@
         "description": "[concat('K8S - Percent failing Pods is too high (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet clusterName = \"', parameters('K8SClusterName'), '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName,\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(FailedPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
+          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet clusterName = \"', parameters('K8SClusterName'), '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName,\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(FailedPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -683,8 +683,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 30,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -698,7 +698,7 @@
             "threshold": 10,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "ClutserName"
             }
@@ -730,7 +730,7 @@
         "description": "[concat('K8S - Percent unknown Pods is too high (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet clusterName = \"', parameters('K8SClusterName'), '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(UnknownPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
+          "query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet clusterName = \"', parameters('K8SClusterName'), '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(UnknownPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -738,8 +738,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 30,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -753,7 +753,7 @@
             "threshold": 20,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "ClutserName"
             }
@@ -785,7 +785,7 @@
         "description": "[concat('K8S - Cluster nodes disks free space used exceeded (Critical) (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let clusterId = \"', variables('K8SResourceId'), '\";\r\nlet endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nInsightsMetrics\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where Origin == \"container.azm.ms/telegraf\" \r\n| where Namespace == \"container.azm.ms/disk\" \r\n| extend Tags = todynamic(Tags) \r\n| project TimeGenerated, ClusterId = Tags[\"container.azm.ms/clusterId\"], Computer = tostring(Tags.hostName), Device = tostring(Tags.device), Path = tostring(Tags.path), DiskMetricName = Name, DiskMetricValue = Val \r\n| where ClusterId =~ clusterId \r\n| where DiskMetricName == \"used_percent\"\r\n| summarize AggregatedValue = max(DiskMetricValue) by bin(TimeGenerated, trendBinSize), Device, Computer\r\n| order by TimeGenerated asc')]",
+          "query": "[concat('let clusterId = \"', variables('K8SResourceId'), '\";\r\nlet endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nInsightsMetrics\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where Origin == \"container.azm.ms/telegraf\" \r\n| where Namespace == \"container.azm.ms/disk\" \r\n| extend Tags = todynamic(Tags) \r\n| project TimeGenerated, ClusterId = Tags[\"container.azm.ms/clusterId\"], Computer = tostring(Tags.hostName), Device = tostring(Tags.device), Path = tostring(Tags.path), DiskMetricName = Name, DiskMetricValue = Val \r\n| where ClusterId =~ clusterId \r\n| where DiskMetricName == \"used_percent\"\r\n| summarize AggregatedValue = max(DiskMetricValue) by bin(TimeGenerated, trendBinSize), Device, Computer\r\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -794,7 +794,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 15,
-          "timeWindowInMinutes": 60
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -808,7 +808,7 @@
             "threshold": 90,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 3,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -840,7 +840,7 @@
         "description": "[concat('K8S - Cluster nodes disks free space used exceeded (Warning) (', parameters('K8SClusterName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let clusterId = \"', variables('K8SResourceId'), '\";\r\nlet endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nInsightsMetrics\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where Origin == \"container.azm.ms/telegraf\" \r\n| where Namespace == \"container.azm.ms/disk\" \r\n| extend Tags = todynamic(Tags) \r\n| project TimeGenerated, ClusterId = Tags[\"container.azm.ms/clusterId\"], Computer = tostring(Tags.hostName), Device = tostring(Tags.device), Path = tostring(Tags.path), DiskMetricName = Name, DiskMetricValue = Val \r\n| where ClusterId =~ clusterId \r\n| where DiskMetricName == \"used_percent\"\r\n| summarize AggregatedValue = max(DiskMetricValue) by bin(TimeGenerated, trendBinSize), Device, Computer\r\n| where AggregatedValue <= 90\r\n| order by TimeGenerated asc')]",
+          "query": "[concat('let clusterId = \"', variables('K8SResourceId'), '\";\r\nlet endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nInsightsMetrics\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where Origin == \"container.azm.ms/telegraf\" \r\n| where Namespace == \"container.azm.ms/disk\" \r\n| extend Tags = todynamic(Tags) \r\n| project TimeGenerated, ClusterId = Tags[\"container.azm.ms/clusterId\"], Computer = tostring(Tags.hostName), Device = tostring(Tags.device), Path = tostring(Tags.path), DiskMetricName = Name, DiskMetricValue = Val \r\n| where ClusterId =~ clusterId \r\n| where DiskMetricName == \"used_percent\"\r\n| summarize AggregatedValue = max(DiskMetricValue) by bin(TimeGenerated, trendBinSize), Device, Computer\r\n| where AggregatedValue <= 90\r\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -863,7 +863,7 @@
             "threshold": 80,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 5,
+              "threshold": 3,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
