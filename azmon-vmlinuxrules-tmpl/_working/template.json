@@ -55,9 +55,9 @@
   },
   "variables": {
     "TemplateId": "azmon-vmlinuxrules",
-    "TemplateVersion": "1.0.0",
-    "TemplateDate": "20191024",
-    "TemplateDescription": "Intial version",
+    "TemplateVersion": "1.0.1",
+    "TemplateDate": "20200221",
+    "TemplateDescription": "Revision of freq and period",
     "TemplateUsage": "Is used to create virtual machine monitoring rules.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -92,7 +92,7 @@
         "description": "[concat('Linux Syslog - daemon - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -100,8 +100,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -112,10 +112,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 1,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -147,7 +147,7 @@
         "description": "[concat('Linux Syslog - daemon - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -155,11 +155,11 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
-          "severity": "0",
+          "severity": "1",
           "aznsAction": {
             "actionGroup": [
               "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
@@ -167,10 +167,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 4,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -202,7 +202,7 @@
         "description": "[concat('Linux Syslog - kern - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -210,8 +210,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -222,10 +222,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 1,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -257,7 +257,7 @@
         "description": "[concat('Linux Syslog - kern - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -265,11 +265,11 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
-          "severity": "0",
+          "severity": "1",
           "aznsAction": {
             "actionGroup": [
               "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
@@ -277,10 +277,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 4,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -312,7 +312,7 @@
         "description": "[concat('Linux Syslog - cron - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -320,8 +320,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -332,10 +332,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 1,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -367,7 +367,7 @@
         "description": "[concat('Linux Syslog - cron - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -375,8 +375,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -387,10 +387,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 4,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -422,7 +422,7 @@
         "description": "[concat('Linux Syslog - auth - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -430,8 +430,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -442,10 +442,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 1,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -477,7 +477,7 @@
         "description": "[concat('Linux Syslog - auth - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -485,11 +485,11 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
-          "severity": "0",
+          "severity": "1",
           "aznsAction": {
             "actionGroup": [
               "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
@@ -497,10 +497,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 4,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -532,7 +532,7 @@
         "description": "[concat('Linux Syslog - syslog - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -540,8 +540,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -552,10 +552,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 4,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -587,7 +587,7 @@
         "description": "[concat('Linux Syslog - syslog - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -595,11 +595,11 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
-          "severity": "0",
+          "severity": "1",
           "aznsAction": {
             "actionGroup": [
               "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
@@ -607,10 +607,10 @@
           },
           "trigger": {
             "thresholdOperator": "GreaterThan",
-            "threshold": 0,
+            "threshold": 4,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "InstanceName"
             }
@@ -651,7 +651,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "1",
@@ -665,7 +665,7 @@
             "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -706,7 +706,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "1",
@@ -720,7 +720,7 @@
             "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -761,7 +761,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "1",
@@ -775,7 +775,7 @@
             "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -816,7 +816,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "1",
@@ -830,7 +830,7 @@
             "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -871,7 +871,7 @@
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 5
+          "timeWindowInMinutes": 10
         },
         "action": {
           "severity": "1",
@@ -885,7 +885,7 @@
             "threshold": 0,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 0,
+              "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -917,7 +917,7 @@
         "description": "[concat('Linux Memory - pct Available - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue < 5')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 5')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -925,8 +925,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -940,7 +940,7 @@
             "threshold": 5,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -972,7 +972,7 @@
         "description": "[concat('Linux Memory - pct Available - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue > 5')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue > 5')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -980,8 +980,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -995,7 +995,7 @@
             "threshold": 15,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1027,7 +1027,7 @@
         "description": "[concat('Linux Memory - pct Available Swap Space - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue < 5')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 5')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1035,8 +1035,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -1050,7 +1050,7 @@
             "threshold": 5,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1082,7 +1082,7 @@
         "description": "[concat('Linux Memory - pct Available Swap Space - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue > 5')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue > 5')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1090,8 +1090,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -1105,7 +1105,7 @@
             "threshold": 15,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1137,7 +1137,7 @@
         "description": "[concat('Linux Memory - Pages per Sec - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > 500')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 500')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1145,8 +1145,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -1160,7 +1160,7 @@
             "threshold": 500,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1192,7 +1192,7 @@
         "description": "[concat('Linux Memory - Pages per Sec - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 500')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue < 500')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1200,8 +1200,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 10,
-          "timeWindowInMinutes": 60
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -1215,7 +1215,7 @@
             "threshold": 350,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1247,7 +1247,7 @@
         "description": "[concat('Linux Logical Disk - pct Used Space - root - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > 95')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 95')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1255,8 +1255,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -1270,7 +1270,7 @@
             "threshold": 95,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1302,7 +1302,7 @@
         "description": "[concat('Linux Logical Disk - pct Used Space - root - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 95')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue < 95')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1310,8 +1310,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -1325,7 +1325,7 @@
             "threshold": 85,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1357,7 +1357,7 @@
         "description": "[concat('Linux Logical Disk - Free Megabytes - root - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue < 500')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 500')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1365,8 +1365,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -1380,7 +1380,7 @@
             "threshold": 500,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1412,7 +1412,7 @@
         "description": "[concat('Linux Logical Disk - Free Megabytes - root - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue > 500')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue > 500')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1420,8 +1420,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 15
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -1435,7 +1435,7 @@
             "threshold": 2048,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1467,7 +1467,7 @@
         "description": "[concat('Linux Processor - pct IO Wait Time - _Total - Critical (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > 85')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 85')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1475,8 +1475,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 10
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "0",
@@ -1490,7 +1490,7 @@
             "threshold": 85,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
@@ -1522,7 +1522,7 @@
         "description": "[concat('Linux Processor - pct IO Wait Time - _Total - Warning (', resourceGroup().name, ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 85')]",
+          "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue < 85')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -1530,8 +1530,8 @@
           ]
         },
         "schedule": {
-          "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 10
+          "frequencyInMinutes": 15,
+          "timeWindowInMinutes": 45
         },
         "action": {
           "severity": "1",
@@ -1545,7 +1545,7 @@
             "threshold": 75,
             "metricTrigger": {
               "thresholdOperator": "GreaterThan",
-              "threshold": 1,
+              "threshold": 2,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
             }
