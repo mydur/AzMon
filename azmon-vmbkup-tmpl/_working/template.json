@@ -11,7 +11,12 @@
     },
     "Environment": {
       "type": "string",
-      "allowedValues": ["dev", "test", "acc", "prod"],
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
       "defaultValue": "test",
       "metadata": {
         "description": "Can one of the following, dev-test-acc-prod"
@@ -79,5 +84,15 @@
         "sourceResourceId": "[resourceId(subscription().subscriptionId,variables('existingVirtualMachinesResourceGroup'),'Microsoft.Compute/virtualMachines',variables('existingVirtualMachines')[copyIndex()])]"
       }
     }
-  ]
+  ],
+  "outputs": {
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
+    }
+  }
 }

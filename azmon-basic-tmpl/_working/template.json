@@ -769,20 +769,6 @@
         },
         {
           "type": "savedSearches",
-          "name": "SearchLogicalDiskCurDiskQueueLengthCritical",
-          "apiVersion": "2017-03-15-preview",
-          "properties": {
-            "Category": "Getronics Monitoring",
-            "DisplayName": "Logical Disk - Current Disk Queue Length - Critical",
-            "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer, InstanceName\n//| where AggregatedValue  > 5')]",
-            "Version": 2
-          },
-          "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-          ]
-        },
-        {
-          "type": "savedSearches",
           "name": "SearchSvcWinRM",
           "apiVersion": "2017-03-15-preview",
           "properties": {
@@ -2226,6 +2212,14 @@
     "AutomationAccountId": {
       "type": "string",
       "value": "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
+    },
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
     }
   }
 }

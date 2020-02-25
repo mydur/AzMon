@@ -11,7 +11,12 @@
     },
     "Environment": {
       "type": "string",
-      "allowedValues": ["dev", "test", "acc", "prod"],
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
       "defaultValue": "test",
       "metadata": {
         "description": "Can one of the following, dev-test-acc-prod"
@@ -111,10 +116,15 @@
                     "CenterLegend": {
                       "Text": "Total",
                       "Operation": "Sum",
-                      "ArcsToSelect": []
+                      "ArcsToSelect": [
+                      ]
                     },
                     "Options": {
-                      "colors": ["#55d455", "#ba141a", "#00bcf2"],
+                      "colors": [
+                        "#55d455",
+                        "#ba141a",
+                        "#00bcf2"
+                      ],
                       "valueColorMapping": [
                         {
                           "value": "Completed",
@@ -126,7 +136,8 @@
                         }
                       ]
                     },
-                    "NavigationSelect": {}
+                    "NavigationSelect": {
+                    }
                   },
                   "List": {
                     "Query": "let Events = AzureDiagnostics | where Category == \"AzureBackupReport\";\r\nEvents \r\n| extend JobOperationSubType_s = columnifexists(\"JobOperationSubType_s\", \"\") \r\n| where OperationName == \"Job\" and JobOperation_s == \"Backup\" and JobStatus_s == \"Failed\" and JobOperationSubType_s != \"Log\" and JobOperationSubType_s != \"Recovery point_Log\" \r\n| distinct JobUniqueId_g, BackupItemUniqueId_s, JobStatus_s, Resource \r\n| project BackupItemUniqueId_s, JobStatus_s, Resource \r\n| join kind=leftouter ( Events | where OperationName == \"BackupItem\" | distinct BackupItemUniqueId_s, BackupItemFriendlyName_s | project BackupItemUniqueId_s , BackupItemFriendlyName_s ) on BackupItemUniqueId_s \r\n| project BackupItemFriendlyName_s, BackupItemUniqueId_s, JobStatus_s, Resource \r\n| extend Vault = Resource \r\n| summarize count() by BackupItemFriendlyName_s, JobStatus_s, Vault, BackupItemUniqueId_s  \r\n| order by count_ desc",
@@ -189,10 +200,15 @@
                     "CenterLegend": {
                       "Text": "Total",
                       "Operation": "Sum",
-                      "ArcsToSelect": []
+                      "ArcsToSelect": [
+                      ]
                     },
                     "Options": {
-                      "colors": ["#00188f", "#0072c6", "#00bcf2"],
+                      "colors": [
+                        "#00188f",
+                        "#0072c6",
+                        "#00bcf2"
+                      ],
                       "valueColorMapping": [
                         {
                           "value": "Completed",
@@ -204,7 +220,8 @@
                         }
                       ]
                     },
-                    "NavigationSelect": {}
+                    "NavigationSelect": {
+                    }
                   },
                   "List": {
                     "Query": "let Events = AzureDiagnostics | where Category == \"AzureBackupReport\";\r\nEvents \r\n| extend JobOperationSubType_s = columnifexists(\"JobOperationSubType_s\", \"\") \r\n| where OperationName == \"Job\" and JobOperation_s == \"Backup\" and JobStatus_s == \"Failed\" and (JobOperationSubType_s == \"Log\" or JobOperationSubType_s == \"Recovery point_Log\") \r\n| project BackupItemUniqueId_s, JobStatus_s, Resource \r\n| join kind=inner (Events | where OperationName == \"BackupItem\" | distinct BackupItemUniqueId_s, BackupItemFriendlyName_s     | project BackupItemUniqueId_s , BackupItemFriendlyName_s ) on BackupItemUniqueId_s \r\n| project BackupItemFriendlyName_s , JobStatus_s, Resource \r\n| extend Vault= Resource | summarize count() by BackupItemFriendlyName_s, JobStatus_s, Vault \r\n| order by count_ desc",
@@ -267,10 +284,15 @@
                     "CenterLegend": {
                       "Text": "Total",
                       "Operation": "Sum",
-                      "ArcsToSelect": []
+                      "ArcsToSelect": [
+                      ]
                     },
                     "Options": {
-                      "colors": ["#007233", "#ba141a", "#00bcf2"],
+                      "colors": [
+                        "#007233",
+                        "#ba141a",
+                        "#00bcf2"
+                      ],
                       "valueColorMapping": [
                         {
                           "value": "Cancelled",
@@ -286,7 +308,8 @@
                         }
                       ]
                     },
-                    "NavigationSelect": {}
+                    "NavigationSelect": {
+                    }
                   },
                   "List": {
                     "Query": "let Events = AzureDiagnostics | where Category == \"AzureBackupReport\";\r\nEvents \r\n| where OperationName == \"Job\" and JobOperation_s == \"Restore\" or JobOperation_s == \"Recovery\" and JobStatus_s == \"Failed\" | distinct JobUniqueId_g, BackupItemUniqueId_s, JobStatus_s, Resource \r\n| project BackupItemUniqueId_s, JobStatus_s, Resource \r\n| join kind=leftouter (Events | where OperationName == \"BackupItem\" | distinct BackupItemUniqueId_s, BackupItemFriendlyName_s | project BackupItemUniqueId_s , BackupItemFriendlyName_s ) on BackupItemUniqueId_s \r\n| project BackupItemFriendlyName_s, BackupItemUniqueId_s, JobStatus_s, Resource \r\n| extend Vault= Resource \r\n| summarize count() by BackupItemFriendlyName_s, BackupItemUniqueId_s , JobStatus_s, Vault \r\n| order by count_ desc",
@@ -349,10 +372,15 @@
                     "CenterLegend": {
                       "Text": "Total",
                       "Operation": "Sum",
-                      "ArcsToSelect": []
+                      "ArcsToSelect": [
+                      ]
                     },
                     "Options": {
-                      "colors": ["#e81123", "#008272", "#00bcf2"],
+                      "colors": [
+                        "#e81123",
+                        "#008272",
+                        "#00bcf2"
+                      ],
                       "valueColorMapping": [
                         {
                           "value": "Critical",
@@ -368,7 +396,8 @@
                         }
                       ]
                     },
-                    "NavigationSelect": {}
+                    "NavigationSelect": {
+                    }
                   },
                   "List": {
                     "Query": "let Events = AzureDiagnostics | where Category == \"AzureBackupReport\";\r\nEvents \r\n| where OperationName == \"Alert\" \r\n| where AlertUniqueId_s != \"\" \r\n| summarize lastOccurred = arg_max(TimeGenerated, *) by AlertUniqueId_s  \r\n| extend CurrentStatus = AlertStatus_s  \r\n| join  (Events | where OperationName == \"Alert\" | where AlertStatus_s == \"Active\" | summarize HitCount = count() by AlertUniqueId_s ) on AlertUniqueId_s  \r\n| project AlertUniqueId_s, lastOccurred, HitCount , CurrentStatus , AlertCode_s, AlertSeverity_s, BackupItemUniqueId_s, RecommendedAction_s \r\n| join kind=leftouter (Events | where OperationName == \"BackupItem\" | distinct BackupItemUniqueId_s, BackupItemFriendlyName_s, BackupItemName_s | project BackupItemUniqueId_s, BackupItemFriendlyName_s, BackupItemName_s ) on BackupItemUniqueId_s \r\n| project BackupItemName_s, AlertCode_s, HitCount \r\n| order by HitCount desc",
@@ -431,10 +460,15 @@
                     "CenterLegend": {
                       "Text": "Total",
                       "Operation": "Sum",
-                      "ArcsToSelect": []
+                      "ArcsToSelect": [
+                      ]
                     },
                     "Options": {
-                      "colors": ["#00188f", "#0072c6", "#00bcf2"],
+                      "colors": [
+                        "#00188f",
+                        "#0072c6",
+                        "#00bcf2"
+                      ],
                       "valueColorMapping": [
                         {
                           "value": "Critical",
@@ -450,7 +484,8 @@
                         }
                       ]
                     },
-                    "NavigationSelect": {}
+                    "NavigationSelect": {
+                    }
                   },
                   "List": {
                     "Query": "let Events = AzureDiagnostics | where Category == \"AzureBackupReport\";\r\nEvents \r\n| where OperationName == \"Alert\" \r\n| where AlertUniqueId_g != \"\" \r\n| summarize lastOccurred = arg_max(TimeGenerated, *) by AlertUniqueId_g  \r\n| extend CurrentStatus = AlertStatus_s  \r\n| join  (Events | where OperationName == \"Alert\" | where AlertStatus_s == \"Active\" | summarize HitCount = count() by AlertUniqueId_g ) on AlertUniqueId_g  \r\n| project AlertUniqueId_g, lastOccurred, HitCount , CurrentStatus , AlertCode_s, AlertSeverity_s, BackupItemUniqueId_s, RecommendedAction_s \r\n| where CurrentStatus == \"Active\" \r\n| join kind=leftouter (Events | where OperationName == \"BackupItem\" | distinct BackupItemUniqueId_s, BackupItemFriendlyName_s, BackupItemName_s | project BackupItemUniqueId_s, BackupItemFriendlyName_s, BackupItemName_s ) on BackupItemUniqueId_s \r\n| project BackupItemName_s, AlertCode_s, HitCount \r\n| order by HitCount desc",
@@ -513,13 +548,20 @@
                     "CenterLegend": {
                       "Text": "Total",
                       "Operation": "Sum",
-                      "ArcsToSelect": []
+                      "ArcsToSelect": [
+                      ]
                     },
                     "Options": {
-                      "colors": ["#ff8c00", "#55d455", "#6dc2e9"],
-                      "valueColorMapping": []
+                      "colors": [
+                        "#ff8c00",
+                        "#55d455",
+                        "#6dc2e9"
+                      ],
+                      "valueColorMapping": [
+                      ]
                     },
-                    "NavigationSelect": {}
+                    "NavigationSelect": {
+                    }
                   },
                   "List": {
                     "Query": "let Events = AzureDiagnostics | where Category == \"AzureBackupReport\";\r\nEvents \r\n| where OperationName == \"BackupItem\" \r\n| where BackupItemProtectionState_s != \"\"  \r\n| summarize arg_max(TimeGenerated, *) by BackupItemUniqueId_s \r\n| project BackupItemFriendlyName_s, BackupItemName_s ,BackupItemType_s, BackupManagementType_s, BackupItemProtectionState_s, BackupItemUniqueId_s \r\n| summarize dcount(BackupItemUniqueId_s) by BackupManagementType_s,BackupItemProtectionState_s \r\n| order by BackupManagementType_s desc",
@@ -588,7 +630,8 @@
                       },
                       "customLabel": "Cloud Storage (GB)"
                     },
-                    "NavigationSelect": {}
+                    "NavigationSelect": {
+                    }
                   },
                   "List": {
                     "Query": "AzureDiagnostics \r\n| where Category == \"AzureBackupReport\" \r\n| where OperationName == \"StorageAssociation\" \r\n| summarize arg_max(TimeGenerated, *) by BackupItemUniqueId_s, StorageUniqueId_s \r\n| extend StorageInGB = todouble(StorageConsumedInMBs_s) / 1024 \r\n| project StorageInGB, BackupItemUniqueId_s, StorageUniqueId_s \r\n| join kind=inner (AzureDiagnostics | where Category == \"AzureBackupReport\" | where OperationName == \"Storage\" | distinct StorageUniqueId_s, StorageType_s | project StorageUniqueId_s, StorageType_s  ) on StorageUniqueId_s \r\n| project StorageInGB, BackupItemUniqueId_s, StorageType_s \r\n| join kind=leftouter (AzureDiagnostics | where Category == \"AzureBackupReport\" | where OperationName == \"BackupItem\" | distinct BackupItemUniqueId_s, BackupItemFriendlyName_s | project BackupItemUniqueId_s, BackupItemFriendlyName_s ) on BackupItemUniqueId_s \r\n| project StorageInGB, BackupItemFriendlyName_s, BackupItemUniqueId_s, StorageType_s \r\n| where StorageType_s == \"Cloud\" \r\n| order by StorageInGB desc",
@@ -642,10 +685,15 @@
                   "CenterLegend": {
                     "Text": "Total",
                     "Operation": "Sum",
-                    "ArcsToSelect": []
+                    "ArcsToSelect": [
+                    ]
                   },
                   "Options": {
-                    "colors": ["#55d455", "#e81123", "#00bcf2"],
+                    "colors": [
+                      "#55d455",
+                      "#e81123",
+                      "#00bcf2"
+                    ],
                     "valueColorMapping": [
                       {
                         "value": "Completed",
@@ -686,7 +734,8 @@
           },
           "properties": {
             "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]",
-            "referencedResources": [],
+            "referencedResources": [
+            ],
             "containedResources": [
               "[resourceId('Microsoft.OperationalInsights/workspaces/views/', variables('workspaceName'), variables('omsSolutions').customSolution.name)]"
             ]
@@ -694,5 +743,15 @@
         }
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
+    }
+  }
 }

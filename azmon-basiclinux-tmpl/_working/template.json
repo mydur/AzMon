@@ -787,6 +787,14 @@
     "WorkspaceId": {
       "type": "string",
       "value": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+    },
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
     }
   }
 }

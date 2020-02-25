@@ -92,6 +92,14 @@
     "authorizations": {
       "type": "array",
       "value": "[parameters('authorizations')]"
+    },
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
     }
   }
-}
+} }

@@ -11,7 +11,12 @@
     },
     "Environment": {
       "type": "string",
-      "allowedValues": ["dev", "test", "acc", "prod"],
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
       "defaultValue": "test",
       "metadata": {
         "description": "Can one of the following, dev-test-acc-prod"
@@ -106,16 +111,25 @@
             "emailAddress": "[parameters('EmailAddress')]"
           }
         ],
-        "smsReceivers": [],
-        "webhookReceivers": [],
-        "itsmReceivers": [],
-        "azureAppPushReceivers": [],
-        "automationRunbookReceivers": [],
-        "voiceReceivers": [],
-        "logicAppReceivers": [],
-        "azureFunctionReceivers": []
+        "smsReceivers": [
+        ],
+        "webhookReceivers": [
+        ],
+        "itsmReceivers": [
+        ],
+        "azureAppPushReceivers": [
+        ],
+        "automationRunbookReceivers": [
+        ],
+        "voiceReceivers": [
+        ],
+        "logicAppReceivers": [
+        ],
+        "azureFunctionReceivers": [
+        ]
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
     },
     {
       "name": "[concat('File services availability (', parameters('StorAcctName'), ')')]",
@@ -147,7 +161,8 @@
             {
               "name": "1st criterion",
               "metricName": "Availability",
-              "dimensions": [],
+              "dimensions": [
+              ],
               "operator": "LessThan",
               "threshold": 100,
               "timeAggregation": "Average"
@@ -194,7 +209,8 @@
             {
               "name": "1st criterion",
               "metricName": "Availability",
-              "dimensions": [],
+              "dimensions": [
+              ],
               "operator": "LessThan",
               "threshold": 100,
               "timeAggregation": "Average"
@@ -241,7 +257,8 @@
             {
               "name": "1st criterion",
               "metricName": "FileCapacity",
-              "dimensions": [],
+              "dimensions": [
+              ],
               "operator": "GreaterThan",
               "threshold": "[mul(parameters('FileCapacityThresholdMBWarning'), 1000000)]",
               "timeAggregation": "Average"
@@ -288,7 +305,8 @@
             {
               "name": "1st criterion",
               "metricName": "FileCapacity",
-              "dimensions": [],
+              "dimensions": [
+              ],
               "operator": "GreaterThan",
               "threshold": "[mul(parameters('FileCapacityThresholdMBCritical'), 1000000)]",
               "timeAggregation": "Average"
@@ -305,5 +323,15 @@
         ]
       }
     }
-  ]
+  ],
+  "outputs": {
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
+    }
+  }
 }

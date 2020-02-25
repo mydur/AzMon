@@ -230,7 +230,7 @@ $Location = (Get-AzLocation | ? { $_.DisplayName -eq "$LocationDisplayName" }).L
 # Update
 ##########################################################################
 #
-If ($Update) {
+If ($DeployBaseSetup) {
 
 }
 ##########################################################################
@@ -291,7 +291,7 @@ If ($DeployBaseSetup) {
         $AzMonBasic = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-basic-tmpl\_working\template.json") `
-                        --name "azmon-basic" `
+                        --name "azmon-basic-update" `
                         --parameters `
                         "Project=$TagProject" `
                         "VMRGName=$VMResourceGroupName " `
@@ -305,7 +305,7 @@ If ($DeployBaseSetup) {
                         "UniqueNumber=$UniqueNumber") `
         | ConvertFrom-Json
         ("azmon-basic-tmpl: " + $AzMonBasic.properties.provisioningState + " (" + $AzMonBasic.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonBasicTmpl = $AzMonBasic.properties.provisioningState
+        $ParametersJSON.Outputs.azMonBasicTmpl = ($AzMonBasic.properties.provisioningState + "-" + $AzMonBasic.properties.outputs.templateVersion.value + "-" + $AzMonBasic.properties.outputs.templateDate.value)
         $WorkspaceName = $AzMonBasic.properties.outputs.workspacename.value
         $ParametersJSON.Outputs.workspaceName = $WorkspaceName
         $WorkspaceId = $AzMonBasic.properties.outputs.workspaceid.value
@@ -360,7 +360,7 @@ If ($DeployBaseSetup) {
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-basicrules-tmpl: " + $AzMonBasicRules.properties.provisioningState + " (" + $AzMonBasicRules.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonBasicRulesTmpl = $AzMonBasicRules.properties.provisioningState
+        $ParametersJSON.Outputs.azMonBasicRulesTmpl = ($AzMonBasicRules.properties.provisioningState + "-" + $AzMonBasicRules.properties.outputs.templateVersion.value + "-" + $AzMonBasicRules.properties.outputs.templateDate.value)
         $BasicRulesActionGroupId = $AzMonBasicRules.properties.outputs.ActionGroupId.value
         $ParametersJSON.Outputs.basicRulesActionGroupId = $BasicRulesActionGroupId
         #
@@ -418,7 +418,7 @@ If ($DeployBaseSetup) {
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-svchealth-tmpl: " + $AzMonSvcHealth.properties.provisioningState + " (" + $AzMonSvcHealth.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonSvcHealthTmpl = $AzMonSvcHealth.properties.provisioningState
+        $ParametersJSON.Outputs.azMonSvcHealthTmpl = ($AzMonSvcHealth.properties.provisioningState + "-" + $AzMonSvcHealth.properties.outputs.templateVersion.value + "-" + $AzMonSvcHealth.properties.outputs.templateDate.value)
         $SvcHealthActionGroupId = $AzMonSvcHealth.properties.outputs.ActionGroupId.value
         $ParametersJSON.Outputs.svcHealthActionGroupId = $SvcHealthActionGroupId
         #
@@ -446,7 +446,7 @@ If ($DeployBaseSetup) {
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-nwrules-tmpl: " + $AzMonNWRules.properties.provisioningState + " (" + $AzMonNWRules.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonNWRulesTmpl = $AzMonNWRules.properties.provisioningState
+        $ParametersJSON.Outputs.azMonNWRulesTmpl = ($AzMonNWRules.properties.provisioningState + "-" + $AzMonNWRules.properties.outputs.templateVersion.value + "-" + $AzMonNWRules.properties.outputs.templateDate.value)
         $NWRulesActionGroupId = $AzMonNWRules.properties.outputs.ActionGroupId.value
         $ParametersJSON.Outputs.nwRulesActionGroupId = $NWRulesActionGroupId
         #
@@ -464,7 +464,7 @@ If ($DeployBaseSetup) {
                         --name "azmon-vmworkbook" ) `
         | ConvertFrom-Json
         ("azmon-vmworkbook-tmpl: " + $AzMonVMWorkbook.properties.provisioningState + " (" + $AzMonVMWorkbook.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonVMWorkbookTmpl = $AzMonVMWorkbook.properties.provisioningState
+        $ParametersJSON.Outputs.azMonVMWorkbookTmpl = ($AzMonVMWorkbook.properties.provisioningState + "-" + $AzMonVMWorkbook.properties.outputs.templateVersion.value + "-" + $AzMonVMWorkbook.properties.outputs.templateDate.value)
         #
         #
         # BACKUPSOL (azmon-backupsol-tmpl)
@@ -481,7 +481,7 @@ If ($DeployBaseSetup) {
                         "Location=$Location") `
         | ConvertFrom-Json
         ("azmon-backupsol-tmpl: " + $AzMonBackupSol.properties.provisioningState + " (" + $AzMonBackupSol.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonBackupSolTmpl = $AzMonBackupSol.properties.provisioningState
+        $ParametersJSON.Outputs.azMonBackupSolTmpl = ($AzMonBackupSol.properties.provisioningState + "-" + $AzMonBackupSol.properties.outputs.templateVersion.value + "-" + $AzMonBackupSol.properties.outputs.templateDate.value)
         #
         # CREATE SERVICE PRINCIPAL
         # ---------------------------
@@ -528,7 +528,7 @@ If ($DeployBaseSetup) {
                                 --name "azmon-delegatedrights" ) `
                 | ConvertFrom-Json
                 ("azmon-delegatedrights-tmpl: " + $AzMonDRM.properties.provisioningState + " (" + $AzMonDRM.properties.correlationId + ")")
-                $ParametersJSON.Outputs.AzMonDRMTmpl = $AzMonDRM.properties.provisioningState
+                $ParametersJSON.Outputs.AzMonDRMTmpl = ( $AzMonDRM.properties.provisioningState + "-" + $AzMonDRM.properties.outputs.templateVersion.value + "-" + $AzMonDRM.properties.outputs.templateDate.value)
         } # End -IncludeDRM
 } # End of DeployBaseSetup
 #
@@ -556,7 +556,7 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
                         "UniqueNumber=$UniqueNumber") `
         | ConvertFrom-Json
         ("azmon-basiclinux-tmpl: " + $AzMonBasicLinux.properties.provisioningState + " (" + $AzMonBasicLinux.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonBasicLinuxTmpl = $AzMonBasicLinux.properties.provisioningState
+        $ParametersJSON.Outputs.azMonBasicLinuxTmpl = ( $AzMonBasicLinux.properties.provisioningState + "-" + $AzMonBasicLinux.properties.outputs.templateVersion.value + "-" + $AzMonBasicLinux.properties.outputs.templateDate.value)
 } # End of IncludeLinux for base setup
 #
 #
@@ -587,7 +587,7 @@ If ($NonAzureVMs) {
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-nonazurevms-tmpl: " + $AzMonOnpremRules.properties.provisioningState + " (" + $AzMonOnpremRules.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonNonAzureVMsTmpl = $AzMonOnpremRules.properties.provisioningState
+        $ParametersJSON.Outputs.azMonNonAzureVMsTmpl = ($AzMonOnpremRules.properties.provisioningState + "-" + $AzMonOnpremRules.properties.outputs.templateVersion.value + "-" + $AzMonOnpremRules.properties.outputs.templateDate.value)
         $NonAzureVMsActionGroupId = $AzMonOnpremRules.properties.outputs.ActionGroupId.value
         $ParametersJSON.Outputs.nonAzureVMsActionGroupId = $NonAzureVMsActionGroupId
 } # End of NonAzureVMs
@@ -639,7 +639,7 @@ If ($AddVMResGroup) {
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-vmrules-tmpl: " + $AzMonVMRules.properties.provisioningState + " (" + $AzMonVMRules.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonVMRulesTmpl = $AzMonVMRules.properties.provisioningState
+        $ParametersJSON.Outputs.azMonVMRulesTmpl = ($AzMonVMRules.properties.provisioningState + "-" + $AzMonVMRules.properties.outputs.templateVersion.value + "-" + $AzMonVMRules.properties.outputs.templateDate.value)
         $VMRulesActionGroupId = $AzMonVMRules.properties.outputs.ActionGroupId.value
         $ParametersJSON.Outputs.vmRulesActionGroupId = $VMRulesActionGroupId
         $AssignmentDisplayName = "AzMon: Deploy Log Analytics Agent for Windows VMs in " + $VMResourceGroupName
@@ -681,7 +681,7 @@ If ($AddVMResGroup) {
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-rschealth-tmpl: " + $AzMonRscHealth.properties.provisioningState + " (" + $AzMonRscHealth.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonRSCHealthTmpl = $AzMonRSCHealth.properties.provisioningState
+        $ParametersJSON.Outputs.azMonRSCHealthTmpl = ($AzMonRscHealth.properties.provisioningState + "-" + $AzMonRscHealth.properties.outputs.templateVersion.value + "-" + $AzMonRscHealth.properties.outputs.templateDate.value)
         $RscHealthActionGroupId = $AzMonRscHealth.properties.outputs.ActionGroupId.value
         $ParametersJSON.Outputs.rscHealthActionGroupId = $RscHealthActionGroupId
         #
@@ -718,7 +718,7 @@ If ($AddVMResGroup) {
                         "UniqueNumber=$UniqueNumber") `
         | ConvertFrom-Json
         ("azmon-vault-tmpl: " + $AzMonVault.properties.provisioningState + " (" + $AzMonVault.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonVaultTmpl = $AzMonVault.properties.provisioningState
+        $ParametersJSON.Outputs.azMonVaultTmpl = ($AzMonVault.properties.provisioningState + "-" + $AzMonVault.properties.outputs.templateVersion.value + "-" + $AzMonVault.properties.outputs.templateDate.value)
         $BackupVaultName = $AzMonVault.properties.outputs.BackupVaultName.value
         $ParametersJSON.Outputs.backupVaultName = $BackupVaultName
         $BackupVaultId = $AzMonVault.properties.outputs.BackupVaultId.value
@@ -742,7 +742,7 @@ If ($AddVMResGroup) {
                                 --name "azmon-delegatedvmrights" ) `
                 | ConvertFrom-Json
                 ("azmon-delegatedvmrights-tmpl: " + $AzMonVMDRM.properties.provisioningState + " (" + $AzMonVMDRM.properties.correlationId + ")")
-                $ParametersJSON.Outputs.AzMonVMDRMTmpl = $AzMonVMDRM.properties.provisioningState
+                $ParametersJSON.Outputs.AzMonVMDRMTmpl = ($AzMonVMDRMRules.properties.provisioningState + "-" + $AzMonVMDRMRules.properties.outputs.templateVersion.value + "-" + $AzMonVMDRMRules.properties.outputs.templateDate.value)
         } # End -IncludeDRM
 } # End AddVMResGroup
 #
@@ -797,7 +797,7 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-vmlinuxrules-tmpl: " + $AzMonVMLinuxRules.properties.provisioningState + " (" + $AzMonVMLinuxRules.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonVMLinuxRulesTmpl = $AzMonVMLinuxRules.properties.provisioningState
+        $ParametersJSON.Outputs.azMonVMLinuxRulesTmpl = ($AzMonVMLinuxRules.properties.provisioningState + "-" + $AzMonVMLinuxRules.properties.outputs.templateVersion.value + "-" + $AzMonVMLinuxRules.properties.outputs.templateDate.value)
 } # End of IncludeLinux for VM rules
 #
 #
@@ -826,7 +826,7 @@ If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-k8srules-tmpl: " + $AzMonK8SRules.properties.provisioningState + " (" + $AzMonK8SRules.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonK8SRulesTmpl = $AzMonK8SRules.properties.provisioningState
+        $ParametersJSON.Outputs.azMonK8SRulesTmpl = ($AzMonK8SRules.properties.provisioningState + "-" + $AzMonK8SRules.properties.outputs.templateVersion.value + "-" + $AzMonK8SRules.properties.outputs.templateDate.value)
         $ParametersJSON.Outputs.K8SClusterName = $K8SClusterName  
 }
 #
@@ -852,7 +852,7 @@ If ($IncludeASR -and $WorkspaceName -ne "tbd") {
                         "ASRVaultName=$ASRVaultName" `
                         "ASRVaultRGName=$ASRVaultRGName" `
                         "AMLWorkspaceName=$WorkspaceName" `
-                        "AMLResourceGroup=$ResourceGroupName" `
+                        "AMLWorkspaceRGName=$ResourceGroupName" `
                         "RPOCritical=$ASRRPOCritical" `
                         "RPOWarning=$ASRRPOWarning" `
                         "TestFailoverMissingThreshold=$ASRTestFailoverMissingThreshold" `
@@ -862,7 +862,7 @@ If ($IncludeASR -and $WorkspaceName -ne "tbd") {
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
         ("azmon-asrrules-tmpl: " + $AzMonASRRules.properties.provisioningState + " (" + $AzMonASRRules.properties.correlationId + ")")
-        $ParametersJSON.Outputs.azMonASRRulesTmpl = $AzMonASRRules.properties.provisioningState
+        $ParametersJSON.Outputs.azMonASRRulesTmpl = ($AzMonASRRules.properties.provisioningState + "-" + $AzMonASRRules.properties.outputs.templateVersion.value + "-" + $AzMonASRRules.properties.outputs.templateDate.value)
         $ParametersJSON.Outputs.ASRVaultName = $ASRVaultName
 
         $ASRDiagSet = '[{ \"category\": \"AzureSiteRecoveryJobs\", \"enabled\": true, \"category\": \"AzureSiteRecoveryEvents\", \"enabled\": true, \"category\": \"AzureSiteRecoveryReplicatedItems\", \"enabled\": true, \"category\": \"AzureSiteRecoveryReplicationStats\", \"enabled\": true, \"category\": \"AzureSiteRecoveryRecoveryPoints\", \"enabled\": true, \"category\": \"AzureSiteRecoveryReplicationDataUploadRate\", \"enabled\": true, \"category\": \"AzureSiteRecoveryProtectedDiskDataChurn\", \"enabled\": true, \"retentionPolicy\": { \"enabled\": false, \"days\": 0 }}]'

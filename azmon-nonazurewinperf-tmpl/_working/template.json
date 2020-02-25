@@ -196,6 +196,14 @@
     "WarningRuleName": {
       "type": "string",
       "value": "[variables('warningRuleName')]"
+    },
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
     }
   }
-}
+} }
