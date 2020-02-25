@@ -25,13 +25,13 @@
     "ASRVaultName": {
       "type": "string",
       "metadata": {
-        "description": "AKS Cluster Resource Name"
+        "description": "Azure Site Recovery Vault Name"
       }
     },
     "ASRVaultRGName": {
       "type": "string",
       "metadata": {
-        "description": "AKS Cluster Resource Group"
+        "description": "Azure Site Recovery Vault Resource Group"
       }
     },
     "RPOCritical": {
@@ -338,7 +338,7 @@
         "Environment": "[parameters('Environment')]"
       },
       "properties": {
-        "description": "[concat('ASR - Too many test failovers missing - Critical (', parameters('ASRVaultName'), ')')]",
+        "description": "[concat('ASR - Too many test failovers missing - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
           "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', variables('ASRName'), '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",

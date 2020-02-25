@@ -63,7 +63,8 @@ param (
         [switch]$IncludeLinux,
         [switch]$IncludeDRM,
         [switch]$IncludeK8S,
-        [switch]$IncludeASR
+        [switch]$IncludeASR,
+        [switch]$Update
 )
 
 ##########################################################################
@@ -171,6 +172,9 @@ New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -It
 $TemplateFolder = "azmon-k8srules-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+$TemplateFolder = "azmon-asrrules-tmpl/_working"
+New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 # Runbooks
 New-Item -Path ($AzMonLocalPath + "\_deployment") -ItemType Directory -ErrorAction SilentlyContinue
 $FileName = "azmon-alertlifecycle-rbok.ps1"
@@ -222,6 +226,13 @@ $SubscriptionID = $Login.id
 $SubscriptionName = $Login.name
 $Location = (Get-AzLocation | ? { $_.DisplayName -eq "$LocationDisplayName" }).Location
 #
+##########################################################################
+# Update
+##########################################################################
+#
+If ($Update) {
+
+}
 ##########################################################################
 # DeployBaseSetup
 ##########################################################################
@@ -827,6 +838,9 @@ If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
 If ($IncludeASR -and $WorkspaceName -ne "tbd") {
         $ASRVaultName = $ParametersJSON.ASR.VaultName
         $ASRVaultRGName = $ParametersJSON.ASR.VaultRGName
+        $ASRRPOCritical = $ParametersJSON.ASR.RPOCritical
+        $ASRRPOWarning = $ParametersJSON.ASR.RPOWarning
+        $ASRTestFailoverMissingThreshold = $ParametersJSON.ASR.TestFailoverMissingThreshold
         ("azmon-asrrules-tmpl...")
         $AzMonASRRules = (az group deployment create `
                         --resource-group "$ASRVaultRGName" `
@@ -836,9 +850,12 @@ If ($IncludeASR -and $WorkspaceName -ne "tbd") {
                         "Project=$TagProject" `
                         "Environment=$Environment" `
                         "ASRVaultName=$ASRVaultName" `
-                        "ASRResourceGroup=$ASRVaultRGName" `
+                        "ASRVaultRGName=$ASRVaultRGName" `
                         "AMLWorkspaceName=$WorkspaceName" `
                         "AMLResourceGroup=$ResourceGroupName" `
+                        "RPOCritical=$ASRRPOCritical" `
+                        "RPOWarning=$ASRRPOWarning" `
+                        "TestFailoverMissingThreshold=$ASRTestFailoverMissingThreshold" `
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `

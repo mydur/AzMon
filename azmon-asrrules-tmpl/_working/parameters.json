@@ -3,16 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Project": {
-      "value": "k8sdeploy"
+      "value": "asrmon"
     },
     "Environment": {
       "value": "test"
     },
     "ASRVaultName": {
-      "value": "deploy-test-k8s"
+      "value": "asr-test-bvlt"
     },
     "ASRVaultRGName": {
-      "value": "k8sdeploy-test-rg"
+      "value": "asr-test-rg"
     },
     "AMLWorkspaceName": {
       "value": "azom2437-prod-lana"

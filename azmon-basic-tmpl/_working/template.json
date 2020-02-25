@@ -1128,7 +1128,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Pods that are failing or recovered from failure",
-            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where ObjectKind =~ \"Pod\"\r\n| where Reason =~ \"BackOff\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), Computer')]",
+            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where ObjectKind =~ \"Pod\"\r\n| where Reason =~ \"BackOff\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1143,7 +1143,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Pods are being evicted",
-            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"Evicted\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), Computer')]",
+            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"Evicted\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1158,7 +1158,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Storage related issues have been detected",
-            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"FailedMount\" or Reason =~ \"FailedAttachVolume\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), Computer ')]",
+            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"FailedMount\" or Reason =~ \"FailedAttachVolume\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer ')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1173,7 +1173,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Scheduler unable to find node to run pod",
-            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"FailedScheduling\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), ClusterName')]",
+            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"FailedScheduling\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), ClusterName')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1188,7 +1188,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Node not ready or not schedulable",
-            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"NodeNotReady\" or Reason =~ \"NodeNotSchedulable\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), Computer ')]",
+            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"NodeNotReady\" or Reason =~ \"NodeNotSchedulable\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer ')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1203,7 +1203,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Too many failures detected in short time-span",
-            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason contains \"Fail\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 5m), ClusterName')]",
+            "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason contains \"Fail\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), ClusterName')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1218,7 +1218,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Nodes average CPU utilization in percent (Critical)",
-            "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet capacityCounterName = \"cpuCapacityNanoCores\";\r\nlet usageCounterName = \"cpuUsageNanoCores\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', 'K8SClusterName', '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| order by TimeGenerated asc')]",
+            "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet capacityCounterName = \"cpuCapacityNanoCores\";\r\nlet usageCounterName = \"cpuUsageNanoCores\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', 'K8SClusterName', '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| order by TimeGenerated asc')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1233,7 +1233,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Nodes average memory utilization in percent (Critical)",
-            "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet capacityCounterName = \"memoryCapacityBytes\";\r\nlet usageCounterName = \"memoryRssBytes\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', 'K8SClusterName', '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n//| where AggregatedValue <= 95\r\n| order by TimeGenerated asc ')]",
+            "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet capacityCounterName = \"memoryCapacityBytes\";\r\nlet usageCounterName = \"memoryRssBytes\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', 'K8SClusterName', '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n//| where AggregatedValue <= 95\r\n| order by TimeGenerated asc ')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1248,7 +1248,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Percent failing Pods is too high",
-            "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet clusterName = \"', 'K8SClusterName', '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName,\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(FailedPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
+            "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet clusterName = \"', 'K8SClusterName', '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName,\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(FailedPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1263,7 +1263,7 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Percent unknown Pods is too high",
-            "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nlet clusterName = \"', 'K8SClusterName', '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(UnknownPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
+            "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet clusterName = \"', 'K8SClusterName', '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(UnknownPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
             "Version": 2
           },
           "dependsOn": [
@@ -1278,7 +1278,112 @@
           "properties": {
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Cluster nodes disks free space used exceeded (Critical)",
-            "Query": "[concat('let clusterId = \"', 'K8SResourceId', '\";\r\nlet endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 5m;\r\nInsightsMetrics\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where Origin == \"container.azm.ms/telegraf\" \r\n| where Namespace == \"container.azm.ms/disk\" \r\n| extend Tags = todynamic(Tags) \r\n| project TimeGenerated, ClusterId = Tags[\"container.azm.ms/clusterId\"], Computer = tostring(Tags.hostName), Device = tostring(Tags.device), Path = tostring(Tags.path), DiskMetricName = Name, DiskMetricValue = Val \r\n| where ClusterId =~ clusterId \r\n| where DiskMetricName == \"used_percent\"\r\n| summarize AggregatedValue = max(DiskMetricValue) by bin(TimeGenerated, trendBinSize), Device, Computer\r\n| order by TimeGenerated asc')]",
+            "Query": "[concat('let clusterId = \"', 'K8SResourceId', '\";\r\nlet endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nInsightsMetrics\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where Origin == \"container.azm.ms/telegraf\" \r\n| where Namespace == \"container.azm.ms/disk\" \r\n| extend Tags = todynamic(Tags) \r\n| project TimeGenerated, ClusterId = Tags[\"container.azm.ms/clusterId\"], Computer = tostring(Tags.hostName), Device = tostring(Tags.device), Path = tostring(Tags.path), DiskMetricName = Name, DiskMetricValue = Val \r\n| where ClusterId =~ clusterId \r\n| where DiskMetricName == \"used_percent\"\r\n| summarize AggregatedValue = max(DiskMetricValue) by bin(TimeGenerated, trendBinSize), Device, Computer\r\n| order by TimeGenerated asc')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "savedSearchesASRReplHealthCritical",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "ASR - Replication health - Critical",
+            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRName__', '\" \n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "savedSearchesASRReplHealthWarning",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "ASR - Replication health - Warning",
+            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRName__', '\" \n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "savedSearchesASRRPOBreachWarning",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "ASR - RPO breaches - Warning",
+            "Query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"   \n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', '__ASRName__', '\" \n| extend RPO = case(rpoInSeconds_d > ', '__RPOCritical__', ', \"Critical\", rpoInSeconds_d ', '__RPOWarning__', ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s  \n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "savedSearchesASRRPOBreachCritical",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "ASR - RPO breaches - Critical",
+            "Query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"   \n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', '__ASRName__', '\" \n| extend RPO = case(rpoInSeconds_d > ', '__RPOCritical__', ', \"Critical\", rpoInSeconds_d ', '__RPOWarning__', ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s  \n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "savedSearchesASRTestFailoverMissing",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "ASR - Too many test failovers missing - Warning",
+            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', 'ASRName', '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "savedSearchesASRJobFailures",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "ASR - Job failures",
+            "Query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', 'ASRName', '\" \n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "savedSearchesASRTestFailover90d",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics Monitoring",
+            "DisplayName": "ASR - Test failover last date 90days",
+            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where tolower(Resource) == \"asr-test-bvlt\"\n| where Category == \"AzureSiteRecoveryReplicatedItems\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where lastSuccessfulTestFailoverTime_t <= ago(90d)\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| summarize count() ')]",
             "Version": 2
           },
           "dependsOn": [
