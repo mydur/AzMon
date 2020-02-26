@@ -176,6 +176,9 @@ New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -It
 $TemplateFolder = "azmon-asrrules-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+$TemplateFolder = "azmon-basicasr-tmpl/_working"
+New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 # Runbooks
 New-Item -Path ($AzMonLocalPath + "\_deployment") -ItemType Directory -ErrorAction SilentlyContinue
 $FileName = "azmon-alertlifecycle-rbok.ps1"
@@ -537,7 +540,7 @@ If ($DeployBaseSetup) {
 # IncludeLinux (Base setup)
 ##########################################################################
 #
-If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azMonBasicLinuxTmpl -ne "Succeeded") {
+If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azMonBasicLinuxTmpl.Contains("Succeeded")) {
         ("azmon-basiclinux-tmpl...")
         $AzMonBasicLinux = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
@@ -835,7 +838,29 @@ If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
 # IncludeASR (ASR rules)
 ##########################################################################
 #
+$WorkspaceName = $ParametersJSON.Outputs.workspaceName
 If ($IncludeASR -and $WorkspaceName -ne "tbd") {
+        ("azmon-basicasr-tmpl...")
+        $AzMonBasicASR = (az group deployment create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-asrrules-tmpl\_working\template.json") `
+                        --name "azmon-asrrules" `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "AMLWorkspaceName=$WorkspaceName" `
+                        "AMLWorkspaceRGName=$ResourceGroupName" `
+                        "dataRetention=$WorkspaceDataRetention" `
+                        "Location=$LocationDisplayName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-basicasr-tmpl: " + $AzMonBasicASR.properties.provisioningState + " (" + $AzMonBasicASR.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonBasicASRTmpl = ($AzMonBasicASR.properties.provisioningState + "-" + $AzMonBasicASR.properties.outputs.templateVersion.value + "-" + $AzMonBasicASR.properties.outputs.templateDate.value)
+}
+If ($IncludeASR -and $ParametersJSON.Outputs.azMonBasicASRTmpl.Contains("Succeeded")) {
         $ASRVaultName = $ParametersJSON.ASR.VaultName
         $ASRVaultRGName = $ParametersJSON.ASR.VaultRGName
         $ASRRPOCritical = $ParametersJSON.ASR.RPOCritical

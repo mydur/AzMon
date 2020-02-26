@@ -82,6 +82,7 @@
     "azMonVMDRMTmpl": "Succeeded",
     "azMonK8SRulesTmpl": "Succeeded",
     "K8SClusterName": "tbd",
+    "azMonBasicASRTmpl": "Succeeded",
     "azMonASRRulesTmpl": "Succeeded",
     "ASRVaultName": "tbd"
   }
