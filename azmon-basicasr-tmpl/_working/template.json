@@ -103,16 +103,16 @@
     }
   },
   "variables": {
-    "TemplateId": "azmon-asrrules",
+    "TemplateId": "azmon-basicasr",
     "TemplateVersion": "1.0.1",
     "TemplateDate": "20200225",
-    "TemplateDescription": "Moved sources and searches from basic to this template",
-    "TemplateUsage": "Deploy the ASR alerting rules and activate monitoring",
+    "TemplateDescription": "Initial version",
+    "TemplateUsage": "Deploy the basic ASR workspace configuration",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
     "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
-    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
+    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]"
   },
   "resources": [
     {

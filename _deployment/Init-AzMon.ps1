@@ -228,7 +228,7 @@ $PSCreds = New-Object System.Management.Automation.PSCredential(("http://azps-" 
 Connect-AzAccount -ServicePrincipal -Credential $PSCreds -Tenant $TenantID
 $SubscriptionID = $Login.id
 $SubscriptionName = $Login.name
-$Location = (Get-AzLocation | ? { $_.DisplayName -eq "$LocationDisplayName" }).Location
+$Location = (Get-AzLocation | Where-Object { $_.DisplayName -eq "$LocationDisplayName" }).Location
 #
 ##########################################################################
 # Update
@@ -843,7 +843,7 @@ If ($IncludeASR -and $WorkspaceName -ne "tbd") {
         ("azmon-basicasr-tmpl...")
         $AzMonBasicASR = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
-                        --template-file ($AzMonLocalPath + "\azmon-asrrules-tmpl\_working\template.json") `
+                        --template-file ($AzMonLocalPath + "\azmon-basicasr-tmpl\_working\template.json") `
                         --name "azmon-asrrules" `
                         --parameters `
                         "Project=$TagProject" `
