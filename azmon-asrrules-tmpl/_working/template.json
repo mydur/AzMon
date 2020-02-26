@@ -141,21 +141,21 @@
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
-    "AMLRG": "[toLower(parameters('AMLWorkspaceRGName'))]",
-    "AMLName": "[toLower(parameters('AMLWorkspaceName'))]",
-    "ASRRG": "[toLower(parameters('ASRVaultRGName'))]",
-    "ASRName": "[toLower(parameters('ASRVaultName'))]",
+    "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
+    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
+    "ASRVaultRGName": "[toLower(parameters('ASRVaultRGName'))]",
+    "ASRVaultName": "[toLower(parameters('ASRVaultName'))]",
     "actionGroupName": "[concat('asrrules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
     "actionGroupShortName": "[take(concat('asrrules', variables('Project')), 12)]",
-    "alertTag": "[concat('hidden-link:', '/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
-    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
-    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
+    "alertTag": "[concat('hidden-link:', '/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
     "emailAddress": "dummy@nowhere.com"
   },
   "resources": [
     {
       "type": "microsoft.operationalinsights/workspaces",
-      "name": "[variables('AMLName')]",
+      "name": "[variables('AMLWorkspaceName')]",
       "apiVersion": "2015-11-01-preview",
       "location": "[parameters('Location')]",
       "tags": {
@@ -186,7 +186,7 @@
           "type": "datasources",
           "name": "ASRSourceVmChurnRate",
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ],
           "kind": "WindowsPerformanceCounter",
           "properties": {
@@ -201,7 +201,7 @@
           "type": "datasources",
           "name": "ASRSourceVmThrpRate",
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ],
           "kind": "WindowsPerformanceCounter",
           "properties": {
@@ -213,107 +213,107 @@
         },
         {
           "type": "savedSearches",
-          "name": "savedSearchesASRReplHealthCritical",
+          "name": "searchASRReplHealthCritical",
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
-            "Category": "Getronics Monitoring",
+            "Category": "Getronics ASR Monitoring",
             "DisplayName": "ASR - Replication health - Critical",
-            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRName__', '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRVaultName__', '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
             "Version": 2
           },
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ]
         },
         {
           "type": "savedSearches",
-          "name": "savedSearchesASRReplHealthWarning",
+          "name": "searchASRReplHealthWarning",
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
-            "Category": "Getronics Monitoring",
+            "Category": "Getronics ASR Monitoring",
             "DisplayName": "ASR - Replication health - Warning",
-            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRName__', '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRVaultName__', '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
             "Version": 2
           },
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ]
         },
         {
           "type": "savedSearches",
-          "name": "savedSearchesASRRPOBreachWarning",
+          "name": "searchASRRPOBreachWarning",
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
-            "Category": "Getronics Monitoring",
+            "Category": "Getronics ASR Monitoring",
             "DisplayName": "ASR - RPO breaches - Warning",
-            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRName__', '\"\n| extend RPO = case(rpoInSeconds_d > ', '__RPOCritical__', ', \"Critical\", rpoInSeconds_d ', '__RPOWarning__', ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
+            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRVaultName__', '\"\n| extend RPO = case(rpoInSeconds_d > ', '__RPOCritical__', ', \"Critical\", rpoInSeconds_d ', '__RPOWarning__', ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
             "Version": 2
           },
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ]
         },
         {
           "type": "savedSearches",
-          "name": "savedSearchesASRRPOBreachCritical",
+          "name": "searchASRRPOBreachCritical",
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
-            "Category": "Getronics Monitoring",
+            "Category": "Getronics ASR Monitoring",
             "DisplayName": "ASR - RPO breaches - Critical",
-            "Query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', '__ASRName__', '\"\n| extend RPO = case(rpoInSeconds_d > ', '__RPOCritical__', ', \"Critical\", rpoInSeconds_d ', '__RPOWarning__', ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
+            "Query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', '__ASRVaultName__', '\"\n| extend RPO = case(rpoInSeconds_d > ', '__RPOCritical__', ', \"Critical\", rpoInSeconds_d ', '__RPOWarning__', ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
             "Version": 2
           },
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ]
         },
         {
           "type": "savedSearches",
-          "name": "savedSearchesASRTestFailoverMissing",
+          "name": "searchASRTestFailoverMissing",
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
-            "Category": "Getronics Monitoring",
+            "Category": "Getronics ASR Monitoring",
             "DisplayName": "ASR - Too many test failovers missing - Warning",
-            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', 'ASRName', '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",
+            "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', 'ASRVaultName', '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",
             "Version": 2
           },
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ]
         },
         {
           "type": "savedSearches",
-          "name": "savedSearchesASRJobFailures",
+          "name": "searchASRJobFailures",
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
-            "Category": "Getronics Monitoring",
+            "Category": "Getronics ASR Monitoring",
             "DisplayName": "ASR - Job failures",
-            "Query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', 'ASRName', '\"\n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)')]",
+            "Query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', 'ASRVaultName', '\"\n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)')]",
             "Version": 2
           },
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ]
         },
         {
           "type": "savedSearches",
-          "name": "savedSearchesASRTestFailover90d",
+          "name": "searchASRTestFailover90d",
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
-            "Category": "Getronics Monitoring",
+            "Category": "Getronics ASR Monitoring",
             "DisplayName": "ASR - Test failover last date 90days",
             "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where tolower(Resource) == \"asr-test-bvlt\"\n| where Category == \"AzureSiteRecoveryReplicatedItems\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where lastSuccessfulTestFailoverTime_t <= ago(90d)\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| summarize count()')]",
             "Version": 2
           },
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLName'))]"
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
           ]
         }
       ]
@@ -338,7 +338,7 @@
         "description": "[concat('ASR - Replication health - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRName'), '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -393,7 +393,7 @@
         "description": "[concat('ASR - Replication health - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRName'), '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -448,7 +448,7 @@
         "description": "[concat('ASR - RPO breaches - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRName'), '\"\n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -503,7 +503,7 @@
         "description": "[concat('ASR - RPO breaches - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', variables('ASRName'), '\" \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
+          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -557,11 +557,11 @@
         "description": "[concat('ASR - Too many test failovers missing - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', variables('ASRName'), '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",
-          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",
+          "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
-            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]"
+            "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]"
           ]
         },
         "schedule": {
@@ -606,7 +606,7 @@
         "name": "[concat('ASR - Job failures - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', variables('ASRName'), '\" \n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)')]",
+          "query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -641,7 +641,6 @@
         "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
       ]
     },
-
     {
       "type": "microsoft.insights/actionGroups",
       "name": "[variables('actionGroupName')]",
