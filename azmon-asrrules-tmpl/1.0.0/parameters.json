@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "asrmon"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "ASRVaultName": {
+      "value": "asr-test-bvlt"
+    },
+    "ASRVaultRGName": {
+      "value": "asr-test-rg"
+    },
+    "AMLWorkspaceName": {
+      "value": "azom2437-prod-lana"
+    },
+    "AMLWorkspaceRGName": {
+      "value": "azmon-prod-rg"
+    },
+    "RPOCritical": {
+      "value": 1800
+    },
+    "RPOWarning": {
+      "value": 900
+    },
+    "TestFailoverMissingThreshold": {
+      "value": 5
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}

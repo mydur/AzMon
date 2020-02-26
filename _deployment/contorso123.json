@@ -37,8 +37,8 @@
     "ClusterRGName": "k8sworkshop-test-rg"
   },
   "ASR": {
-    "VaultName": "workshop-test-k8s",
-    "VaultRGName": "k8sworkshop-test-rg",
+    "VaultName": "asr-test-bvlt",
+    "VaultRGName": "asr-test-rg",
     "RPOCritical": 1800,
     "RPOWarning": 900,
     "TestFailoverMissingThreshold": 5

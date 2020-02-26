@@ -101,6 +101,7 @@ $UniqueNumber = $ParametersJSON.General.UniqueNumber
 $LocationDisplayName = $ParametersJSON.General.LocationDisplayName
 $VMResourceGroupName = $ParametersJSON.VMRules.VMRGName
 $dataPerDayThresholdMB = $ParametersJSON.Basic.dataPerDayThresholdMB
+$WorkspaceDataRetention = $ParametersJSON.Basic.WorkspaceDataRetention
 # Probably no change needed...
 $ResourceGroupName = ("azmon-$Environment-rg").ToLower()
 $WorkspaceName = $ParametersJSON.Outputs.workspaceName
@@ -287,7 +288,6 @@ If ($DeployBaseSetup) {
         # - Linked services
         # The template also contains an 'outputs' section of which the output is captured in variables listed below.
         ("azmon-basic-tmpl...")
-        $WorkspaceDataRetention = $ParametersJSON.Basic.WorkspaceDataRetention
         $AzMonBasic = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-basic-tmpl\_working\template.json") `
@@ -856,6 +856,8 @@ If ($IncludeASR -and $WorkspaceName -ne "tbd") {
                         "RPOCritical=$ASRRPOCritical" `
                         "RPOWarning=$ASRRPOWarning" `
                         "TestFailoverMissingThreshold=$ASRTestFailoverMissingThreshold" `
+                        "dataRetention=$WorkspaceDataRetention" `
+                        "Location=$LocationDisplayName" `
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `
