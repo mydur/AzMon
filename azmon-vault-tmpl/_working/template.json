@@ -115,9 +115,9 @@
   },
   "variables": {
     "TemplateId": "azmon-vault",
-    "TemplateVersion": "1.0.10",
-    "TemplateDate": "20190913",
-    "TemplateDescription": "Added resource locks",
+    "TemplateVersion": "1.0.11",
+    "TemplateDate": "20200303",
+    "TemplateDescription": "Added more diagnostic settings",
     "TemplateUsage": "Used to create backup vault and initial configuration",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -318,6 +318,46 @@
         "logs": [
           {
             "category": "AzureBackupReport",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 7,
+              "enabled": false
+            }
+          },
+          {
+            "category": "CoreAzureBackup",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 7,
+              "enabled": false
+            }
+          },
+          {
+            "category": "AddonAzureBackupJobs",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 7,
+              "enabled": false
+            }
+          },
+          {
+            "category": "AddonAzureBackupPolicy",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 7,
+              "enabled": false
+            }
+          },
+          {
+            "category": "AddonAzureBackupStorage",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 7,
+              "enabled": false
+            }
+          },
+          {
+            "category": "AddonAzureBackupProtectedInstance",
             "enabled": true,
             "retentionPolicy": {
               "days": 7,
