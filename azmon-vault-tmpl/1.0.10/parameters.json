@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environment": {
+      "value": "prod"
+    },
+    "UniqueNumber": {
+      "value": "9999"
+    },
+    "WorkspaceName": {
+      "value": "azmon-prod-lana"
+    },
+    "WorkspaceRGName": {
+      "value": "azmon-prod-rg"
+    },
+    "redundancyType": {
+      "value": "LocallyRedundant"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
