@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environment": {
+      "value": "prod"
+    },
+    "AMLWorkspaceName": {
+      "value": "azmon2437-prod-lana"
+    },
+    "AMLWorkspaceRGName": {
+      "value": "azmon-prod-rg"
+    },
+    "Location": {
+      "value": "West Europe"
+    },
+    "dataRetention": {
+      "value": 60
+    },
+    "ServerEndpoint": {
+      "value": "azloc01"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}

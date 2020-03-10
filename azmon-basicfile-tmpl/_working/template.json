@@ -1,0 +1,706 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "AMLWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Name"
+      }
+    },
+    "AMLWorkspaceRGName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Resource Group"
+      }
+    },
+    "dataRetention": {
+      "type": "int",
+      "defaultValue": 31,
+      "minValue": 31,
+      "maxValue": 730,
+      "metadata": {
+        "description": "Number of retention days in the PerGB2018 pricing tier (31-730)."
+      }
+    },
+    "Location": {
+      "type": "string",
+      "allowedValues": [
+        "East Asia",
+        "Southeast Asia",
+        "Central US",
+        "East US",
+        "East US 2",
+        "West US",
+        "North Central US",
+        "South Central US",
+        "North Europe",
+        "West Europe",
+        "Japan West",
+        "Japan East",
+        "Brazil South",
+        "Australia East",
+        "Australia",
+        "Southeast",
+        "South India",
+        "Central India",
+        "West India",
+        "Canada Central",
+        "Canada East",
+        "UK South",
+        "UK West",
+        "West Central US",
+        "West US 2",
+        "Korea Central",
+        "Korea South",
+        "France Central",
+        "France South",
+        "Australia Central",
+        "Australia Central 2",
+        "South Africa North",
+        "South Africa West"
+      ],
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The region or location where resources will be deployed"
+      }
+    },
+    "ServerEndpoint": {
+      "type": "string",
+      "metadata": {
+        "description": "Computername of the server endpoint (cache server)"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-basicfile",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20200227",
+    "TemplateDescription": "Initial version",
+    "TemplateUsage": "Deploy the basic file monitoring workspace configuration",
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
+    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
+    "ServerEndpoint": "[toLower(parameters('ServerEndpoint'))]"
+  },
+  "resources": [
+    {
+      "type": "microsoft.operationalinsights/workspaces",
+      "name": "[variables('AMLWorkspaceName')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "[parameters('Location')]",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "scale": null,
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "features": {
+          "searchVersion": 1
+        },
+        "retentionInDays": "[parameters('dataRetention')]"
+      },
+      "dependsOn": [
+      ],
+      "resources": [
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "AFSBytesTransDownload",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "AFS Bytes Transferred",
+            "instanceName": "_Total",
+            "intervalSeconds": 60,
+            "counterName": "Downloaded Bytes/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "AFSBytesTransUpload",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "AFS Bytes Transferred",
+            "instanceName": "_Total",
+            "intervalSeconds": 60,
+            "counterName": "Uploaded Bytes/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "AFSBytesTransTotal",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "AFS Bytes Transferred",
+            "instanceName": "_Total",
+            "intervalSeconds": 60,
+            "counterName": "Total Bytes/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "AFSBytesOpsDownload",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "AFS Bytes Operations",
+            "instanceName": "_Total",
+            "intervalSeconds": 60,
+            "counterName": "Downloaded Sync Files/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "AFSBytesOpsUpload",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "AFS Bytes Operations",
+            "instanceName": "_Total",
+            "intervalSeconds": 60,
+            "counterName": "Uploaded Sync Files/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "AFSBytesOpsTotal",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "AFS Bytes Operations",
+            "instanceName": "_Total",
+            "intervalSeconds": 60,
+            "counterName": "Total Sync File Operations/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSDiagnostic",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Agent/Diagnostic",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSItemResults",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Agent/ItemResults",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSOperational",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Agent/Operational",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSRecallResults",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Agent/RecallResults",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSScrubbing",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Agent/Scrubbing",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSTelemetry",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Agent/Telemetry",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSTieringResults",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Agent/TieringResults",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSMgmtDiagnostic",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Management/Diagnostic",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "dataSources",
+          "name": "EventAFSMgmtOperational",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsEvent",
+          "properties": {
+            "eventLogName": "Microsoft-FileSync-Management/Operational",
+            "eventTypes": [
+              {
+                "eventType": "Error"
+              },
+              {
+                "eventType": "Warning"
+              }
+            ]
+          }
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSConnNotEstablished",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - A connection with the service could not be established",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80072ee7\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSNoAccessAzFileShare",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync can not access the Azure file share specified in the cloud endpoint",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8305f\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSFailedNotAuth",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed because the request is not authorized to perform this operation",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c86044\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSStoAcctNameResolve",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - The storage account name used could not be resolved",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80C83060\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSUnknownErrAccess",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - An unknown error occured while accessing the storage account",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8308a\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFailStorAcctLck",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed due to storage account locked",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c83092\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFailDatabase",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed due to a problem with the sync database",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x8e5e044e\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSFileShareLImit",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - You reached the Azure file share storage limit",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8603e\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSFileShareNotFound",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - The Azure file share cannot be found",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c86030\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFailAuth",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed due to a problem with authentication",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c80300\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFaulAuthId",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed due to authentication identity not found",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c83079\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSVolumeLowDisk",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - The volume where the server endpoint is located is low on disk space",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x8e5e0211\" or EventData contains “0x80c8031a”\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFailManyFiles",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed due to problems with many individual files",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8023b\" or EventData contains “0x80c8021c” or EventData contains “0x80c80253”\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFailServerPath",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed due to a problem with the server endpoint path",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c80019\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSServiceUnavailable",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - The service is currently unavailable",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8004b\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFailException",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed due to an exception",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80131500\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFailPermSysVol",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed because permissions on the System Volume Information folder are incorrect",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8027e\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchAFSSyncFailDeleteCreate",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "Category": "Getronics AFS Monitoring",
+            "DisplayName": "AFS - Sync failed because the Azure file share was deleted and recreated",
+            "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8027e\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
+    }
+  }
+}

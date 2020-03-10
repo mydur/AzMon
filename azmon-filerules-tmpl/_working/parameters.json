@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "Environment": {
+      "value": "prod"
+    },
+    "AMLWorkspaceName": {
+      "value": "azmon2437-prod-lana"
+    },
+    "AMLWorkspaceRGName": {
+      "value": "azmon-prod-rg"
+    },
+    "StorAcctName": {
+      "value": "azmonfileprodstor"
+    },
+    "FileCapacityThresholdMBWarning": {
+      "value": 500
+    },
+    "FileCapacityThresholdMBCritical": {
+      "value": 1000
+    },
+    "ServerEndpoint": {
+      "value": "AZLOC01"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
