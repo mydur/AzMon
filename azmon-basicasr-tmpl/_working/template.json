@@ -155,7 +155,7 @@
             "objectName": "ASRAnalytics",
             "instanceName": "*",
             "intervalSeconds": 60,
-            "counterName": "SourceVmChurnRate "
+            "counterName": "SourceVmChurnRate"
           }
         },
         {
@@ -170,7 +170,7 @@
             "objectName": "ASRAnalytics",
             "instanceName": "*",
             "intervalSeconds": 60,
-            "counterName": "SourceVmThrpRate  "
+            "counterName": "SourceVmThrpRate"
           }
         },
         {
