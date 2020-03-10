@@ -122,7 +122,7 @@
         "description": "[concat('ASR - Replication health - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| project-rename TimeGenerated, ConfigServer=name_s , HealthState=replicationHealth_s\n| where HealthState == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -147,7 +147,7 @@
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
-              "metricColumn": "Computer"
+              "metricColumn": "ConfigServer"
             }
           },
           "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
@@ -177,7 +177,7 @@
         "description": "[concat('ASR - Replication health - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| project-rename TimeGenerated, ConfigServer=name_s , HealthState=replicationHealth_s\n| where HealthState == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -202,7 +202,7 @@
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
-              "metricColumn": "Computer"
+              "metricColumn": "ConfigServer"
             }
           },
           "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
@@ -232,7 +232,7 @@
         "description": "[concat('ASR - RPO breaches - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")\n| project-rename TimeGenerated, ConfigServer=name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -257,7 +257,7 @@
               "thresholdOperator": "GreaterThan",
               "threshold": 2,
               "metricTriggerType": "Consecutive",
-              "metricColumn": "Computer"
+              "metricColumn": "ConfigServer"
             }
           },
           "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
@@ -287,7 +287,7 @@
         "description": "[concat('ASR - RPO breaches - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
+          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project-rename TimeGenerated, ConfigServer=name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -312,7 +312,7 @@
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
-              "metricColumn": "Computer"
+              "metricColumn": "ConfigServer"
             }
           },
           "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
@@ -390,7 +390,7 @@
         "name": "[concat('ASR - Job failures - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)')]",
+          "query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Resource')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -415,7 +415,7 @@
               "thresholdOperator": "GreaterThan",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
-              "metricColumn": "Computer"
+              "metricColumn": "Resource"
             }
           },
           "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
