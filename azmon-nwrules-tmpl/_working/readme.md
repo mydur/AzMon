@@ -8,6 +8,18 @@ The purpose of this template is to deploy network monitoring alert rules that ar
 
 > These tests need to be configured manually in the log analytics workspace via a set of steps that are separately available.
 
+_scheduledQueryRules_
+| #   | Name                               | Breach | Threshold | Freq | Period |
+| --- | :--------------------------------- | :----- | :-------- | :--- | :----- |
+| 1   | Network - Azure Vnet to On-premise |        | >0        | 5    | 5      |
+| 2   | Network - Azure Vnet to Web        |        | >0        | 5    | 5      |
+| 3   | Network - Azure Vnet to Azure Vnet |        | >0        | 5    | 5      |
+
+_Actiongroup_
+| #   | Name                    | Short Name   | Target            |
+| --- | :---------------------- | :----------- | :---------------- |
+| 1   | nwrules-azmon-prod-agrp | nwrulesazmon | dummy@nowhere.com |
+
 To be able to re-use the template the following parameters were introduced:
 
 - **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.

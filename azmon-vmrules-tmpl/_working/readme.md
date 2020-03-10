@@ -2,6 +2,36 @@
 
 The purpose of this template is to deploy a set of Alert Rules and an Action Group to be used in the alert rules.
 
+_scheduledQueryRules_
+| #   | Name                                                 | Breach | Threshold | Freq | Period |
+| --- | :--------------------------------------------------- | :----- | :-------- | :--- | :----- |
+| 1   | Heartbeat alert - Critical                           | >2     | >0        | 5    | 10     |
+| 2   | Logical Disk - Current Disk Queue Length - Critical  | >2     | >5        | 15   | 45     |
+| 3   | Logical Disk - Current Disk Queue Length - Warning   | >2     | >3        | 15   | 45     |
+| 4   | Memory - Available MB - Critical                     | >2     | <500      | 15   | 45     |
+| 5   | Memory - Available MB - Warning                      | >2     | <750      | 15   | 45     |
+| 6   | Memory - Pages per Sec - Warning                     | >2     | >350      | 15   | 45     |
+| 7   | Memory - Pages per Sec - Critical                    | >2     | >500      | 15   | 45     |
+| 8   | Memory -  Percent Committed Bytes in Use - Crtitical | >2     | >90       | 15   | 45     |
+| 9   | Memory -  Percent Committed Bytes in Use - Warning   | >2     | >75       | 15   | 45     |
+| 10  | Processor - Queue Length - Warning                   | >2     | >3        | 15   | 45     |
+| 11  | Processor - Queue Length - Critica                   | >2     | >5        | 15   | 45     |
+| 12  | Processor - Time Total - Critical                    | >2     | >85       | 15   | 45     |
+| 13  | Processor - Time Total - Warning                     | >2     | >70       | 15   | 45     |
+| 14  | Service - DHCP Client                                | >1     | >0        | 5    | 10     |
+| 15  | Service - DNS Client                                 | >1     | >0        | 5    | 10     |
+| 16  | Service - Windows Event Log                          | >1     | >0        | 5    | 10     |
+| 17  | Service - Windows Firewall                           | >1     | >0        | 5    | 10     |
+| 18  | Service - RPC                                        | >1     | >0        | 5    | 10     |
+| 19  | Service - Server                                     | >1     | >0        | 5    | 10     |
+| 20  | Service - WinRM                                      | >1     | >0        | 5    | 10     |
+| 21  | Logical Disk - Free MB on C - Critical               | >2     | <5000     | 15   | 45     |
+
+_Actiongroup_
+| #   | Name                    | Short Name | Target            |
+| --- | :---------------------- | :--------- | :---------------- |
+| 1   | vmrules-azmon-prod-agrp | vmrazmon   | dummy@nowhere.com |
+
 To be able to re-use the template the following parameters were introduced:
 
 - **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.

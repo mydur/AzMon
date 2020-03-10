@@ -43,6 +43,19 @@ Following resource types are created by the template:
 - Alert Rules
 - Action Group(s)
 
+_Alert Rules_
+| #   | Name                                      | Description                                                                         |
+| --- | :---------------------------------------- | :---------------------------------------------------------------------------------- |
+| 1   | AzSvc - <subscription name> - Incident    | Alert rule that raises an alert for every service failure (see list above) when     |
+|     |                                           | this service is used in the region where the incident happens.                      |
+| 2   | AzSvc - <subscription name> - Information | Alert rule that raises an alert for every service information (see list above) when |
+|     |                                           | this service is used in the region where the incident happens.                      |
+
+_Actiongroup_
+| #   | Name                      | Short Name | Target            |
+| --- | :------------------------ | :--------- | :---------------- |
+| 1   | svchealth-azmon-prod-agrp | svchazmon  | dummy@nowhere.com |
+
 The location where the resources are created is choosen at deployment time and should be the resource group where the basic monitoring setup is deployed. Lifecycle of the created resources is defined by the lifecycle of the subscription at which they are targetted.
 
 To be able to re-use the template the following parameters were introduced:

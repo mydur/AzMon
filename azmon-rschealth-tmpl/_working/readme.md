@@ -20,6 +20,20 @@ Following resource types are created by the template:
 - Alert Rules
 - Action Group(s)
 
+_Alert Rules_
+| #   | Name                                         | Description                                                                     |
+| --- | :------------------------------------------- | :------------------------------------------------------------------------------ |
+| 1   | AzRscIssue - <resourcegroup name> - Incident | Alert rule that raises an alert for every resource in a given resource group    |
+|     |                                              | for which health state goes from Available, Unknown or Degraded to Unavailable. |
+| 2   | AzRscInfo - <resourcegroup name> - Degraded  | Alert rule that raises an alert for every resource in a given resource group    |
+|     |                                              | for which health state goes from Available, Unknown or Unavailable to Degraded. |
+
+_Actiongroup_
+| #   | Name                      | Short Name | Target            |
+| --- | :------------------------ | :--------- | :---------------- |
+| 1   | rschealth-azmon-prod-agrp | rschazmon  | dummy@nowhere.com |
+
+
 All resources are created in the same resource group as the one that is used as target. By doing this we link the lifecycle of the resources created by this template to the lifecycle of the resource group and its resources. Suppose you delete the resource group then the alert rules and action groups will also be deleted. This is expected behavior because rules monitoring health of resouces in a non-existong resource group have no reason of existence.
 
 To be able to re-use the template the following parameters were introduced:

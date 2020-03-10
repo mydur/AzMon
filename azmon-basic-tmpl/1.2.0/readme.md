@@ -13,6 +13,53 @@ For the storage account and automation account there's no initial configuration 
 - Solutions
 - Linked services
 
+_Datasources (perf):_
+| #   | Name                              | Category          | Counter                   | Instance | Interval |
+| --- | :-------------------------------- | :---------------- | :------------------------ | :------- | :------- |
+| 1   | PerfMemoryAvailMB                 | Memory            | Available Mbytes          | *        | 60       |
+| 2   | PerfMemoryPagesSec                | Memory            | Pages/sec                 | *        | 60       |
+| 3   | PerfMemoryCommittedBytesInUse     | Memory            | % Committed Bytes In Use  | *        | 60       |
+| 4   | PerfLogicalDiskFreeSpace          | LogicalDisk       | % Free Space              | *        | 60       |
+| 5   | PerfLogicalDiskAvgDiskRead        | LogicalDisk       | Avg. Disk sec/Read        | *        | 60       |
+| 6   | PerfLogicalDiskAvgDisTransfer     | LogicalDisk       | Avg. Disk sec/Transfer    | *        | 60       |
+| 7   | PerfLogicalDiskAvgDiskWrite       | LogicalDisk       | Avg. Disk sec/Write       | *        | 60       |
+| 8   | PerfLogicalDiskCurDiskQueueLength | LogicalDisk       | Current Disk Queue Length | *        | 60       |
+| 9   | PerfLogicalDiskFreeMB             | LogicalDisk       | Free MegaBytes            | *        | 60       |
+| 10  | PerfLogicalDiskDiskReads          | LogicalDisk       | Disk Reads/sec            | *        | 60       |
+| 11  | PerfLogicalDiskDiskWrites         | LogicalDisk       | Disk Writes/sec           | *        | 60       |
+| 12  | PerfLogicalDiskDiskTransfers      | LogicalDisk       | Disk Transfers/sec        | *        | 60       |
+| 13  | PerfSystemProcessor               | System            |                           | *        | 60       |
+| 14  | PerfProcessorTotal                | Processor         | % Processor Time          | _Total   | 60       |
+| 15  | PerfNetworkBytesTotal             | Network Interface | Bytes Total/sec           | *        | 60       |
+| 16  | PerfNetworkBytesSent              | Network Adapter   | Bytes Send/sec            | *        | 60       |
+| 17  | PerfNetworkBytesReceived          | Network Adapter   | Bytes Received/sec        | *        | 60       |
+| 18  | PerfProcessProcessorTime          | Process           | % Processor Time          | *        | 60       |
+| 19  | PerfProcessPrivateBytes           | Process           | Private Bytes             | *        | 60       |
+
+
+_Datasources (event):_
+| #   | Name                | Eventlog    | Error | Warning | Info |
+| --- | :------------------ | :---------- | :---- | :------ | :--- |
+| 1   | EventApplicationLog | Application | X     | X       |      |
+| 2   | EventSystemLog      | System      | X     | X       |      |
+
+_Solutions_
+| #   | Name                             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| --- | :------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | OMSGallery/ADAssessment          | Operations Management Suite Active Directory Health Check Solution assesses the risk and health of your Active Directory environments on a regular interval. It provides a prioritized list of recommendations tailored to your deployments. These recommendations are categorized across six focus areas which allows you and your team to quickly understand the risk and health of your environments and easily take action to decrease risk and improve health. |
+| 2   | OMSGallery/AgentHealthAssessment | The Azure Log Analytics Agent Health solution gives customers insight into the health, performance and availability of their Windows and Linux agents.                                                                                                                                                                                                                                                                                                              |
+| 3   | OMSGallery/AlertManagement       | The Alert Management Solution helps you view your Operations Manager and Log Analytics Log alerts across your entire environment. This tool can help you to easily triage alerts and identify root causes in your environment.                                                                                                                                                                                                                                      |
+| 4   | OMSGallery/AntiMalware           | Operations Management Suite Antimalware Assessment Solution helps you identify servers that are infected or at increased risk of infection by malware.                                                                                                                                                                                                                                                                                                              |
+| 5   | OMSGallery/AzureActivity         | he Azure Activity Log Analytics Solution gives you insights into activities happening in your Azure environment across multiple Azure subscriptions. In a single view, see aggregated statistics of all activities and then drill-down for more details.                                                                                                                                                                                                            |
+| 6   | OMSGallery/DnsAnalytics          | The DNS Analytics solution provides security, performance and operations related insights into the DNS infrastructure of your organization by collecting, analyzing and correlating analytic and audit logs and other related data from the DNS servers.                                                                                                                                                                                                            |
+| 7   | OMSGallery/AzureAutomation       | Automation & Control in Operations Management Suite (OMS) delivers unified capabilities to deploy, configure, and maintain your infrastructure and applications in Azure or any other cloud, including on-premises, across Windows Server and Linux.                                                                                                                                                                                                                |
+| 8   | OMSGallery/AzureNSGAnalytics     | The Azure Network Security Group Analytics Solution helps you easier troubleshoot issues across your Azure networks by providing visibility into the network security group rules and logs.                                                                                                                                                                                                                                                                         |
+| 9   | OMSGallery/ChangeTracking        | Change Tracking helps you easily identify software, file, daemon, and Windows Services changes that occur in your environment. Identifying these configuration changes can help you pinpoint operational issues.                                                                                                                                                                                                                                                    |
+| 10  | OMSGallery/LogicAppsManagement   | The Logic Apps Management Solution allows to monitor and manage your Logic Apps. This solution provides you a summary of overall health of your Logic Apps, with options to drill into details and to troubleshoot unexpected behavior patterns.                                                                                                                                                                                                                    |
+|     |                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+
+
+
 To be able to re-use the template for different customers/projects the following parameters are use:
 
 - **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.

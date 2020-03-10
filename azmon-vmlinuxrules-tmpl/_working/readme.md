@@ -4,6 +4,42 @@ The purpose of this template is to deploy a set of alert rules to be used in Lin
 
 > **Note:** At the moment Linux monitoring is only supported for Azure hosted virtual machines.
 
+_scheduledQueryRules_
+| #   | Name                                                   | Breach | Threshold | Freq | Period |
+| --- | :----------------------------------------------------- | :----- | :-------- | :--- | :----- |
+| 1   | Linux Syslog - daemon – Critical                       | >2     | >1        | 15   | 45     |
+| 2   | Linux Syslog - daemon – Warning                        | >2     | >4        | 15   | 45     |
+| 3   | Linux Syslog - kern – Critical                         | >2     | >1        | 15   | 45     |
+| 4   | Linux Syslog - kern – Warning                          | >2     | >4        | 15   | 45     |
+| 5   | Linux Syslog - cron – Critical                         | >2     | >1        | 15   | 45     |
+| 6   | Linux Syslog - cron – Warning                          | >2     | >4        | 15   | 45     |
+| 7   | Linux Syslog - auth – Critical                         | >2     | >1        | 15   | 45     |
+| 8   | Linux Syslog - auth – Warning                          | >2     | >4        | 15   | 45     |
+| 9   | Linux Syslog - syslog – Critical                       | >2     | >1        | 15   | 45     |
+| 10  | Linux Syslog - syslog – Warning                        | >2     | >4        | 15   | 45     |
+| 11  | Linux Daemon State - ntpd                              | >1     | >0        | 5    | 10     |
+| 12  | Linux Daemon State - crond                             | >1     | >0        | 5    | 10     |
+| 13  | Linux Daemon State - sshd                              | >1     | >0        | 5    | 10     |
+| 14  | Linux Daemon State - syslogd                           | >1     | >0        | 5    | 10     |
+| 15  | Linux Daemon State - auditd                            | >1     | >0        | 5    | 10     |
+| 16  | Linux Memory - pct Available – Critical                | >2     | <5        | 15   | 45     |
+| 17  | Linux Memory - pct Available – Warning                 | >2     | <15       | 15   | 45     |
+| 18  | Linux Memory - pct Available Swap Space – Critical     | >2     | <5        | 15   | 45     |
+| 19  | Linux Memory - pct Available Swap Space – Warning      | >2     | <15       | 15   | 45     |
+| 20  | Linux Memory - Pages per Sec – Critical                | >2     | >500      | 15   | 45     |
+| 21  | Linux Memory - Pages per Sec – Warning                 | >2     | >350      | 15   | 45     |
+| 22  | Linux Logical Disk - pct Used Space - root – Critical  | >2     | >95       | 15   | 45     |
+| 23  | Linux Logical Disk - pct Used Space - root – Warning   | >2     | >85       | 15   | 45     |
+| 24  | Linux Logical Disk - Free Megabytes - root – Critical  | >2     | <500      | 15   | 45     |
+| 25  | Linux Logical Disk - Free Megabytes - root – Warning   | >2     | <2048     | 15   | 45     |
+| 26  | Linux Processor - pct IO Wait Time - _Total – Critical | >2     | >85       | 15   | 45     |
+| 27  | Linux Processor - pct IO Wait Time - _Total – Warning  | >2     | >75       | 15   | 45     |
+
+_Actiongroup_
+| #   | Name                         | Short Name   | Target            |
+| --- | :--------------------------- | :----------- | :---------------- |
+| 1   | vmlinuxrules-azmon-prod-agrp | vmlinuxazmon | dummy@nowhere.com |
+
 To be able to re-use the template the following parameters were introduced:
 
 - **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.

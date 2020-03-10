@@ -8,7 +8,22 @@ Monitoring Azure Site Recovery covers the following topics:
 - Issues and errors affecting configuration and replication.
 - Infrastructure components such as on-premises servers.
 
-We will do this in 2 different ways, via the Azure console and via Azure Monitor Logs (AML) alert rules. This template is used to config the AML method.
+We will do this in 2 different ways, via the Azure console and via Azure Monitor Logs (AML) alert rules. This template is used to config the AML method. The following alert rules and action group will be created.
+
+_scheduledQueryRules_
+| #   | Name                                                         | Breach | Threshold | Freq | Period |
+| --- | :----------------------------------------------------------- | :----- | :-------- | :--- | :----- |
+| 1   | ASR - Replication health - Critical (vault name)             | >1     | >0        | 15   | 30     |
+| 2   | ASR - Replication health - Warning (vault name)              | >2     | >0        | 15   | 45     |
+| 3   | ASR - RPO breaches - Critical (vault name)                   | >1     | >0        | 15   | 30     |
+| 4   | ASR - RPO breaches – Warning (vault name)                    | >2     | >0        | 15   | 45     |
+| 5   | ASR - Too many test failovers missing - Warning (vault name) |        | >5        | 1440 | 1440   |
+| 6   | ASR - Job failures – Critical – (vault name)                 | >1     | >0        | 30   | 60     |
+
+_Actiongroup_
+| #   | Name                     | Short Name    | Target            |
+| --- | :----------------------- | :------------ | :---------------- |
+| 1   | asrrules-azmon-prod-agrp | asrrulesazmon | dummy@nowhere.com |
 
 To be able to re-use the template the following parameters were introduced:
 

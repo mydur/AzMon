@@ -1,23 +1,34 @@
-# azmon-asrrules-tmpl
+# azmon-basicasr-tmpl
 
-The purpose of this template is to deploy a set of Alert Rules and an Action Group to monitor Azure Site Recovery. The ASR monitoring relies on diagnostic settings being enabled. If deployment is done via the automation script then enabling diagnostics is being taken care of by that script. 
+The purpose of this template is to make the workspace ready for ASR monitoring. This is done by adding 2 datasources and some saved queries.
 
-Monitoring Azure Site Recovery covers the following topics:
-- The health and status of machines replicated by Site Recovery
-- Test failover status of machines.
-- Issues and errors affecting configuration and replication.
-- Infrastructure components such as on-premises servers.
+> **Note:** You will also find some lines in the template to deploy the AML workspace itself. This is needed because the sub-resources deployed later (saved queries, datasources) require this. Because the workspace already exists no actual deployment will take place.
 
-We will do this in 2 different ways, via the Azure console and via Azure Monitor Logs (AML) alert rules. This template is used to config the AML method.
+The template adds datasources and saved queries to the AML workspace.
+
+_Datasources:_
+| #   | Name                 | Category     | Counter           | Instance | Interval |
+| --- | :------------------- | :----------- | :---------------- | :------- | :------- |
+| 1   | ASRSourceVmChurnRate | ASRAnalytics | SourceVmChurnRate | *        | 60       |
+| 2   | ASRSourceVmThrpRate  | ASRAnalytics | SourceVmThrpRate  | *        | 60       |
+
+_Saved queries:_
+| #   | Name                         | Category                 | Display name                                    |
+| --- | :--------------------------- | :----------------------- | :---------------------------------------------- |
+| 1   | searchASRReplHealthCritical  | Getronics ASR Monitoring | ASR - Replication health – Critical             |
+| 2   | searchASRReplHealthWarning   | Getronics ASR Monitoring | ASR - Replication health – Warning              |
+| 3   | searchASRRPOBreachWarning    | Getronics ASR Monitoring | ASR - RPO breaches – Warning                    |
+| 4   | searchASRRPOBreachCritical   | Getronics ASR Monitoring | ASR - RPO breaches – Critical                   |
+| 5   | searchASRTestFailoverMissing | Getronics ASR Monitoring | ASR - Too many test failovers missing – Warning |
+| 6   | searchASRJobFailures         | Getronics ASR Monitoring | ASR - Job failures                              |
+| 7   | searchASRTestFailover90d     | Getronics ASR Monitoring | ASR - Test failover last date 90days            |
+
+
 
 To be able to re-use the template the following parameters were introduced:
 
 - **Project:** An inidicator string for the customer or project that this will be used for. What you enter here will be used in tags but also in the names for the different resources that are created.
 - **Environment:** Can be one of the following: dev-test-acc-prod.
-- **ASRVaultName:** The name of the recovery services vault used for Azure Site Recovery.
-- **ASRVaultRGName:** The resource group in which the recovery services vault resides.
-- **RPOCritical:** Threshold value in seconds for when an RPO breach is considered to be Critical.
-- **RPOWarning:** Threshold value in seconds for when an RPO breach is considered to be Warning.
 - **AMLWorkspaceName:** The actual name of the log analytics workspace that can be found in the resource group of which the name is stored in AMLResourceGroup.
 - **AMLWorkspaceRGName:** The resource group in which the log analytics workspace was installed by the azmon-basic-tmpl template.
 - **CreatedOn:** This paramters is in fact a variable that holds the current date and time to be added as a tag to the resources created by this template. Because of technical reasons this has to be a parameter and not a variable. The default value for the parameter is the outcome of the function [utcNow()]
@@ -36,6 +47,6 @@ Tags are very important in Azure Governance as they help you in filtering the re
 - **OwnedBy:** A free text field to provide information about the person or team that owns the resource. Isn't to be confused with the CreatedBy field.
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-asrrules-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-basicasr-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a><br />
