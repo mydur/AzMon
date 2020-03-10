@@ -43,6 +43,13 @@
     "RPOWarning": 900,
     "TestFailoverMissingThreshold": 5
   },
+  "AFS": {
+    "ServerEndpoint": "azloc01",
+    "StorAcctName": "azmonfileprodstor",
+    "StorAcctRGName": "azmonfile-prod-rg",
+    "FileCapacityThresholdMBWarning": 500,
+    "FileCapacityThresholdMBCritical": 1000
+  },
   "Outputs": {
     "GovSetDefId": "tbd",
     "GovKeyvaultId": "tbd",
@@ -51,7 +58,7 @@
     "GovStorAcctId": "tbd",
     "GovAutoAcctId": "tbd",
     "azMonBasicTmpl": "Succeeded",
-    "workspaceId": "tbd",
+    "workspaceId": "/subscriptions/a53c5946-e76d-4ca2-bee2-57cfbb3eee7a/resourceGroups/azmon-prod-rg/providers/microsoft.operationalinsights/workspaces/azmon2437-prod-lana",
     "workspaceName": "azmon2437-prod-lana",
     "autoAcctName": "tbd",
     "autoAcctId": "tbd",
@@ -84,6 +91,9 @@
     "K8SClusterName": "tbd",
     "azMonBasicASRTmpl": "Succeeded",
     "azMonASRRulesTmpl": "Succeeded",
-    "ASRVaultName": "tbd"
+    "ASRVaultName": "tbd",
+    "azMonBasicAFSTmpl": "tbd",
+    "azMonAFSRulesTmpl": "tbd",
+    "AFSstorAcctName": "tbd"
   }
 }
