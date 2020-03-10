@@ -106,9 +106,9 @@
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.2.0",
-    "TemplateDate": "20191004",
-    "TemplateDescription": "Added saved search for maintenance mode",
+    "TemplateVersion": "1.2.1",
+    "TemplateDate": "20200310",
+    "TemplateDescription": "Added solutions, Containers",
     "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -1966,6 +1966,29 @@
         "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
         "containedResources": [
           "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/WireData2(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('Containers(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/WireData2(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('Containers(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/Containers",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/Containers(', variables('workspaceName'), ')')]"
         ]
       },
       "dependsOn": [
