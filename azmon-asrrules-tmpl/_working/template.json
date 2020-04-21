@@ -122,7 +122,7 @@
         "description": "[concat('ASR - Replication health - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"',variables('ASRVaultName'), '\"\n| project-rename TimeGenerated, ConfigServer=name_s , HealthState=replicationHealth_s\n| where HealthState == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics  \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s  \n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -177,7 +177,7 @@
         "description": "[concat('ASR - Replication health - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| project-rename TimeGenerated, ConfigServer=name_s , HealthState=replicationHealth_s\n| where HealthState == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics  \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"  \n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s  \n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -232,7 +232,7 @@
         "description": "[concat('ASR - RPO breaches - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")\n| project-rename TimeGenerated, ConfigServer=name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"   \n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"  \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d > ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s  \n| order by TimeGenerated asc\n')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -287,7 +287,7 @@
         "description": "[concat('ASR - RPO breaches - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project-rename TimeGenerated, ConfigServer=name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated')]",
+          "query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"   \n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"  \n| extend RPO = case(rpoInSeconds_d > ', parameters('RPOCritical'), ', \"Critical\", rpoInSeconds_d > ', parameters('RPOWarning'), ', \"Warning\", \"Ok\")  \n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s  \n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -341,7 +341,7 @@
         "description": "[concat('ASR - Too many test failovers missing - Warning (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics   \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s\n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc\n')]",
           "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
           "queryType": "ResultCount",
           "authorizedResources": [
@@ -390,7 +390,7 @@
         "name": "[concat('ASR - Job failures - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\" \n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Resource')]",
+          "query": "[concat('AzureDiagnostics   \n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"  \n| where ResultType == \"Failed\"  \n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)\n\n')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
