@@ -55,7 +55,8 @@
                         2019-10-25      Added -IncludeLinux switch parameter  
                         2019-12-20      Added -IncludeK8S switch parameter
                         2020-02-20      Added -IncludeASR switch parameter
-                        2020-03-03      Added -IncludeAFS switch parameter 
+                        2020-03-03      Added -IncludeAFS switch parameter
+                        2020-04-20      Added -ASRserver switch parameter 
 #>
 
 ##########################################################################
@@ -73,6 +74,7 @@ param (
         [switch]$IncludeK8S,
         [switch]$IncludeASR,
         [switch]$IncludeAFS,
+        [switch]$ASRserver,
         [switch]$Update
 )
 
@@ -183,6 +185,9 @@ $TemplateFolder = "azmon-k8srules-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 $TemplateFolder = "azmon-asrrules-tmpl/_working"
+New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+$TemplateFolder = "azmon-asrvmrules-tmpl/_working"
 New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
 $TemplateFolder = "azmon-basicasr-tmpl/_working"
@@ -305,11 +310,12 @@ If ($DeployBaseSetup) {
         # - Solutions
         # - Linked services
         # The template also contains an 'outputs' section of which the output is captured in variables listed below.
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-basic-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-basic-tmpl...")
         $AzMonBasic = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-basic-tmpl\_working\template.json") `
-                        --name "azmon-basic-update" `
+                        --name ("azmon-basic-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "VMRGName=$VMResourceGroupName " `
@@ -361,11 +367,12 @@ If ($DeployBaseSetup) {
         # This template deploys a set of rules and action group that all contribute to the monitoring of the workspace and the service itself. The areas that are being monitored are:
         #       - Workspace data usage: If data ingestion is above a threshold for 2 consecutive days then an alert is raised and this should be investigated.
         #
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-basicrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-basicrules-tmpl...")
         $AzMonBasicRules = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-basicrules-tmpl\_working\template.json") `
-                        --name "azmon-basicrules" `
+                        --name ("azmon-basicrules-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -422,11 +429,12 @@ If ($DeployBaseSetup) {
         # Azure is comprised of managed services that are offered to the customer. These services hosted in Azure all run of course on hardware. It is Microsoft's task to monitor that hardware and also the software that delivers the service to the customer. We can't and shouldn't monitor the hardware or the software that hosts the services but we should at least be aware of the health state of the different services.
         # This template aims to notify us when a service has issues or when there's planned downtime or maintenance scheduled.
         # Alert rules created in this template also need a target to work against. In this case this will be at the subscription level. Two alert rules will be created, one for Incidents and one for Information.
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-svchealth-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-svchealth-tmpl...")
         $AzMonSvcHealth = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-svchealth-tmpl\_working\template.json") `
-                        --name "azmon-svchealth" `
+                        --name ("azmon-svchealth-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -448,11 +456,12 @@ If ($DeployBaseSetup) {
         # - AzVnet2Web: Azure VNet to internet communication.
         # - AzVnet2AzVnet: Azure VNet to Azure VNet communication
         # These tests need to be configured manually in the log analytics workspace via a set of steps that are separately available.
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-nwrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-nwrules-tmpl...")
         $AzMonNWRules = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-nwrules-tmpl\_working\template.json") `
-                        --name "azmon-nwrules" `
+                        --name ("azmon-nwrules-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -488,11 +497,12 @@ If ($DeployBaseSetup) {
         # BACKUPSOL (azmon-backupsol-tmpl)
         # -----------------------------------
         # The template deploys an additional solution to the log analytics workspace to monitor Azure backup.
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-backupsol-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-backupsol-tmpl...")
         $AzMonBackupSol = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-backupsol-tmpl\_working\template.json") `
-                        --name "azmon-backupsol" `
+                        --name ("azmon-backupsol-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Environment=$Environment" `
                         "workspaceName=$WorkspaceName" `
@@ -533,6 +543,7 @@ If ($DeployBaseSetup) {
         # INCLUDE DRM
         # -------------
         if ($IncludeDRM) {
+                $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json") -Raw | ConvertFrom-Json
                 ("azmon-delegatedrights-tmpl...")
                 $ContributorGroupId = $ParametersJSON.DRM.ContributorGroupId
                 $MSPTenantId = $ParametersJSON.DRM.MSPTenantId 
@@ -543,7 +554,7 @@ If ($DeployBaseSetup) {
                                 --location "$Location" `
                                 --template-file ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\template.json") `
                                 --parameters ($AzMonLocalPath + "\azmon-delegatedrights-tmpl\_working\parameters.json") `
-                                --name "azmon-delegatedrights" ) `
+                                --name ("azmon-delegatedrights-" + $TemplateJSON.variables.TemplateVersion) ) `
                 | ConvertFrom-Json
                 ("azmon-delegatedrights-tmpl: " + $AzMonDRM.properties.provisioningState + " (" + $AzMonDRM.properties.correlationId + ")")
                 $ParametersJSON.Outputs.AzMonDRMTmpl = ( $AzMonDRM.properties.provisioningState + "-" + $AzMonDRM.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
@@ -556,11 +567,12 @@ If ($DeployBaseSetup) {
 ##########################################################################
 #
 If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azMonBasicLinuxTmpl.Contains("Succeeded")) {
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-basiclinux-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-basiclinux-tmpl...")
         $AzMonBasicLinux = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-basiclinux-tmpl\_working\template.json") `
-                        --name "azmon-basiclinux" `
+                        --name ("azmon-basiclinux-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "VMRGName=$VMResourceGroupName " `
@@ -589,11 +601,12 @@ If ($NonAzureVMs) {
         # NONAZUREVMS (azmon-nonazurevms-tmpl)
         # ----------------------------------------
         # This template is used to deploy a set of monitoring rules that will be used for all virtual machines that are Non-Azure. These alert rules are stored in the same resource group as where the workspace resides. There's only 1 set of rules when it comes to non-azure virtual machine monitoring and that set contains the same rules as for monitoring virtual machines in a resource group.
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-nonazurevms-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-nonazurevms-tmpl...")
         $AzMonOnpremRules = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-nonazurevms-tmpl\_working\template.json") `
-                        --name "azmon-nonazurevms" `
+                        --name ("azmon-nonazurevms-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -641,11 +654,12 @@ If ($AddVMResGroup) {
         # This template is used to deploy a set of monitoring rules that will be used for all virtual machines in the resource group. These alert rules are stored in the resource group together with the virtual machines so that when the resource group gets decomissioned the alert rules are deleted also. Remember that we use log analytics to monitor the virtual machines and that before a virtual machines can be monitored by a log analytics workspace an agent needs to be installed on the virtual machine that reports to the workspace. That's why in this section of the script we also enable a policy-set (initiative) that is used to deploy the Microsoft Monitoring Agent (MMA) to all supported virtual machines in the resource group. The scope for the policy is the resource group which means that we will have a policy for every resource group containing virtual machines to be monitored. The policy contains a DeployIfNotExist action which means that we need credentials to perform the actual deployment. We leave it to Azure to create a managed identity for us but we need to give that identity rights to perform its actions. Two roles are given to the managed identity:
         # - Contributor - scoped to resoruce group containing virtual machines
         # - Log Analytics Contributor - scoped to resource group containig the log analytics workspace
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-vmrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-vmrules-tmpl...")
         $AzMonVMRules = (az group deployment create `
                         --resource-group "$VMResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-vmrules-tmpl\_working\template.json") `
-                        --name "azmon-vmrules" `
+                        --name ("azmon-vmrules-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -685,11 +699,12 @@ If ($AddVMResGroup) {
         # RSCHEALTH (azmon-rschealth-tmpl)
         # ------------------------------------
         # The purpose of this template is to put all resources (alert rules and action groups) in place to monitor health of resources. Not every type of Azure resource emits health information but for those types who do this is an easy way to be kept aware of the health state of your individual resources.
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-rschealth-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-rschealth-tmpl...")
         $AzMonRscHealth = (az group deployment create `
                         --resource-group "$VMResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-rschealth-tmpl\_working\template.json") `
-                        --name "azmon-rschealth" `
+                        --name ("azmon-rschealth-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -707,6 +722,7 @@ If ($AddVMResGroup) {
         # VAULT (azmon-vault-tmpl)
         # ----------------------------
         # This template is used to deploy a Azure Recovery Services vault together with diagnostics sent to a log analytics workspace. To complete the monitoring you must make sure that the backup solution is also configured in the choosen log analytics workspace.
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-vault-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-vault-tmpl...")
         $instantRpRetentionRangeInDays = $ParametersJSON.Vault.instantRpRetentionRangeInDays
         $dailyRetentionDurationCount = $ParametersJSON.Vault.dailyRetentionDurationCount
@@ -717,7 +733,7 @@ If ($AddVMResGroup) {
         $AzMonVault = (az group deployment create `
                         --resource-group "$VMResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-vault-tmpl\_working\template.json") `
-                        --name "azmon-vault" `
+                        --name ("azmon-vault-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -747,6 +763,7 @@ If ($AddVMResGroup) {
         # INCLUDE DRM
         # -------------
         if ($IncludeDRM) {
+                $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-delegatedvmrights-tmpl\_working\parameters.json") -Raw | ConvertFrom-Json
                 ("azmon-delegatedvmrights-tmpl...")
                 $VMContributorGroupId = $ParametersJSON.DRM.VMContributorGroupId
                 $MSPTenantId = $ParametersJSON.DRM.MSPTenantId 
@@ -757,7 +774,7 @@ If ($AddVMResGroup) {
                                 --location "$Location" `
                                 --template-file ($AzMonLocalPath + "\azmon-delegatedvmrights-tmpl\_working\template.json") `
                                 --parameters ($AzMonLocalPath + "\azmon-delegatedvmrights-tmpl\_working\parameters.json") `
-                                --name "azmon-delegatedvmrights" ) `
+                                --name ("azmon-delegatedvmrights-" + $TemplateJSON.variables.TemplateVersion) ) `
                 | ConvertFrom-Json
                 ("azmon-delegatedvmrights-tmpl: " + $AzMonVMDRM.properties.provisioningState + " (" + $AzMonVMDRM.properties.correlationId + ")")
                 $ParametersJSON.Outputs.AzMonVMDRMTmpl = ($AzMonVMDRMRules.properties.provisioningState + "-" + $AzMonVMDRMRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
@@ -778,6 +795,7 @@ If ($AddVMResGroup) {
 #
 # NOTE: Make sure that all virtual machines listed in the parameters file are also present in Azure in the resource group where the deployment takes place. If a virtual machine is missing in Azure then the deployment will fail at that point. All preceding virtual machines will have been added to the backup, all subsequent virtual machines will not have been added.
 If ($IncludeVmBkup) {
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-vmbkup-tmpl\_working\parameters.json") -Raw | ConvertFrom-Json
         ("azmon-vmbkup-tmpl...")
         $AzBkupParametersJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-vmbkup-tmpl\_working\parameters.json") -Raw | ConvertFrom-Json
         $AzBkupParametersJSON.parameters.UniqueNumber.value = $ParametersJSON.General.UniqueNumber
@@ -790,7 +808,7 @@ If ($IncludeVmBkup) {
         else {
                 $AzBkUpParametersFile -replace "\\", "" -replace """\[", "[" -replace "\]""", "]" | Out-File -FilePath ($AzMonLocalPath + "\azmon-vmbkup-tmpl\_working\parameters.json") -Force -Encoding ascii
         }
-        $AzMonVMBkup = New-AzResourceGroupDeployment -ResourceGroupName $VMResourceGroupName -Name "azmon-vmbkup" -TemplateFile  ($AzMonLocalPath + "\azmon-vmbkup-tmpl\_working\template.json") -TemplateParameterFile  ($AzMonLocalPath + "\azmon-vmbkup-tmpl\_working\parameters.json") 
+        $AzMonVMBkup = New-AzResourceGroupDeployment -ResourceGroupName $VMResourceGroupName -Name ("azmon-vmbkup-" + $TemplateJSON.variables.TemplateVersion) -TemplateFile  ($AzMonLocalPath + "\azmon-vmbkup-tmpl\_working\template.json") -TemplateParameterFile  ($AzMonLocalPath + "\azmon-vmbkup-tmpl\_working\parameters.json") 
 } # End IncludeVMBkUp
 #
 #
@@ -799,11 +817,12 @@ If ($IncludeVmBkup) {
 ##########################################################################
 #
 If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azMonBasicLinuxTmpl -eq "Succeeded") {
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-vmlinuxrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-vmlinuxrules-tmpl...")
         $AzMonVMLinuxRules = (az group deployment create `
                         --resource-group "$VMResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-vmlinuxrules-tmpl\_working\template.json") `
-                        --name "azmon-vmlinuxrules" `
+                        --name ("azmon-vmlinuxrules-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -826,11 +845,12 @@ If ($IncludeLinux -and $WorkspaceName -ne "tbd" -and $ParametersJSON.Outputs.azM
 If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
         $K8SClusterName = $ParametersJSON.K8S.ClusterName
         $K8SClusterRGName = $ParametersJSON.K8S.ClusterRGName
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-k8srules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-k8srules-tmpl...")
         $AzMonK8SRules = (az group deployment create `
                         --resource-group "$K8SClusterRGName" `
                         --template-file ($AzMonLocalPath + "\azmon-k8srules-tmpl\_working\template.json") `
-                        --name "azmon-k8srules" `
+                        --name ("azmon-k8srules-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -856,11 +876,12 @@ If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
 $WorkspaceName = $ParametersJSON.Outputs.workspaceName
 $azMonBasicASRTmpl = $ParametersJSON.Outputs.azMonBasicASRTmpl
 If ($IncludeASR -and $WorkspaceName -ne "tbd" -and (-Not $azMonBasicASRTmpl.Contains("Succeeded"))) {
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-basicasr-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-basicasr-tmpl...")
         $AzMonBasicASR = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-basicasr-tmpl\_working\template.json") `
-                        --name "azmon-basicasr" `
+                        --name ("azmon-basicasr-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -882,11 +903,12 @@ If ($IncludeASR -and $ParametersJSON.Outputs.azMonBasicASRTmpl.Contains("Succeed
         $ASRRPOCritical = $ParametersJSON.ASR.RPOCritical
         $ASRRPOWarning = $ParametersJSON.ASR.RPOWarning
         $ASRTestFailoverMissingThreshold = $ParametersJSON.ASR.TestFailoverMissingThreshold
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-asrrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-asrrules-tmpl...")
         $AzMonASRRules = (az group deployment create `
                         --resource-group "$ASRVaultRGName" `
                         --template-file ($AzMonLocalPath + "\azmon-asrrules-tmpl\_working\template.json") `
-                        --name "azmon-asrrules" `
+                        --name ("azmon-asrrules-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -917,6 +939,31 @@ If ($IncludeASR -and $ParametersJSON.Outputs.azMonBasicASRTmpl.Contains("Succeed
         | ConvertFrom-Json
         ("$ASRVaultName diagnostic settings: " + $ASRDiagnostics.id)
 }
+If ($ASRserver -and $ParametersJSON.Outputs.azMonBasicASRTmpl.Contains("Succeeded")) {
+        $ASRVaultRGName = $ParametersJSON.ASR.VaultRGName
+        $ASRvmName = $ParametersJSON.ASR.ASRvmName
+        $ASRcacheDrive = $ParametersJSON.ASR.ASRcacheDrive
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-asrvmrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
+        ("azmon-asrvmrules-tmpl...")
+        $AzMonASRVMRules = (az group deployment create `
+                        --resource-group "$ASRVaultRGName" `
+                        --template-file ($AzMonLocalPath + "\azmon-asrvmrules-tmpl\_working\template.json") `
+                        --name ("azmon-asrvmrules-" + $TemplateJSON.variables.TemplateVersion) `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "AZMONBasicRGName=$ResourceGroupName" `
+                        "workspaceName=$WorkspaceName" `
+                        "ASRvmName=$ASRvmName" `
+                        "ASRcacheDrive=$ASRcacheDrive" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        ("azmon-asrvmrules-tmpl: " + $AzMonASRVMRules.properties.provisioningState + " (" + $AzMonASRVMRules.properties.correlationId + ")")
+        $ParametersJSON.Outputs.ASRvmName = ($AzMonASRVMRules.properties.provisioningState + "-" + $AzMonASRVMRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+}
 #
 #
 ##########################################################################
@@ -927,11 +974,12 @@ $WorkspaceName = $ParametersJSON.Outputs.workspaceName
 $azMonBasicAFSTmpl = $ParametersJSON.Outputs.azMonBasicAFSTmpl
 $ServerEndpoint = $ParametersJSON.AFS.ServerEndpoint
 If ($IncludeAFS -and $WorkspaceName -ne "tbd" -and (-Not $azMonBasicAFSTmpl.Contains("Succeeded"))) {
-        ("azmon-basicafs-tmpl...")
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-basicfile-tmpl\_working\template.json") -Raw | ConvertFrom-Json
+        ("azmon-basicfile-tmpl...")
         $AzMonBasicAFS = (az group deployment create `
                         --resource-group "$ResourceGroupName" `
-                        --template-file ($AzMonLocalPath + "\azmon-basicafs-tmpl\_working\template.json") `
-                        --name "azmon-basicafs" `
+                        --template-file ($AzMonLocalPath + "\azmon-basicfile-tmpl\_working\template.json") `
+                        --name ("azmon-basicfile-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -945,7 +993,7 @@ If ($IncludeAFS -and $WorkspaceName -ne "tbd" -and (-Not $azMonBasicAFSTmpl.Cont
                         "CreatedBy=$UserDisplayName" `
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
-        ("azmon-basicafs-tmpl: " + $AzMonBasicAFS.properties.provisioningState + " (" + $AzMonBasicAFS.properties.correlationId + ")")
+        ("azmon-basicfile-tmpl: " + $AzMonBasicAFS.properties.provisioningState + " (" + $AzMonBasicAFS.properties.correlationId + ")")
         $ParametersJSON.Outputs.azMonBasicAFSTmpl = ($AzMonBasicAFS.properties.provisioningState + "-" + $AzMonBasicAFS.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
 }
 If ($IncludeAFS -and $ParametersJSON.Outputs.azMonBasicAFSTmpl.Contains("Succeeded")) {
@@ -953,11 +1001,12 @@ If ($IncludeAFS -and $ParametersJSON.Outputs.azMonBasicAFSTmpl.Contains("Succeed
         $AFSstorAcctRGName = $ParametersJSON.AFS.StorAcctRGName
         $AFSfileCapacityThresholdMBWarning = $ParametersJSON.AFS.FileCapacityThresholdMBWarning
         $AFSfileCapacityThresholdMBCritical = $ParametersJSON.AFS.FileCapacityThresholdMBCritical
-        ("azmon-afsrules-tmpl...")
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-filerules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
+        ("azmon-filerules-tmpl...")
         $AzMonAFSRules = (az group deployment create `
                         --resource-group "$AFSstorAcctRGName" `
-                        --template-file ($AzMonLocalPath + "\azmon-afsrules-tmpl\_working\template.json") `
-                        --name "azmon-afsrules" `
+                        --template-file ($AzMonLocalPath + "\azmon-filerules-tmpl\_working\template.json") `
+                        --name ("azmon-filerules-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
@@ -972,7 +1021,7 @@ If ($IncludeAFS -and $ParametersJSON.Outputs.azMonBasicAFSTmpl.Contains("Succeed
                         "CreatedBy=$UserDisplayName" `
                         "OwnedBy=$TagOwnedBy") `
         | ConvertFrom-Json
-        ("azmon-afsrules-tmpl: " + $AzMonAFSRules.properties.provisioningState + " (" + $AzMonAFSRules.properties.correlationId + ")")
+        ("azmon-filerules-tmpl: " + $AzMonAFSRules.properties.provisioningState + " (" + $AzMonAFSRules.properties.correlationId + ")")
         $ParametersJSON.Outputs.azMonAFSRulesTmpl = ($AzMonAFSRules.properties.provisioningState + "-" + $AzMonAFSRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
         $ParametersJSON.Outputs.AFSstorAcctName = $AFSstorAcctName
 }

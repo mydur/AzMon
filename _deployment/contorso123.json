@@ -41,7 +41,9 @@
     "VaultRGName": "asr-test-rg",
     "RPOCritical": 1800,
     "RPOWarning": 900,
-    "TestFailoverMissingThreshold": 5
+    "TestFailoverMissingThreshold": 5,
+    "ASRvmName": "azmonvmprod02",
+    "ASRcacheDrive": "C:"
   },
   "AFS": {
     "ServerEndpoint": "azloc01",
@@ -92,6 +94,7 @@
     "azMonBasicASRTmpl": "Succeeded",
     "azMonASRRulesTmpl": "Succeeded",
     "ASRVaultName": "tbd",
+    "ASRvmName": "tbd",
     "azMonBasicAFSTmpl": "tbd",
     "azMonAFSRulesTmpl": "tbd",
     "AFSstorAcctName": "tbd"
