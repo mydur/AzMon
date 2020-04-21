@@ -83,7 +83,7 @@
   },
   "variables": {
     "TemplateId": "azmon-asrrules",
-    "TemplateVersion": "1.0.1",
+    "TemplateVersion": "1.0.2",
     "TemplateDate": "20200421",
     "TemplateDescription": "Moved sources and searches from basic to this template",
     "TemplateUsage": "Deploy the ASR alerting rules and activate monitoring",
