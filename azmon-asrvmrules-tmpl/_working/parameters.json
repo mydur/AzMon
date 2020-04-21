@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmonk8s"
+    },
+    "Environment": {
+      "value": "prod"
+    },
+    "AZMONBasicRGName": {
+      "value": "azmon-prod-rg"
+    },
+    "WorkspaceName": {
+      "value": "azmon2437-prod-lana"
+    },
+    "ASRvmName": {
+      "value": "azmonvmprod02"
+    },
+    "ASRcacheDrive": {
+      "value": "C:"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
