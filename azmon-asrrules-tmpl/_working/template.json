@@ -122,7 +122,7 @@
         "description": "[concat('ASR - Replication health - Critical (', parameters('ASRVaultName'), ')')]",
         "enabled": "true",
         "source": {
-          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', variables('ASRVaultName'), '\"\n| project-rename TimeGenerated, ConfigServer=name_s , HealthState=replicationHealth_s\n| where HealthState == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated asc')]",
+          "query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"',variables('ASRVaultName'), '\"\n| project-rename TimeGenerated, ConfigServer=name_s , HealthState=replicationHealth_s\n| where HealthState == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), ConfigServer\n| order by TimeGenerated asc')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
           "authorizedResources": [
