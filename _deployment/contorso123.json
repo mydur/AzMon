@@ -52,6 +52,9 @@
     "FileCapacityThresholdMBWarning": 500,
     "FileCapacityThresholdMBCritical": 1000
   },
+  "NSG": {
+    "NSGRulesFileLocation": "C:\\Temp\\nsgrules.json"
+  },
   "Outputs": {
     "GovSetDefId": "tbd",
     "GovKeyvaultId": "tbd",

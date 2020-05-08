@@ -42,12 +42,18 @@
 	
         .PARAMETER IncludeAFS
                 This switch indicates that the monitoring for Azure File Sync should be enabled and configured.
-
+	
+        .PARAMETER ASRServer
+                This switch indicates that monitoring for on on-premise ASR Configuration/Process server should be enabled.
+	
+        .PARAMETER IncludeNSG
+                This switch indicates that the monitoring for Network Security Groups should be enabled and configured.
+                
         .NOTES
 		Title:          Init-AzMon.ps1
 		Author:         Rudy Michiels
                 Created:        2019-10-17
-                Version:        0.4
+                Version:        10
 		ChangeLog:
                         2019-09-26      Initial version
                         2019-09-30      Added -IncludeVMBkUp switch parameter
@@ -56,7 +62,8 @@
                         2019-12-20      Added -IncludeK8S switch parameter
                         2020-02-20      Added -IncludeASR switch parameter
                         2020-03-03      Added -IncludeAFS switch parameter
-                        2020-04-20      Added -ASRserver switch parameter 
+                        2020-04-20      Added -ASRserver switch parameter
+                        2020-05-07      Added -IncludeNSG switch parameter 
 #>
 
 ##########################################################################
@@ -75,6 +82,7 @@ param (
         [switch]$IncludeASR,
         [switch]$IncludeAFS,
         [switch]$ASRserver,
+        [switch]$IncludeNSG,
         [switch]$Update
 )
 
@@ -133,72 +141,16 @@ $RBOKAlertLifeCycleCloseThreshold = 20  # Number of days without changes after w
 ##########################################################################
 # DOWNLOAD TEMPLATE FILES
 ##########################################################################
-$TemplateFolder = "azmon-basic-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-basicrules-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-svchealth-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-nwrules-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-vmworkbook-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-backupsol-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-vmrules-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-nonazurevms-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-rschealth-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-vault-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-vmbkup-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/parameters.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\parameters.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-delegatedrights-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/parameters.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\parameters.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-delegatedvmrights-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/parameters.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\parameters.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-vmlinuxrules-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-basiclinux-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-k8srules-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-asrrules-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-asrvmrules-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-basicasr-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-filerules-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
-$TemplateFolder = "azmon-basicfile-tmpl/_working"
-New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
-(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working"
+
+foreach ($TemplateFolder in $TemplateFolders) {
+        New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
+        (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFolder + "/template.json") | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force -Encoding ascii
+        $TemplateContents = Get-Content -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json")
+        $NewTemplateContents = $TemplateContents -replace "\?\?\?", " "
+        $NewTemplateContents | Out-File -FilePath ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\") + "\template.json") -Force  -Encoding ascii
+}
+
 # Runbooks
 New-Item -Path ($AzMonLocalPath + "\_deployment") -ItemType Directory -ErrorAction SilentlyContinue
 $FileName = "azmon-alertlifecycle-rbok.ps1"
@@ -946,6 +898,7 @@ If ($ASRserver -and $ParametersJSON.Outputs.azMonBasicASRTmpl.Contains("Succeede
         $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-asrvmrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         ("azmon-asrvmrules-tmpl...")
         $AzMonASRVMRules = (az group deployment create `
+                        --debug `
                         --resource-group "$ASRVaultRGName" `
                         --template-file ($AzMonLocalPath + "\azmon-asrvmrules-tmpl\_working\template.json") `
                         --name ("azmon-asrvmrules-" + $TemplateJSON.variables.TemplateVersion) `
@@ -1024,6 +977,85 @@ If ($IncludeAFS -and $ParametersJSON.Outputs.azMonBasicAFSTmpl.Contains("Succeed
         ("azmon-filerules-tmpl: " + $AzMonAFSRules.properties.provisioningState + " (" + $AzMonAFSRules.properties.correlationId + ")")
         $ParametersJSON.Outputs.azMonAFSRulesTmpl = ($AzMonAFSRules.properties.provisioningState + "-" + $AzMonAFSRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
         $ParametersJSON.Outputs.AFSstorAcctName = $AFSstorAcctName
+}
+#
+#
+##########################################################################
+# IncludeNSG (Network Security Group)
+##########################################################################
+#
+$WorkspaceName = $ParametersJSON.Outputs.workspaceName
+$WorkspaceId = $ParametersJSON.Outputs.workspaceID
+$NSGRulesFileLocation = $ParametersJSON.NSG.NSGRulesFileLocation
+$NSGDiagSet = '[{\"category\":\"NetworkSecurityGroupEvent\",\"enabled\": true},{\"category\":\"NetworkSecurityGroupRuleCounter\",\"enabled\": true}]'
+
+If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocation)) {
+        $NSGRulesJSON = Get-Content -Path "$NSGRulesFileLocation" -Raw | ConvertFrom-Json
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-nsgrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
+        ("azmon-nsgrules-tmpl...")
+        foreach ($nsgrule in $NSGRulesJSON.nsgrules) {
+                $NSGName = $nsgrule.NSGName
+                $NSGRGName = $nsgrule.NSGRGName
+                $NSGId = (((((az network nsg show --name "$NSGName"--resource-group "$NSGRGName") -split "`n") | Where-Object { $_ -notmatch "etag" }) -join "`n") | ConvertFrom-Json).id 
+                $NSGDiagSetData = (az monitor diagnostic-settings show --name "$WorkspaceName" --resource "$NSGId")
+                if ($NSGDiagSetData -contains "doesn't exist") {
+                        $NSGDiagnostics = (az monitor diagnostic-settings create `
+                                        --name "$WorkspaceName" `
+                                        --resource "$NSGId" `
+                                        --workspace "$WorkspaceId" `
+                                        --logs "$NSGDiagSet") `
+                        | ConvertFrom-Json
+                }
+                $IpRule = $false
+                if ($nsgrule.IPV4 -ne "") {
+                        $IpRule = $true
+                        $NSGalertRuleName = "Network - NSG - {0} for {1} ({2})" -f $nsgrule.Rule, $nsgrule.IPV4, $nsgrule.NSG
+                }
+                else {
+                        $NSGalertRuleName = "Network - NSG - {0} for {1} ({2})" -f $nsgrule.Rule, $nsgrule.Subnet, $nsgrule.NSG
+                }
+                if ($nsgrule.Log -eq "") {
+                        $NSGRuleName = $nsgrule.Rule
+                        $NSGRuleDescription = $nsgrule.Description
+                        $NSGActionGroupName = $nsgrule.ActionGroup
+                        $NSGType = $nsgrule.Type
+                        $NSGDirection = $nsgrule.Direction
+                        $NSGIPV4 = $nsgrule.IPV4
+                        $NSGSubnet = $nsgrule.Subnet
+                        $NSGFrequency = $nsgrule.Frequency
+                        $NSGThreshold = $nsgrule.Threshold
+                        $NSGBreach = $nsgrule.Breach
+                        $AzMonNSGRules = (az group deployment create `
+                                        --resource-group "$NSGRGName" `
+                                        --template-file ($AzMonLocalPath + "\azmon-nsgrules-tmpl\_working\template.json") `
+                                        --name ("azmon-nsgrules-" + $TemplateJSON.variables.TemplateVersion) `
+                                        --parameters `
+                                        "Project=$TagProject" `
+                                        "NSGName=$NSGName" `
+                                        "NSGRuleName=$NSGRuleName" `
+                                        "Description=$NSGRuleDescription" `
+                                        "Direction=$NSGDirection" `
+                                        "Type=$NSGType" `
+                                        "IPV4=$NSGIPV4" `
+                                        "Subnet=$NSGSubnet" `
+                                        "Frequency=$NSGFrequency" `
+                                        "Threshold=$NSGThreshold" `
+                                        "Breach=$NSGBreach" `
+                                        "NSGAlertRuleName=$NSGAlertRuleName" `
+                                        "AZMONBasicRGName=$ResourceGroupName" `
+                                        "workspaceName=$WorkspaceName" `
+                                        "actionGroupName=$NSGActionGroupName" `
+                                        "Environment=$Environment" `
+                                        "CreatedOn=$TagCreatedOn" `
+                                        "EndsOn=$TagEndsOn" `
+                                        "CreatedBy=$UserDisplayName" `
+                                        "OwnedBy=$TagOwnedBy") `
+                        | ConvertFrom-Json
+                        ("azmon-nsgrules-tmpl: " + $AzMonNSGRules.properties.provisioningState + " (" + $AzMonNSGRules.properties.correlationId + ")")
+                        $nsgrule.Active = ($AzMonBasicAFS.properties.provisioningState + "-" + $AzMonBasicAFS.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+                }
+        }
+        $NSGRulesJSON | ConvertTo-Json | Out-File -FilePath "$NSGRulesFileLocation" -Force -Encoding ascii
 }
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
