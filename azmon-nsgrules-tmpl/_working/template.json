@@ -118,10 +118,17 @@
       }
     },
     "actionGroupName": {
-      "defaultValue": "vmrules-azmon-prod-agrp",
+      "defaultValue": "",
       "type": "String",
       "metadata": {
         "description": "Name of the action group to use for alert forwarding."
+      }
+    },
+    "actionGroupRGName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Name of the action group resource group to use for alert forwarding."
       }
     },
     "Environment": {
@@ -166,17 +173,20 @@
     "TemplateUsage": "Is used to create NSG monitoring alert rules",
     "TemplateDocumentation": "<Name of document.>",
     "NSGName": "[toUpper(parameters('NSGName'))]",
+    "IPV4AlertRuleName": "[if(not(empty(parameters('IPV4'))), parameters('NSGAlertRuleName'), 'NA')]",
+    "SubnetAlertRuleName": "[if(equals(variables('IPV4AlertRuleName'), 'NA'), parameters('NSGAlertRuleName'), 'NA')]",
     "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
     "workspaceName": "[toLower(parameters('workspaceName'))]",
     "actionGroupName": "[toLower(parameters('actionGroupName'))]",
+    "actionGroupRGName": "[toLower(parameters('actionGroupRGName'))]",
     "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
   },
   "resources": [
     {
-      "condition": "[not(equals(parameters('IPV4'), ''))]",
-      "name": "[parameters('NSGAlertRuleName')]",
+      "condition": "[not(empty(parameters('IPV4')))]",
+      "name": "[variables('IPV4AlertRuleName')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
       "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
@@ -209,7 +219,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('actionGroupRGName'), '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {
@@ -229,8 +239,8 @@
       ]
     },
     {
-      "condition": "[equals(parameters('IPV4'), '')]",
-      "name": "[parameters('NSGAlertRuleName')]",
+      "condition": "[empty(parameters('IPV4'))]",
+      "name": "[variables('SubnetAlertRuleName')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
       "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
@@ -263,7 +273,7 @@
           "severity": "1",
           "aznsAction": {
             "actionGroup": [
-              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('actionGroupRGName'), '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
             ]
           },
           "trigger": {

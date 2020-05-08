@@ -41,6 +41,9 @@
     "actionGroupName": {
       "value": "nwrules-azmon-prod-agrp"
     },
+    "actionGroupRGName": {
+      "value": "azmon-prod-rg"
+    },
     "Environment": {
       "value": "prod"
     },
