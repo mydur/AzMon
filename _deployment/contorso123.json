@@ -53,7 +53,7 @@
     "FileCapacityThresholdMBCritical": 1000
   },
   "NSG": {
-    "NSGRulesFileLocation": "C:\\Temp\\nsgrules.json"
+    "NSGRulesFileLocation": "C:\\Getronics\\nsgrules.json"
   },
   "Outputs": {
     "GovSetDefId": "tbd",

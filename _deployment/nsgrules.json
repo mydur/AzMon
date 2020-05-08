@@ -4,6 +4,7 @@
       "NSGName": "azmonvm-prod-nsg",
       "NSGRGName": "azmonvm-prod-rg",
       "ActionGroupName": "nwrules-azmon-prod-agrp",
+      "ActionGroupRGName": "azmon-prod-rg",
       "NSGRuleName": "DefaultRule_DenyAllInBound",
       "Direction": "In",
       "Type": "block",
@@ -12,22 +13,23 @@
       "Frequency": 15,
       "Threshold": 20,
       "Breach": 2,
-      "Description": "",
+      "Description": "Deny All InBound",
       "Log": ""
     },
     {
       "NSGName": "azmonvm-prod-nsg",
       "NSGRGName": "azmonvm-prod-rg",
       "ActionGroupName": "nwrules-azmon-prod-agrp",
+      "ActionGroupRGName": "azmon-prod-rg",
       "NSGRuleName": "DefaultRule_DenyAllOutBound",
       "Direction": "Out",
       "Type": "block",
-      "IPV4": "10.10.100.4",
-      "Subnet": "10.10.100.0//24",
+      "IPV4": "",
+      "Subnet": "10.10.100.0/24",
       "Frequency": 15,
       "Threshold": 20,
       "Breach": 2,
-      "Description": "",
+      "Description": "Deny All OutBound",
       "Log": ""
     }
   ]

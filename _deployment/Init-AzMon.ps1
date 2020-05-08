@@ -141,7 +141,7 @@ $RBOKAlertLifeCycleCloseThreshold = 20  # Number of days without changes after w
 ##########################################################################
 # DOWNLOAD TEMPLATE FILES
 ##########################################################################
-$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working"
+$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working", "azmon-nsgrules-tmpl/_working"
 
 foreach ($TemplateFolder in $TemplateFolders) {
         New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
@@ -996,9 +996,10 @@ If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocat
         foreach ($nsgrule in $NSGRulesJSON.nsgrules) {
                 $NSGName = $nsgrule.NSGName
                 $NSGRGName = $nsgrule.NSGRGName
-                $NSGId = (((((az network nsg show --name "$NSGName"--resource-group "$NSGRGName") -split "`n") | Where-Object { $_ -notmatch "etag" }) -join "`n") | ConvertFrom-Json).id 
+                $NSGId = (((((az network nsg show --name "$NSGName"--resource-group "$NSGRGName") -split "`n") | Where-Object { $_ -notmatch "etag" }) -join "`n") | ConvertFrom-Json).id
+                $NSGDiagSetData = 'NA' 
                 $NSGDiagSetData = (az monitor diagnostic-settings show --name "$WorkspaceName" --resource "$NSGId")
-                if ($NSGDiagSetData -contains "doesn't exist") {
+                if ($NSGDiagSetData -eq 'NA') {
                         $NSGDiagnostics = (az monitor diagnostic-settings create `
                                         --name "$WorkspaceName" `
                                         --resource "$NSGId" `
@@ -1009,15 +1010,16 @@ If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocat
                 $IpRule = $false
                 if ($nsgrule.IPV4 -ne "") {
                         $IpRule = $true
-                        $NSGalertRuleName = "Network - NSG - {0} for {1} ({2})" -f $nsgrule.Rule, $nsgrule.IPV4, $nsgrule.NSG
+                        $NSGalertRuleName = "Network - NSG - {0} for {1} ({2})" -f $nsgrule.NSGRuleName, $nsgrule.IPV4, $nsgrule.NSGName
                 }
                 else {
-                        $NSGalertRuleName = "Network - NSG - {0} for {1} ({2})" -f $nsgrule.Rule, $nsgrule.Subnet, $nsgrule.NSG
+                        $NSGalertRuleName = "Network - NSG - {0} for {1} ({2})" -f $nsgrule.NSGRuleName, ($nsgrule.Subnet -replace '/', '-'), $nsgrule.NSGName
                 }
                 if ($nsgrule.Log -eq "") {
-                        $NSGRuleName = $nsgrule.Rule
+                        $NSGRuleName = $nsgrule.NSGRuleName
                         $NSGRuleDescription = $nsgrule.Description
-                        $NSGActionGroupName = $nsgrule.ActionGroup
+                        $NSGActionGroupName = $nsgrule.ActionGroupName
+                        $NSGActionGroupRGName = $nsgrule.ActionGroupRGName
                         $NSGType = $nsgrule.Type
                         $NSGDirection = $nsgrule.Direction
                         $NSGIPV4 = $nsgrule.IPV4
@@ -1026,6 +1028,7 @@ If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocat
                         $NSGThreshold = $nsgrule.Threshold
                         $NSGBreach = $nsgrule.Breach
                         $AzMonNSGRules = (az group deployment create `
+                                        --debug `
                                         --resource-group "$NSGRGName" `
                                         --template-file ($AzMonLocalPath + "\azmon-nsgrules-tmpl\_working\template.json") `
                                         --name ("azmon-nsgrules-" + $TemplateJSON.variables.TemplateVersion) `
@@ -1045,6 +1048,7 @@ If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocat
                                         "AZMONBasicRGName=$ResourceGroupName" `
                                         "workspaceName=$WorkspaceName" `
                                         "actionGroupName=$NSGActionGroupName" `
+                                        "actionGroupRGName=$NSGActionGroupRGName" `
                                         "Environment=$Environment" `
                                         "CreatedOn=$TagCreatedOn" `
                                         "EndsOn=$TagEndsOn" `
@@ -1052,7 +1056,7 @@ If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocat
                                         "OwnedBy=$TagOwnedBy") `
                         | ConvertFrom-Json
                         ("azmon-nsgrules-tmpl: " + $AzMonNSGRules.properties.provisioningState + " (" + $AzMonNSGRules.properties.correlationId + ")")
-                        $nsgrule.Active = ($AzMonBasicAFS.properties.provisioningState + "-" + $AzMonBasicAFS.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+                        $nsgrule.Log = ($AzMonNSGRules.properties.provisioningState + "-" + $AzMonNSGRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
                 }
         }
         $NSGRulesJSON | ConvertTo-Json | Out-File -FilePath "$NSGRulesFileLocation" -Force -Encoding ascii
