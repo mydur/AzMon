@@ -1,0 +1,296 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "NSGName": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Network Security Group"
+      }
+    },
+    "NSGRuleName": {
+      "type": "string",
+      "allowedValues": [
+      ],
+      "defaultValue": "",
+      "metadata": {
+        "description": "Name of the NSG rule to search for"
+      }
+    },
+    "Description": {
+      "type": "string",
+      "allowedValues": [
+      ],
+      "defaultValue": "",
+      "metadata": {
+        "description": "Description of the NSG rule name"
+      }
+    },
+    "Direction": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [
+        "In",
+        "Out"
+      ],
+      "metadata": {
+        "description": "Direction of the traffice. Can be In or Out"
+      }
+    },
+    "Type": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [
+        "allow",
+        "block"
+      ],
+      "metadata": {
+        "description": "Type of action taken. Cn be block or allow"
+      }
+    },
+    "IPV4": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [
+      ],
+      "metadata": {
+        "description": "IPV4 address of the server to filter. This parameters is mutual exclusive with the Subnet parameter and has priority if both exist"
+      }
+    },
+    "Subnet": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [
+      ],
+      "metadata": {
+        "description": "Subnet CIDR notation of the subnet to filter. This parameters is mutual exclusive with the IPV4 parameter and does not have priority if both exist"
+      }
+    },
+    "Frequency": {
+      "type": "int",
+      "defaultValue": "",
+      "allowedValues": [
+      ],
+      "metadata": {
+        "description": "The frequency at which the alert rule will execute the query against the log analytics database. The same value is used for the Period (data window)"
+      }
+    },
+    "Threshold": {
+      "type": "int",
+      "defaultValue": "",
+      "allowedValues": [
+      ],
+      "metadata": {
+        "description": "Threshold value against which the query result is evaluated"
+      }
+    },
+    "Breach": {
+      "type": "int",
+      "defaultValue": "",
+      "allowedValues": [
+      ],
+      "metadata": {
+        "description": "Number of consecutive times that threshold should be reached before an alert is raised"
+      }
+    },
+    "NSGAlertRuleName": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [
+      ],
+      "metadata": {
+        "description": "Name of the alert rule that will be created"
+      }
+    },
+    "AZMONBasicRGName": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Resource group name where basic monitoring was deployed -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "workspaceName": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Workspace name where basic monitoring is running -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "actionGroupName": {
+      "defaultValue": "vmrules-azmon-prod-agrp",
+      "type": "String",
+      "metadata": {
+        "description": "Name of the action group to use for alert forwarding."
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Project": {
+      "defaultValue": "",
+      "type": "String"
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-nsgrules",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20200507",
+    "TemplateDescription": "Intial version",
+    "TemplateUsage": "Is used to create NSG monitoring alert rules",
+    "TemplateDocumentation": "<Name of document.>",
+    "NSGName": "[toUpper(parameters('NSGName'))]",
+    "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
+    "workspaceName": "[toLower(parameters('workspaceName'))]",
+    "actionGroupName": "[toLower(parameters('actionGroupName'))]",
+    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+  },
+  "resources": [
+    {
+      "condition": "[not(equals(parameters('IPV4'), ''))]",
+      "name": "[parameters('NSGAlertRuleName')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "description": "[parameters('Description')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureDiagnostics\n| where ResourceType == \"NETWORKSECURITYGROUPS\" and Category == \"NetworkSecurityGroupEvent\" \n| where Resource == \"', variables('NSGName'), '\"\n| where primaryIPv4Address_s == \"', parameters('IPV4'), '\"\n| where direction_s == \"', parameters('Direction'), '\" and type_s == \"', parameters('Type'), '\" \n| where ruleName_s == \"', parameters('NSGRuleName'), '\" \n| summarize AggregatedValue = cnt() by bin(TimeGenerated, 5m), primaryIPv4Address_s\n| order by TimeGenerated asc')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": "[parameters('Frequency')]",
+          "timeWindowInMinutes": "[parameters('Frequency')]"
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": "[parameters('Threshold')]",
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": "[parameters('Breach')]",
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+      ]
+    },
+    {
+      "condition": "[equals(parameters('IPV4'), '')]",
+      "name": "[parameters('NSGAlertRuleName')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "description": "[parameters('Description')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureDiagnostics\n| where ResourceType == \"NETWORKSECURITYGROUPS\" and Category == \"NetworkSecurityGroupEvent\" \n| where Resource == \"', variables('NSGName'), '\"\n| where subnetPrefix_s == \"', parameters('Subnet'), '\"\n| where direction_s == \"', parameters('Direction'), '\" and type_s == \"', parameters('Type'), '\" \n| where ruleName_s == \"', parameters('NSGRuleName'), '\" \n| summarize AggregatedValue = cnt() by bin(TimeGenerated, 5m), primaryIPv4Address_s\n| order by TimeGenerated asc')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": [
+            "[variables('authorizedResources')]"
+          ]
+        },
+        "schedule": {
+          "frequencyInMinutes": "[parameters('Frequency')]",
+          "timeWindowInMinutes": "[parameters('Frequency')]"
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": "[parameters('Threshold')]",
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": "[parameters('Breach')]",
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Computer"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+      ]
+    }
+  ],
+  "outputs": {
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
+    }
+  }
+}

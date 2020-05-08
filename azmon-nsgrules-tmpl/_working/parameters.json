@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "NSGName": {
+      "value": "AZMON-PROD-NSG"
+    },
+    "NSGRuleName": {
+      "value": "DefaultRule_DenyAllInBound"
+    },
+    "Description": {
+      "value": "Deny all InBound"
+    },
+    "Direction": {
+      "value": "In"
+    },
+    "Type": {
+      "value": "block"
+    },
+    "IPV4": {
+      "value": "10.10.100.4"
+    },
+    "Subnet": {
+      "value": "10.10.100.0/24"
+    },
+    "Frequency": {
+      "value": 15
+    },
+    "Threshold": {
+      "value": 20
+    },
+    "Breach": {
+      "value": 2
+    },
+    "AZMONBasicRGName": {
+      "value": "azmon-prod-rg"
+    },
+    "workspaceName": {
+      "value": "azmon2437-prod-lana"
+    },
+    "actionGroupName": {
+      "value": "nwrules-azmon-prod-agrp"
+    },
+    "Environment": {
+      "value": "prod"
+    },
+    "Project": {
+      "value": "azmon"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
