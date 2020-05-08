@@ -380,7 +380,7 @@
         "[variables('alertTag')]": "Resource"
       },
       "properties": {
-        "description": "[concat('InMage Scout VX Agent - Sentinel/Outpost (', variables('ASRvmName'), ')')]",
+        "description": "[concat('InMage Scout VX Agent - Sentinel-Outpost (', variables('ASRvmName'), ')')]",
         "enabled": "true",
         "source": {
           "query": "[concat('let ASRvmName = \"', variables('ASRvmName'), '/\";\nConfigurationChange\n| where tolower(Computer) == ASRvmName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"InMage Scout VX Agent - Sentinel/Outpost\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",

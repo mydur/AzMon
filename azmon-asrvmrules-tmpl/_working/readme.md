@@ -3,22 +3,23 @@
 The purpose of this template is to deploy a set of Alert Rules and an Action Group to monitor Azure Site Recovery. The rules contained in this template monitor the health of the ASR configuration/process server.
 
 _scheduledQueryRules_
-| #   | Name                                                                     | Breach | Threshold | Freq | Period |
-| --- | :----------------------------------------------------------------------- | :----- | :-------- | :--- | :----- |
-| 1   | ASR - Cache Disk - % Free Space - Critical (ASRvmName)                   | >2     | <25       | 15   | 45     |
-| 2   | ASR - Cache Disk - % Free Space - Warning (ASRvmName)                    | >2     | <35       | 15   | 45     |
-| 3   | ASR - Service - Process Server (ASRvmName)                               | >1     | >0        | 5    | 10     |
-| 4   | ASR - Service - Process Server Monitor (ASRvmName)                       | >1     | >0        | 5    | 10     |
-| 5   | ASR - Service - cxprocessserver (ASRvmName)                              | >1     | >0        | 5    | 10     |
-| 6   | ASR - Service - InMage PushInstall (ASRvmName)                           | >1     | >0        | 5    | 10     |
-| 7   | ASR - Service - InMage Scout Application Service (ASRvmName)             | >1     | >0        | 5    | 10     |
-| 8   | ASR - Service - InMage Scout VX Agent - Sentinel/Outpost (ASRvmName)     | >1     | >0        | 5    | 10     |
-| 9   | ASR - Service - Log Upload Service (ASRvmName)                           | >1     | >0        | 5    | 10     |
-| 10  | ASR - Service - Microsoft Azure Site Recovery Services Agent (ASRvmName) | >1     | >0        | 5    | 10     |
-| 11  | ASR - Service - Microsoft Azure Site Recovery Service (ASRvmName)        | >1     | >0        | 5    | 10     |
-| 12  | ASR - Service - tmansvc (ASRvmName)                                      | >1     | >0        | 5    | 10     |
-| 13  | ASR - Service - MySQL (ASRvmName)                                        | >1     | >0        | 5    | 10     |
-| 14  | ASR - Service - World Wide Web Pusblishing Service (ASRvmName)           | >1     | >0        | 5    | 10     |
+| #   | Name                                                                     | Breach | Threshold | Freq/Bin | Period |
+| --- | :----------------------------------------------------------------------- | :----- | :-------- | :------- | :----- |
+| 1   | ASR - Cache Disk - % Free Space - Critical (ASRvmName)                   | >2     | <25       | 15       | 45     |
+| 2   | ASR - Cache Disk - % Free Space - Warning (ASRvmName)                    | >2     | <35       | 15       | 45     |
+| 3   | ASR - Service - Process Server (ASRvmName)                               | >1     | >0        | 5        | 10     |
+| 4   | ASR - Service - Process Server Monitor (ASRvmName)                       | >1     | >0        | 5        | 10     |
+| 5   | ASR - Service - cxprocessserver (ASRvmName)                              | >1     | >0        | 5        | 10     |
+| 6   | ASR - Service - InMage PushInstall (ASRvmName)                           | >1     | >0        | 5        | 10     |
+| 7   | ASR - Service - InMage Scout Application Service (ASRvmName)             | >1     | >0        | 5        | 10     |
+| 8   | ASR - Service - InMage Scout VX Agent - Sentinel-Outpost (ASRvmName)     | >1     | >0        | 5        | 10     |
+| 9   | ASR - Service - Log Upload Service (ASRvmName)                           | >1     | >0        | 5        | 10     |
+| 10  | ASR - Service - Microsoft Azure Site Recovery Services Agent (ASRvmName) | >1     | >0        | 5        | 10     |
+| 11  | ASR - Service - Microsoft Azure Site Recovery Service (ASRvmName)        | >1     | >0        | 5        | 10     |
+| 12  | ASR - Service - tmansvc (ASRvmName)                                      | >1     | >0        | 5        | 10     |
+| 13  | ASR - Service - MySQL (ASRvmName)                                        | >1     | >0        | 5        | 10     |
+| 14  | ASR - Service - World Wide Web Pusblishing Service (ASRvmName)           | >1     | >0        | 5        | 10     |
+
 
 _Actiongroup_
 | #   | Name                        | Short Name  | Target            |
