@@ -96,6 +96,7 @@ Set-Location -Path "C:\Getronics\AzMon"
 If ($CheckPrereqs) {
         Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile "C:\Getronics\AzMon\AzureCLI.msi"
         Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+        Remove-Item -Force "C:\Getronics\AzMon\AzureCLI.msi"
 }
 
 ##########################################################################
@@ -141,7 +142,7 @@ $RBOKAlertLifeCycleCloseThreshold = 20  # Number of days without changes after w
 ##########################################################################
 # DOWNLOAD TEMPLATE FILES
 ##########################################################################
-$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working", "azmon-nsgrules-tmpl/_working"
+$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working", "azmon-nsgrules-tmpl/_working", "azmon-subdiag-tmpl/_working"
 
 foreach ($TemplateFolder in $TemplateFolders) {
         New-Item -Path ($AzMonLocalPath + "\" + ($TemplateFolder -replace "/", "\")) -ItemType Directory -ErrorAction SilentlyContinue
@@ -345,6 +346,19 @@ If ($DeployBaseSetup) {
         # DIAGNOSTICS SETTINGS
         # ------------------------
         # Most Azure resources emit logs that can be capture by a log analytics workspace. In this section we configure diagnostics settings for some AzGov and AzMon resources.
+        # Subscription
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-subdiag-tmpl\_working\template.json") -Raw | ConvertFrom-Json
+        ("azmon-subdiag-tmpl...")
+        $AzMonSubDiag = (az deployment sub create `
+                        --template-file ($AzMonLocalPath + "\azmon-subdiag-tmpl\_working\template.json") `
+                        --name ("azmon-subdiag-" + $TemplateJSON.variables.TemplateVersion) `
+                        --location $Location `
+                        --parameters `
+                        "workspaceId=$WorkspaceId" `
+                        "settingName=$WorkspaceName") `
+        | ConvertFrom-Json
+        ("azmon-subdiag-tmpl: " + $AzMonSubDiag.properties.provisioningState + " (" + $AzMonSubDiag.properties.correlationId + ")")
+        $ParametersJSON.Outputs.azMonSubDiagTmpl = ($AzMonSubDiag.properties.provisioningState + "-" + $AzMonSubDiag.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
         # AzGov.Keyvault
         $KeyvDiagSet = '[{ \"category\": \"AuditEvent\", \"enabled\": true, \"retentionPolicy\": { \"enabled\": false, \"days\": 0 }}]'
         $KeyvaultId = (az keyvault show --name "$KeyvaultName" --resource-group "$KeyvaultRGName" | ConvertFrom-Json).id
@@ -1028,7 +1042,6 @@ If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocat
                         $NSGThreshold = $nsgrule.Threshold
                         $NSGBreach = $nsgrule.Breach
                         $AzMonNSGRules = (az group deployment create `
-                                        --debug `
                                         --resource-group "$NSGRGName" `
                                         --template-file ($AzMonLocalPath + "\azmon-nsgrules-tmpl\_working\template.json") `
                                         --name ("azmon-nsgrules-" + $TemplateJSON.variables.TemplateVersion) `
