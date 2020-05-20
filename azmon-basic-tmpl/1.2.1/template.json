@@ -106,9 +106,9 @@
   },
   "variables": {
     "TemplateId": "azmon-basic",
-    "TemplateVersion": "1.2.2",
-    "TemplateDate": "20200513",
-    "TemplateDescription": "Added subscription diagnostic settings",
+    "TemplateVersion": "1.2.1",
+    "TemplateDate": "20200310",
+    "TemplateDescription": "Added solutions, Containers",
     "TemplateUsage": "Is used to setup a base monitoring environment.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "VMRGName": {
+      "value": "azmovm-test-rg"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "UniqueNumber": {
+      "value": "9999"
+    },
+    "dataRetention": {
+      "value": 60
+    },
+    "Location": {
+      "value": "West Europe"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
