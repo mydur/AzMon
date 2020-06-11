@@ -78,6 +78,7 @@ $AzCLIAadaName = "azcli-$Environment-aada"
 $AzPSAadaName = "azps-$Environment-aada"
 $AzCopyAadaName = "azcopy-$Environment-aada"
 $AzAutoAadaName = "azauto-$Environment-aada"
+$AzMonARMMID = "azmonarm-$Environment-mid"
 $TagOwnedBy = "Getronics"
 $TagCreatedOn = (Get-Date -Format "yyyyMMdd")
 $TagEnvironment = $Environment
@@ -92,10 +93,15 @@ $StorAcctSKU = "Standard_LRS"
 ##########################################################################
 # DOWNLOAD TEMPLATE FILES
 ##########################################################################
+# Templates
 $TemplateFile = "azgov-tagpolicies-tmpl/_working/tagpolicies.json"
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFile) | Out-File -FilePath $TagPoliciesJSONFile -Force
 $TemplateFile = "azgov-autoacct-tmpl/_working/automationaccount.json"
 (New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + $TemplateFile) | Out-File -FilePath $AutomationAccountJSONFile -Force
+# Helper scripts
+New-Item -Path ($AzMonLocalPath + "\_deployment") -ItemType Directory -ErrorAction SilentlyContinue
+$FileName = "Create-RunAsAccount.ps1"
+(New-Object System.Net.WebClient).DownloadString($GithubBaseFolder + "_deployment/" + $FileName) | Out-File -FilePath ($AzMonLocalPath + "\_deployment\" + $FileName) -Force -Encoding ascii
 
 ##########################################################################
 # 0. LOGIN TO AZURE
@@ -196,6 +202,11 @@ $ParametersJSON.Outputs.GovKeyvaultId = $KeyvaultID
 #
 # 5. CREATE SERVICE PRINCIPALS
 # ----------------------------
+# First get the AD role to which some service principals will be added
+$Cred = Get-Credential -Message "Please enter username and password for Azure AD connection..."
+Connect-AzureAD -Credential $Cred
+$roleName = "Company Administrator"
+$role = Get-AzureADDirectoryRole | Where-Object { $_.displayName -eq $roleName }
 # AZCOPY
 $AzCopyAada = (az ad sp create-for-rbac `
                 --name "$AzCopyAadaName" `
@@ -274,6 +285,7 @@ $AzPSAadaKeyvPol = (az keyvault set-policy `
                 --certificate-permissions backup create delete deleteissuers get getissuers import list listissuers managecontacts manageissuers purge recover restore setissuers update `
                 --key-permissions backup create decrypt delete encrypt get import list purge recover restore sign unwrapKey update verify wrapKey) `
 | ConvertFrom-Json
+Add-AzureADDirectoryRoleMember -ObjectId $role.ObjectId -RefObjectId (Get-AzureADServicePrincipal -SearchString $AzPSAadaName).ObjectID
 # AZAUTO
 $AzAutoAada = (az ad sp create-for-rbac `
                 --name "$AzAutoAadaName" `
@@ -300,8 +312,24 @@ $AzAutoAadaKeyvPol = (az keyvault set-policy `
                 --key-permissions get list) `
 | ConvertFrom-Json
 #
+# Grant service principals rights in Azure AD
+
+# AZPS
+$userName = $AzPSAadaName
+
+
 #
-# 6. STORAGE ACCOUNT
+# 6. CREATE MANAGED IDENTITIES
+# ----------------------------
+# AZMONARM
+# The ArmonARM managed identity will be used in ARM deployment templates for the Microsoft.deploymentScript resource type.
+$AzMonARMMID = (az identity create `
+                --name "$AzMonARMMIDName" `
+                --resource-group "$ResourceGroupName") `
+| ConvertFrom-Json
+#
+#
+# 7. STORAGE ACCOUNT
 # ------------------
 # This storage account can be used to store all things related to managing an Azure environment. To start this storage account doesn't contain any data.
 $StorAcct = (az storage account create `
@@ -325,7 +353,7 @@ $StorAcctLock = (az resource lock create `
 $ParametersJSON.Outputs.GovStorAcctId = $StorAcctID
 #
 #
-# 7. AUTOMATION ACCOUNT
+# 8. AUTOMATION ACCOUNT
 # ---------------------
 # This is the automation account that will be used to run automation scripts used for governance. To start this automation account doesn't contain any runbooks.
 $AutoAcct = (az group deployment create `
@@ -335,7 +363,22 @@ $AutoAcct = (az group deployment create `
                 --parameters "Environment=$Environment" "Location=$Location" "UniqueNumber=$Rnd") `
 | ConvertFrom-Json
 ("Automation Account: " + $AutoAcct.id)
+$AutoAcctName = $AutoAcct.properties.outputs.AutoAcctName.value
 $ParametersJSON.Outputs.GovAutoAcctId = $AutoAcct.id
+# Login to Azure (Powershell)
+$AzPSAadaKeyv = (az keyvault secret show `
+                --vault-name $KeyvaultName `
+                --name ("azps-" + $Environment + "-aada")) `
+| ConvertFrom-Json
+$AzPSAadaSecret = $AzPSAadaKeyv.value
+$Pwd = ConvertTo-SecureString "$AzPSAadaSecret" -AsPlainText -Force
+$PSCreds = New-Object System.Management.Automation.PSCredential(("http://azps-" + $Environment + "-aada"), $Pwd)
+Connect-AzAccount -ServicePrincipal -Credential $PSCreds -Tenant $TenantID
+# Add RunAsAccount to the automation account
+$RunAsAcctAadaName = $AutoAcctName -replace "auto", "aada"
+$ScriptFileName = $AzMonLocalPath + "\_deployment\" + "Create-RunAsAccount.ps1"
+$ScriptParameters = "-ResourceGroup '$ResourceGroupName' -AutomationAccountName '$AutoAcctName' -SubscriptionId '$SubscriptionID' -ApplicationDisplayName '$RunAsAcctAadaName' -SelfSignedCertPlainPassword '$RunAsAcctAadaName' -CreateClassicRunAsAccount 0"
+Invoke-Expression "$ScriptFileName $ScriptParameters"
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
 $ParametersJSON | ConvertTo-Json | Out-File -FilePath "$ParametersFile" -Force -Encoding ascii
