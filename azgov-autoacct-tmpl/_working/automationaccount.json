@@ -4,7 +4,12 @@
   "parameters": {
     "Environment": {
       "type": "string",
-      "allowedValues": ["dev", "test", "acc", "prod"],
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
       "defaultValue": "prod",
       "metadata": {
         "description": "Can one of the following, dev-test-acc-prod"
@@ -35,14 +40,16 @@
       "name": "[variables('automationAccountName')]",
       "apiVersion": "2015-10-31",
       "location": "[parameters('Location')]",
-      "tags": {},
+      "tags": {
+      },
       "scale": null,
       "properties": {
         "sku": {
           "name": "Free"
         }
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
     },
     {
       "type": "Microsoft.Automation/automationAccounts/providers/locks",
@@ -57,5 +64,10 @@
       }
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "AutoAcctName": {
+      "type": "string",
+      "value": "[concat('azgov', parameters('UniqueNUmber'),'-', variables('Environment'), '-auto')]"
+    },
+  }
 }
