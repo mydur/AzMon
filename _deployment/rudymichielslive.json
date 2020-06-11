@@ -1,75 +1,73 @@
 {
-    "General":  {
-                    "CompanyName":  "rudymichielsllive",
-                    "CompanyDomain":  "rudymichielslive.onmicrosoft.com",
-                    "TenantID":  "0587b807-8aee-444c-b96b-f6afaa1b0251",
-                    "Environment":  "prod",
-                    "TagEndsOn":  "99999999",
-                    "TagCostCenter":  "Default",
-                    "UniqueNumber":  "7752",
-                    "LocationDisplayName":  "West Europe"
-                },
-    "Basic":  {
-                  "WorkspaceDataRetention":  60,
-                  "dataPerDayThresholdMB":  1536
-              },
-    "VMRules":  {
-                    "VMRGName":  "azmonvm-prod-rg"
-                },
-    "Vault":  {
-                  "instantRpRetentionRangeInDays":  2,
-                  "dailyRetentionDurationCount":  30,
-                  "weeklyRetentionDurationCount":  12,
-                  "monthlyRetentionDurationCount":  60,
-                  "yearlyRetentionDurationCount":  10,
-                  "redundancyType":  "LocallyRedundant"
-              },
-    "VMBkUp":  {
-                   "existingVirtualMachines":  [
-                                                   "azmonvmprod01"
-                                               ]
-               },
-    "DRM":  {
-                "MSPTenantId":  "9e087d00-55f5-4dc2-bcc4-cfdacca00ab5",
-                "ContributorGroupId":  "2e600b14-11df-4195-9daa-69c960f8904e",
-                "VMContributorGroupId":  "ed26fa2c-35e8-45fb-b84f-b72ead1a1a9d"
-            },
-    "Outputs":  {
-                    "GovSetDefId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/providers/Microsoft.Authorization/policySetDefinitions/azgov-tagpolicies-setd",
-                    "GovKeyvaultId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azgov-prod-rg/providers/Microsoft.KeyVault/vaults/azgov7752-prod-keyv",
-                    "GovAssignmentId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/providers/Microsoft.Authorization/policyAssignments/azgov-tagpolicies-assi",
-                    "GovResGroupId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azgov-prod-rg",
-                    "GovStorAcctId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azgov-prod-rg/providers/Microsoft.Storage/storageAccounts/azgov7752prodstor",
-                    "GovAutoAcctId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azgov-prod-rg/providers/Microsoft.Resources/deployments/azgov-automationacct",
-                    "azMonBasicTmpl":  "Succeeded",
-                    "workspaceId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azmon-prod-rg/providers/microsoft.operationalinsights/workspaces/azmon7752-prod-lana",
-                    "workspaceName":  "azmon7752-prod-lana",
-                    "autoAcctName":  "azmon7752-prod-auto",
-                    "autoAcctId":  "tbd",
-                    "storAcctName":  "azmon7752prodstor",
-                    "azMonBasicRulesTmpl":  "Succeeded",
-                    "basicRulesActionGroupId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/basic-azmon-prod-agrp",
-                    "azMonBasicLinuxTmpl":  "Succeeded",
-                    "azMonVMLinuxRulesTmpl":  "Succeeded",
-                    "azMonNonAzureVMsTmpl":  "Succeeded",
-                    "nonAzureVMsActionGroupId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/nonazure-azmon-prod-agrp",
-                    "azMonSvcHealthTmpl":  "Succeeded",
-                    "svcHealthActionGroupId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/svchealth-azmon-prod-agrp",
-                    "azMonNWRulesTmpl":  "Succeeded",
-                    "nwRulesActionGroupId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/nwrules-azmon-prod-agrp",
-                    "azMonVMWorkbookTmpl":  "Succeeded",
-                    "azMonBackupSolTmpl":  "Succeeded",
-                    "azMonVMRulesTmpl":  "Succeeded",
-                    "vmRulesActionGroupId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmonvm-prod-rg/providers/microsoft.insights/actionGroups/vmrules-azmon-prod-agrp",
-                    "VMRoleAssignment":  null,
-                    "LANARoleAssignment":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azmon-prod-rg/providers/Microsoft.Authorization/roleAssignments/ef644503-9481-44cb-816d-6e5e0d513ae5",
-                    "azMonRSCHealthTmpl":  "Succeeded",
-                    "rscHealthActionGroupId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmonvm-prod-rg/providers/microsoft.insights/actionGroups/rschealth-azmon-prod-agrp",
-                    "azMonVaultTmpl":  "Succeeded",
-                    "backupVaultName":  "azmon7752-prod-bvlt",
-                    "backupVaultId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azmonvm-prod-rg/providers/Microsoft.RecoveryServices/vaults/azmon7752-prod-bvlt",
-                    "vaultActionGroupId":  "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmonvm-prod-rg/providers/microsoft.insights/actionGroups/backup-azmon-prod-agrp",
-                    "AzMonDRMTmpl":  "Succeeded",
-                    "AzMonVMDRMTmpl":  "Succeeded"
-                }
+  "General": {
+    "CompanyName": "rudymichielsllive",
+    "CompanyDomain": "rudymichielslive.onmicrosoft.com",
+    "TenantID": "0587b807-8aee-444c-b96b-f6afaa1b0251",
+    "Environment": "prod",
+    "TagEndsOn": "99999999",
+    "TagCostCenter": "Default",
+    "UniqueNumber": "7752",
+    "LocationDisplayName": "West Europe"
+  },
+  "Basic": {
+    "WorkspaceDataRetention": 60,
+    "dataPerDayThresholdMB": 1536
+  },
+  "VMRules": {
+    "VMRGName": "azmonvm-prod-rg"
+  },
+  "Vault": {
+    "instantRpRetentionRangeInDays": 2,
+    "dailyRetentionDurationCount": 30,
+    "weeklyRetentionDurationCount": 12,
+    "monthlyRetentionDurationCount": 60,
+    "yearlyRetentionDurationCount": 10,
+    "redundancyType": "LocallyRedundant"
+  },
+  "VMBkUp": {
+    "existingVirtualMachines": ["azmonvmprod01"]
+  },
+  "DRM": {
+    "MSPTenantId": "9e087d00-55f5-4dc2-bcc4-cfdacca00ab5",
+    "ContributorGroupId": "2e600b14-11df-4195-9daa-69c960f8904e",
+    "VMContributorGroupId": "ed26fa2c-35e8-45fb-b84f-b72ead1a1a9d"
+  },
+  "Outputs": {
+    "GovSetDefId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/providers/Microsoft.Authorization/policySetDefinitions/azgov-tagpolicies-setd",
+    "GovKeyvaultId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azgov-prod-rg/providers/Microsoft.KeyVault/vaults/azgov7752-prod-keyv",
+    "GovAssignmentId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/providers/Microsoft.Authorization/policyAssignments/azgov-tagpolicies-assi",
+    "GovResGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azgov-prod-rg",
+    "GovStorAcctId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azgov-prod-rg/providers/Microsoft.Storage/storageAccounts/azgov7752prodstor",
+    "GovAutoAcctId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azgov-prod-rg/providers/Microsoft.Resources/deployments/azgov-automationacct",
+    "azMonBasicTmpl": "Succeeded",
+    "workspaceId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azmon-prod-rg/providers/microsoft.operationalinsights/workspaces/azmon7752-prod-lana",
+    "workspaceName": "azmon7752-prod-lana",
+    "autoAcctName": "azmon7752-prod-auto",
+    "autoAcctId": "tbd",
+    "storAcctName": "azmon7752prodstor",
+    "azMonBasicRulesTmpl": "Succeeded",
+    "basicRulesActionGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/basic-azmon-prod-agrp",
+    "azMonBasicLinuxTmpl": "Succeeded",
+    "azMonVMLinuxRulesTmpl": "Succeeded",
+    "azMonNonAzureVMsTmpl": "Succeeded",
+    "nonAzureVMsActionGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/nonazure-azmon-prod-agrp",
+    "azMonSvcHealthTmpl": "Succeeded",
+    "svcHealthActionGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/svchealth-azmon-prod-agrp",
+    "azMonNWRulesTmpl": "Succeeded",
+    "nwRulesActionGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmon-prod-rg/providers/microsoft.insights/actionGroups/nwrules-azmon-prod-agrp",
+    "azMonVMWorkbookTmpl": "Succeeded",
+    "azMonBackupSolTmpl": "Succeeded",
+    "azMonVMRulesTmpl": "Succeeded",
+    "vmRulesActionGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmonvm-prod-rg/providers/microsoft.insights/actionGroups/vmrules-azmon-prod-agrp",
+    "VMRoleAssignment": null,
+    "LANARoleAssignment": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azmon-prod-rg/providers/Microsoft.Authorization/roleAssignments/ef644503-9481-44cb-816d-6e5e0d513ae5",
+    "azMonRSCHealthTmpl": "Succeeded",
+    "rscHealthActionGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmonvm-prod-rg/providers/microsoft.insights/actionGroups/rschealth-azmon-prod-agrp",
+    "azMonVaultTmpl": "Succeeded",
+    "backupVaultName": "azmon7752-prod-bvlt",
+    "backupVaultId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourceGroups/azmonvm-prod-rg/providers/Microsoft.RecoveryServices/vaults/azmon7752-prod-bvlt",
+    "vaultActionGroupId": "/subscriptions/fd355e78-91f8-4ad4-8184-fc3f52ef5c20/resourcegroups/azmonvm-prod-rg/providers/microsoft.insights/actionGroups/backup-azmon-prod-agrp",
+    "AzMonDRMTmpl": "Succeeded",
+    "AzMonVMDRMTmpl": "Succeeded"
+  }
 }
