@@ -65,7 +65,7 @@
     "azMonBasicTmpl": "Succeeded",
     "workspaceId": "/subscriptions/a53c5946-e76d-4ca2-bee2-57cfbb3eee7a/resourceGroups/azmon-prod-rg/providers/microsoft.operationalinsights/workspaces/azmon2437-prod-lana",
     "workspaceName": "azmon2437-prod-lana",
-    "autoAcctName": "tbd",
+    "autoAcctName": "azmon2437-prod-auto",
     "autoAcctId": "tbd",
     "storAcctName": "tbd",
     "azMonBasicRulesTmpl": "Succeeded",
