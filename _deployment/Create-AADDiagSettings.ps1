@@ -1,5 +1,5 @@
 param(
-    $workspaceName = "runbookguru"
+    $workspaceName
 )
 
 Import-Module Az
