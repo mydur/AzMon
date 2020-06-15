@@ -53,5 +53,9 @@
     }
   ],
   "outputs": {
+    "AutoAcctName": {
+      "type": "string",
+      "value": "[variables('automationAccountName')]"
+    }
   }
 }
