@@ -50,24 +50,8 @@
       },
       "dependsOn": [
       ]
-    },
-    {
-      "type": "Microsoft.Automation/automationAccounts/providers/locks",
-      "name": "[concat(variables('automationAccountName'), '/Microsoft.Authorization/automationaccountlock')]",
-      "apiVersion": "2016-09-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
-      ],
-      "properties": {
-        "level": "CannotDelete",
-        "notes": "Automation account should not be deleted."
-      }
     }
   ],
   "outputs": {
-    "AutoAcctName": {
-      "type": "string",
-      "value": "[concat('azgov', parameters('UniqueNUmber'),'-', variables('Environment'), '-auto')]"
-    },
   }
 }
