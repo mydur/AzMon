@@ -103,7 +103,7 @@ Import-Module Az.Automation
 Enable-AzureRmAlias
 
 
-#Connect-AzAccount -Environment $EnvironmentName
+Connect-AzAccount -Environment $EnvironmentName
 $Subscription = Get-AzSubscription -SubscriptionId $SubscriptionId | Set-AzContext
 
 # Create a Run As account by using a service principal
