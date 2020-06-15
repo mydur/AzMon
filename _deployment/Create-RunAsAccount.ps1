@@ -13,6 +13,9 @@ Param (
     [String] $SubscriptionId,
 
     [Parameter(Mandatory = $true)]
+    [String] $TenantId,
+
+    [Parameter(Mandatory = $true)]
     [Boolean] $CreateClassicRunAsAccount,
 
     [Parameter(Mandatory = $true)]
@@ -54,7 +57,6 @@ function CreateServicePrincipal([System.Security.Cryptography.X509Certificates.X
     $keyId = (New-Guid).Guid
 
     # Create an Azure AD application, AD App Credential, AD ServicePrincipal
-
     # Requires Application Developer Role, but works with Application administrator or GLOBAL ADMIN
     $Application = New-AzADApplication -DisplayName $ApplicationDisplayName -HomePage ("http://" + $applicationDisplayName) -IdentifierUris ("http://" + $keyId)
     # Requires Application administrator or GLOBAL ADMIN
@@ -88,22 +90,9 @@ function CreateAutomationConnectionAsset ([string] $resourceGroup, [string] $aut
     New-AzAutomationConnection -ResourceGroupName $ResourceGroup -AutomationAccountName $automationAccountName -Name $connectionAssetName -ConnectionTypeName $connectionTypeName -ConnectionFieldValues $connectionFieldValues
 }
 
-#Import-Module AzureRm.Profile
-#Import-Module AzureRm.Resources
-
-#$AureRmProfileVersion = (Get-Module AzureRm.Profile).Version
-#if (!(($AzureRmProfileVersion.Major -ge 3 -and $AzureRmProfileVersion.Minor -ge 4) -or ($AzureRmProfileVersion.Major -gt 3))) {
-#    Write-Error -Message "Please install the latest Azure PowerShell and retry. Relevant doc url : https://docs.microsoft.com/powershell/azureps-cmdlets-docs/ "
-#    return
-#}
-
-# To use the new Az modules to create your Run As accounts, please uncomment the following lines and ensure you comment out the previous 8 lines that import the AzureRM modules to avoid any issues. To learn about about using Az modules in your Automation account see https://docs.microsoft.com/azure/automation/az-modules.
-
 Import-Module Az.Automation
 Enable-AzureRmAlias
-
-
-Connect-AzAccount -Environment $EnvironmentName
+Connect-AzAccount -TenantId $TenantId
 $Subscription = Get-AzSubscription -SubscriptionId $SubscriptionId | Set-AzContext
 
 # Create a Run As account by using a service principal
@@ -131,16 +120,13 @@ $ApplicationId = CreateServicePrincipal $PfxCert $ApplicationDisplayName
 CreateAutomationCertificateAsset $ResourceGroup $AutomationAccountName $CertifcateAssetName $PfxCertPathForRunAsAccount $PfxCertPlainPasswordForRunAsAccount $true
 
 # Populate the ConnectionFieldValues
-$SubscriptionInfo = Get-AzSubscription -SubscriptionId $SubscriptionId
-$TenantID = $SubscriptionInfo | Select TenantId -First 1
 $Thumbprint = $PfxCert.Thumbprint
-$ConnectionFieldValues = @{"ApplicationId" = $ApplicationId; "TenantId" = $TenantID.TenantId; "CertificateThumbprint" = $Thumbprint; "SubscriptionId" = $SubscriptionId }
+$ConnectionFieldValues = @{"ApplicationId" = $ApplicationId; "TenantId" = $TenantID; "CertificateThumbprint" = $Thumbprint; "SubscriptionId" = $SubscriptionId }
 
 # Create an Automation connection asset named AzureRunAsConnection in the Automation account. This connection uses the service principal.
 CreateAutomationConnectionAsset $ResourceGroup $AutomationAccountName $ConnectionAssetName $ConnectionTypeName $ConnectionFieldValues
 
 if ($CreateClassicRunAsAccount) {
-    # Create a Run As account by using a service principal
     $ClassicRunAsAccountCertifcateAssetName = "AzureClassicRunAsCertificate"
     $ClassicRunAsAccountConnectionAssetName = "AzureClassicRunAsConnection"
     $ClassicRunAsAccountConnectionTypeName = "AzureClassicCertificate "
@@ -171,6 +157,4 @@ if ($CreateClassicRunAsAccount) {
 
     # Create an Automation connection asset named AzureRunAsConnection in the Automation account. This connection uses the service principal.
     CreateAutomationConnectionAsset $ResourceGroup $AutomationAccountName $ClassicRunAsAccountConnectionAssetName $ClassicRunAsAccountConnectionTypeName   $ClassicRunAsAccountConnectionFieldValues
-
-    Write-Host -ForegroundColor red       $UploadMessage
 }
