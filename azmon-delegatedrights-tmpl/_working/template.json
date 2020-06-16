@@ -102,4 +102,4 @@
       "value": "[variables('TemplateDate')]"
     }
   }
-} }
+}
