@@ -545,6 +545,7 @@
           "name": "MaintenanceModeOngoing",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "category": "Getronics Monitoring",
             "displayName": "MaintenanceMode Ongoing",
             "query": "ConfigurationChange\r\n| where TimeGenerated > ago(60d)\r\n| where ConfigChangeType == \"WindowsServices\" \r\n| where SvcDisplayName == \"Maintenance Mode Ongoing\" \r\n| where ChangeCategory == \"Added\" or ChangeCategory == \"Removed\" \r\n| order by Computer , TimeGenerated asc\r\n| project Computer , ChangeCategory , TimeGenerated \r\n| summarize arg_max(TimeGenerated,*) by Computer\r\n| where ChangeCategory == \"Added\" \r\n| project Computer \r\n| distinct Computer",
@@ -559,6 +560,7 @@
           "name": "SearchSvcWindowsFirewall",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "category": "Getronics Monitoring",
             "displayName": "Service - Windows Firewall",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -573,6 +575,7 @@
           "name": "SearchLogicalDiskPercentFreeSpace",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Percent Free Space",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"% Free Space\" \n| where InstanceName <> \"HarddiskVolume1\" and InstanceName <> \"_Total\" and InstanceName <> \"C:\"\n| where TimeGenerated > ago(15m)\n| summarize PercentFree=avg(CounterValue) by Computer\n| where PercentFree < 10')]",
@@ -587,6 +590,7 @@
           "name": "SearchSvcDHCPClient",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - DHCP Client",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -601,6 +605,7 @@
           "name": "SearchHeartbeat",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Heartbeat per resource group > 3 minutes",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\r\nHeartbeat \r\n| where _ResourceId contains ResourceGroupName\r\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \r\n| where LastHeartbeat < ago(3m)')]",
@@ -616,6 +621,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - DNS Client",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DNS Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -630,6 +636,7 @@
           "name": "SearchLogicalCurDiskQueueLengthCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Current Disk Queue Length - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer, InstanceName\n//| where AggregatedValue  > 5')]",
@@ -644,6 +651,7 @@
           "name": "SearchProcessorQueueCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Processor - Queue Length - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"System\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 5')]",
@@ -658,6 +666,7 @@
           "name": "SearchProcessorQueueWarning",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Processor - Queue Length - Warning",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"System\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue < 5')]",
@@ -672,6 +681,7 @@
           "name": "SearchSvcWindowsEventLog",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - Windows Event Log",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Event Log\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -686,6 +696,7 @@
           "name": "SearchLogicalDiskCurDiskQueueLengthCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Current Disk Queue Length - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer, InstanceName\n| where AggregatedValue  > 5')]",
@@ -700,6 +711,7 @@
           "name": "SearchMemoryPercentCommittedBytesInUseCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Percent Committed Bytes In Use - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer\n| where AggregatedValue > 90')]",
@@ -714,6 +726,7 @@
           "name": "SearchMemoryAvailableMBCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Available MB - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer\n//| where AggregatedValue < 500')]",
@@ -728,6 +741,7 @@
           "name": "SearchProcessorTimeTotalCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Processor - Time Total - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 85')]",
@@ -742,6 +756,7 @@
           "name": "SearchSvcWinRM",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - WinRM",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -756,6 +771,7 @@
           "name": "SearchMemoryPagesSecCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Pages per Sec - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer\n//| where AggregatedValue > 500')]",
@@ -770,6 +786,7 @@
           "name": "SearchLogicalDiskFreeMBonCCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Logical Disk - Free MB on C - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf \n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Free Megabytes\" \n| where InstanceName == \"C:\"\n| where TimeGenerated > ago(5m) \n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 5000')]",
@@ -784,6 +801,7 @@
           "name": "SearchHeartbeatcritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Heartbeat alert - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nHeartbeat\n| where _ResourceId contains ResourceGroupName\n| summarize LastHeartbeat=max(TimeGenerated) by Computer \n| where LastHeartbeat < ago(5m)')]",
@@ -798,6 +816,7 @@
           "name": "SearchSvcRPC",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - RPC",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -813,6 +832,7 @@
           "name": "SearchMemoryCommittedBytesInUseCritical",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Memory - Percent Committed Bytes In Use - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer\n//| where AggregatedValue > 90')]",
@@ -827,6 +847,7 @@
           "name": "SearchSvcServer",
           "apiVersion": "2017-03-15-preview",
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Service - Server",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -842,6 +863,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Network - AzVnet2OnPrem",
             "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2OnPrem\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
@@ -857,6 +879,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Network - AzVnet2Web",
             "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2Web\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
@@ -872,6 +895,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Network - AzVnet2AzVnet",
             "Query": "NetworkMonitoring \r\n| where TestName == \"AzVnet2AzVnet\"\r\n| where (SubType == \"EndpointHealth\" or SubType == \"EndpointPath\")\r\n| where (LossHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\" or ServiceResponseHealthState == \"Unhealthy\" or LatencyHealthState == \"Unhealthy\")",
@@ -887,6 +911,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Logical Disk - Current Disk Queue Length - Critical (NonAzure)')]",
             "Query": "[concat('Perf\n| where _ResourceId == \"\" \n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Current Disk Queue Length\" \n| where InstanceName <> \"_Total\" and InstanceName <> \"HarddiskVolume1\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer, InstanceName\n//| where AggregatedValue  > 5')]",
@@ -902,6 +927,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Logical Disk - Free MB on C - Critical (NonAzure)')]",
             "Query": "[concat('Perf \n| where _ResourceId == \"\" \n| where ObjectName == \"LogicalDisk\" \n| where CounterName == \"Free Megabytes\" \n| where InstanceName == \"C:\"\n| where TimeGenerated > ago(5m) \n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue < 5000')]",
@@ -917,6 +943,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Memory - Available MB - Critical (NonAzure)')]",
             "Query": "[concat('Perf\n| where _ResourceId == \"\" \n| where ObjectName == \"Memory\" \n| where CounterName == \"Available MBytes\" \n//| where TimeGenerated > ago(60m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer\n//| where AggregatedValue < 500')]",
@@ -932,6 +959,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Memory - Pages per Sec - Critical (NonAzure)')]",
             "Query": "[concat('Perf\n| where _ResourceId == \"\" \n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\" \n//| where TimeGenerated > ago(60m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer\n//| where AggregatedValue > 500')]",
@@ -947,6 +975,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Memory - Percent Committed Bytes in Use - Critical (NonAzure)')]",
             "Query": "[concat('Perf\n| where _ResourceId == \"\" \n| where ObjectName == \"Memory\" \n| where CounterName == \"% Committed Bytes In Use\" \n//| where TimeGenerated > ago(60m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer\n//| where AggregatedValue > 90')]",
@@ -962,6 +991,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Processor - Queue Length - Critical (NonAzure)')]",
             "Query": "[concat('Perf\n| where _ResourceId == \"\" \n| where ObjectName == \"System\" \n| where CounterName == \"Processor Queue Length\"\n| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > 5')]",
@@ -977,6 +1007,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Processor - Time Total - Critical (NonAzure)')]",
             "Query": "[concat('Perf\n| where _ResourceId == \"\" \n| where ObjectName == \"Processor\" \n| where CounterName == \"% Processor Time\"\n| where InstanceName == \"_Total\"\n//| where TimeGenerated > ago(15m)\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > 85')]",
@@ -992,6 +1023,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Service - DHCP Client (NonAzure)')]",
             "Query": "[concat('ConfigurationChange\n| where _ResourceId == \"\" \n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DHCP Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1007,6 +1039,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Service - DNS Client (NonAzure)')]",
             "Query": "[concat('ConfigurationChange\n| where _ResourceId == \"\" \n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"DNS Client\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1022,6 +1055,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Service - RPC (NonAzure)')]",
             "Query": "[concat('ConfigurationChange\n| where _ResourceId == \"\" \n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Remote Procedure Call (RPC)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1037,6 +1071,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Service - Server (NonAzure)')]",
             "Query": "[concat('ConfigurationChange\n| where _ResourceId == \"\" \n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Server\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1052,6 +1087,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Service - WinRM (NonAzure)')]",
             "Query": "[concat('ConfigurationChange\n| where _ResourceId == \"\" \n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Remote Management (WS-Management)\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1067,6 +1103,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "[concat('Service - Windows Firewall (NonAzure)')]",
             "Query": "[concat('ConfigurationChange\n| where _ResourceId == \"\" \n//| where TimeGenerated > ago(30m) \n| where ConfigChangeType == \"WindowsServices\" \n| where SvcDisplayName == \"Windows Firewall\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1082,6 +1119,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Pods that are failing or recovered from failure",
             "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where ObjectKind =~ \"Pod\"\r\n| where Reason =~ \"BackOff\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer')]",
@@ -1097,6 +1135,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Pods are being evicted",
             "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"Evicted\"\r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer')]",
@@ -1112,6 +1151,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Storage related issues have been detected",
             "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"FailedMount\" or Reason =~ \"FailedAttachVolume\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer ')]",
@@ -1127,6 +1167,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Scheduler unable to find node to run pod",
             "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"FailedScheduling\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), ClusterName')]",
@@ -1142,6 +1183,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Node not ready or not schedulable",
             "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason =~ \"NodeNotReady\" or Reason =~ \"NodeNotSchedulable\" \r\n| project TimeGenerated, Count, Computer\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), Computer ')]",
@@ -1157,6 +1199,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Too many failures detected in short time-span",
             "Query": "[concat('KubeEvents \r\n| where ClusterName =~ \"', 'K8SClusterName', '\"\r\n| where Reason contains \"Fail\"\r\n| project TimeGenerated, Count, ClusterName\r\n| summarize AggregatedValue=sum(Count) by bin(TimeGenerated, 15m), ClusterName')]",
@@ -1172,6 +1215,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Nodes average CPU utilization in percent (Critical)",
             "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet capacityCounterName = \"cpuCapacityNanoCores\";\r\nlet usageCounterName = \"cpuUsageNanoCores\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', 'K8SClusterName', '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n| order by TimeGenerated asc')]",
@@ -1187,6 +1231,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Nodes average memory utilization in percent (Critical)",
             "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet capacityCounterName = \"memoryCapacityBytes\";\r\nlet usageCounterName = \"memoryRssBytes\";\r\nKubeNodeInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName =~ \"', 'K8SClusterName', '\" \r\n| distinct ClusterName, Computer\r\n| join hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == capacityCounterName\r\n| summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)\r\n| project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue\r\n) on Computer\r\n| join kind=inner hint.strategy=shuffle (\r\nPerf\r\n| where TimeGenerated < endDateTime + trendBinSize\r\n| where TimeGenerated >= startDateTime - trendBinSize\r\n| where ObjectName == \"K8SNode\"\r\n| where CounterName == usageCounterName\r\n| project Computer, UsageValue = CounterValue, TimeGenerated\r\n) on Computer\r\n| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime\r\n| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue\r\n| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), Computer\r\n//| where AggregatedValue <= 95\r\n| order by TimeGenerated asc ')]",
@@ -1202,6 +1247,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Percent failing Pods is too high",
             "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet clusterName = \"', 'K8SClusterName', '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName,\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(FailedPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
@@ -1217,6 +1263,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Percent unknown Pods is too high",
             "Query": "[concat('let endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nlet clusterName = \"', 'K8SClusterName', '\";\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where ClusterName == clusterName\r\n| distinct ClusterName, TimeGenerated\r\n| summarize ClusterSnapshotCount = count() by bin(TimeGenerated, trendBinSize), ClusterName\r\n| join hint.strategy=broadcast (\r\nKubePodInventory\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| distinct ClusterName, Computer, PodUid, TimeGenerated, PodStatus\r\n| summarize TotalCount = count(),\r\nPendingCount = sumif(1, PodStatus =~ \"Pending\"),\r\nRunningCount = sumif(1, PodStatus =~ \"Running\"),\r\nSucceededCount = sumif(1, PodStatus =~ \"Succeeded\"),\r\nFailedCount = sumif(1, PodStatus =~ \"Failed\")\r\nby ClusterName, bin(TimeGenerated, trendBinSize)\r\n) on ClusterName, TimeGenerated\r\n| extend UnknownCount = TotalCount - PendingCount - RunningCount - SucceededCount - FailedCount\r\n| project TimeGenerated, ClusterName\r\nTotalCount = todouble(TotalCount) / ClusterSnapshotCount,\r\nPendingCount = todouble(PendingCount) / ClusterSnapshotCount,\r\nPendingPercent = round((todouble(PendingCount) / todouble(TotalCount) * 100)), \r\nRunningCount = todouble(RunningCount) / ClusterSnapshotCount,\r\nRunningPercent = round((todouble(RunningCount) / todouble(TotalCount) * 100)),\r\nSucceededCount = todouble(SucceededCount) / ClusterSnapshotCount,\r\nSucceededPercent = round((todouble(SucceededCount) / todouble(TotalCount) * 100)),\r\nFailedCount = todouble(FailedCount) / ClusterSnapshotCount,\r\nFailedPercent = round((todouble(FailedCount) / todouble(TotalCount) * 100)),\r\nUnknownCount = todouble(UnknownCount) / ClusterSnapshotCount,\r\nUnknownPercent = round((todouble(UnknownCount) / todouble(TotalCount) * 100))\r\n| summarize AggregatedValue = avg(UnknownPercent) by bin(TimeGenerated, trendBinSize), ClusterName')]",
@@ -1232,6 +1279,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "K8S - Cluster nodes disks free space used exceeded (Critical)",
             "Query": "[concat('let clusterId = \"', 'K8SResourceId', '\";\r\nlet endDateTime = now();\r\nlet startDateTime = ago(60m);\r\nlet trendBinSize = 15m;\r\nInsightsMetrics\r\n| where TimeGenerated < endDateTime\r\n| where TimeGenerated >= startDateTime\r\n| where Origin == \"container.azm.ms/telegraf\" \r\n| where Namespace == \"container.azm.ms/disk\" \r\n| extend Tags = todynamic(Tags) \r\n| project TimeGenerated, ClusterId = Tags[\"container.azm.ms/clusterId\"], Computer = tostring(Tags.hostName), Device = tostring(Tags.device), Path = tostring(Tags.path), DiskMetricName = Name, DiskMetricValue = Val \r\n| where ClusterId =~ clusterId \r\n| where DiskMetricName == \"used_percent\"\r\n| summarize AggregatedValue = max(DiskMetricValue) by bin(TimeGenerated, trendBinSize), Device, Computer\r\n| order by TimeGenerated asc')]",
@@ -1247,6 +1295,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - daemon - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1262,6 +1311,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - daemon - Warning",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1277,6 +1327,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - kern - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1292,6 +1343,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - kern - Warning",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1307,6 +1359,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - cron - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1322,6 +1375,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - cron - Warning",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1337,6 +1391,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - auth - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1352,6 +1407,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - auth - Warning",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1367,6 +1423,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - syslog - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1382,6 +1439,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Syslog - syslog - Warning",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
@@ -1397,6 +1455,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Daemon - State - ntpd",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"ntpd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1412,6 +1471,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Daemon - State - crond",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"crond\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1427,6 +1487,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Daemon - State - sshd",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"sshd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1442,6 +1503,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Daemon - State - syslogd",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"syslogd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1457,6 +1519,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Daemon - State - auditd",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"auditd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
@@ -1472,6 +1535,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Memory - pct Available - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 5')]",
@@ -1487,6 +1551,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Memory - pct Available Swap Space - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 5')]",
@@ -1502,6 +1567,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Memory - Pages per Sec - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 500')]",
@@ -1517,6 +1583,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Logical Disk - pct Used Space - root - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 95')]",
@@ -1532,6 +1599,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Logical Disk - Free Megabytes - root - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 500')]",
@@ -1547,6 +1615,7 @@
           "apiVersion": "2017-03-15-preview",
           "scale": null,
           "properties": {
+            "etag": "*",
             "Category": "Getronics Monitoring",
             "DisplayName": "Linux Processor - pct IO Wait Time - _Total - Critical",
             "Query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGName'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 85')]",
