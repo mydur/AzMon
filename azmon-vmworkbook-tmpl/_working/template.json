@@ -52,14 +52,6 @@
         "workbookId": {
             "type": "string",
             "value": "[resourceId( 'microsoft.insights/workbooks', parameters('workbookId'))]"
-        },
-        "TemplateVersion": {
-            "type": "string",
-            "value": "[variables('TemplateVersion')]"
-        },
-        "TemplateDate": {
-            "type": "string",
-            "value": "[variables('TemplateDate')]"
         }
     },
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
