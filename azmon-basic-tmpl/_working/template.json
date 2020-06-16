@@ -145,7 +145,7 @@
     },
     {
       "type": "Microsoft.Automation/automationAccounts/providers/locks",
-      "name": "[concat(variables('automationAccountName'), '/Microsoft.Authorization/automationaccountlock')]",
+      "name": "[concat(variables('automationAccountName'), '/Microsoft.Authorization/azmon-autoacctND-lock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
         "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
@@ -2066,7 +2066,7 @@
     },
     {
       "type": "microsoft.operationalinsights/workspaces/providers/locks",
-      "name": "[concat(variables('workspaceName'), '/Microsoft.Authorization/workspacelock')]",
+      "name": "[concat(variables('workspaceName'), '/Microsoft.Authorization/azmon-workspaceND-lock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
         "[resourceId('microsoft.operationalinsights/workspaces', variables('workspaceName'))]"
@@ -2125,7 +2125,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts/providers/locks",
-      "name": "[concat(variables('storageAccountName'), '/Microsoft.Authorization/storageaccountlock')]",
+      "name": "[concat(variables('storageAccountName'), '/Microsoft.Authorization/azmon-storageacctND-lock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
