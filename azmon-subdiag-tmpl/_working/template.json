@@ -21,7 +21,7 @@
         "TemplateDate": "20200513",
         "TemplateDescription": "Initial version",
         "TemplateUsage": "Is used to configure diagnostic settings for subscription",
-        "TemplateDocumentation": "<Name of document.>",
+        "TemplateDocumentation": "<Name of document.>"
     },
     "resources": [
         {
