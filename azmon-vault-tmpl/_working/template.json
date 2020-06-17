@@ -277,7 +277,7 @@
     },
     {
       "type": "Microsoft.RecoveryServices/vaults/providers/locks",
-      "name": "[concat(variables('backupVaultName'), '/Microsoft.Authorization/recoveryserviceslock')]",
+      "name": "[concat(variables('backupVaultName'), '/Microsoft.Authorization/azmon-backupvaultND-lock')]",
       "apiVersion": "2016-09-01",
       "dependsOn": [
         "[resourceId('Microsoft.RecoveryServices/vaults', variables('backupVaultName'))]"
