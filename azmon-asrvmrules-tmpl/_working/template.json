@@ -364,7 +364,7 @@
       ]
     },
     {
-      "name": "[concat('ASR - Service - InMage Scout VX Agent - Sentinel/Outpost (', variables('ASRvmName'), ')')]",
+      "name": "[concat('ASR - Service - InMage Scout VX Agent - Sentinel-Outpost (', variables('ASRvmName'), ')')]",
       "type": "Microsoft.Insights/scheduledQueryRules",
       "location": "[resourceGroup().location]",
       "apiVersion": "2018-04-16",
