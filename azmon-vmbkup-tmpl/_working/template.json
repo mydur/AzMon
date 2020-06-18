@@ -29,13 +29,13 @@
         "description": "Unique number to add to the name of the accounts."
       }
     },
-    "existingVirtualMachines": {
+    "VirtualMachines": {
       "type": "array",
       "metadata": {
         "description": "Array of Azure virtual machines. e.g. [\"vm1\",\"vm2\",\"vm3\"] -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
-    "existingBackupPolicy": {
+    "BackupPolicy": {
       "type": "string",
       "defaultValue": "DefaultPolicy",
       "metadata": {
@@ -55,33 +55,30 @@
     "TemplateVersion": "1.0.1",
     "TemplateDate": "20190806",
     "TemplateDescription": "Added toLower() and replace() functions",
-    "TemplateUsage": "Used to enable VM backup on existing vault and policy",
+    "TemplateUsage": "Used to enable VM backup on  vault and policy",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
-    "existingVirtualMachinesResourceGroup": "[resourceGroup().name]",
-    "existingVirtualMachines": "[parameters('existingVirtualMachines')]",
-    "existingRecoveryServicesVault": "[concat(variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-bvlt')]",
-    "existingBackupPolicy": "[toLower(parameters('existingBackupPolicy'))]",
-    "backupFabric": "Azure",
-    "v2VmType": "Microsoft.Compute/virtualMachines",
-    "v2VmContainer": "iaasvmcontainer;iaasvmcontainerv2;",
-    "v2Vm": "vm;iaasvmcontainerv2;"
+    "VirtualMachinesResourceGroup": "[resourceGroup().name]",
+    "VirtualMachines": "[parameters('VirtualMachines')]",
+    "RecoveryServicesVault": "[concat(variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-bvlt')]",
+    "BackupPolicy": "[toLower(parameters('BackupPolicy'))]",
+    "backupFabric": "Azure"
   },
   "resources": [
     {
-      "name": "[concat(variables('existingRecoveryServicesVault'), '/', variables('backupFabric'), '/', variables('v2VmContainer'), concat(variables('existingVirtualMachinesResourceGroup'),';',variables('existingVirtualMachines')[copyIndex()]), '/', variables('v2Vm'), concat(variables('existingVirtualMachinesResourceGroup'),';',variables('existingVirtualMachines')[copyIndex()]))]",
-      "apiVersion": "2016-06-01",
-      "location": "[parameters('location')]",
       "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+      "apiVersion": "2016-06-01",
+      "name": "[concat(variables('RecoveryServicesVault'), '/', variables('backupFabric'), '/iaasvmcontainer;iaasvmcontainerv2;', variables('VirtualMachinesResourceGroup'),';',variables('VirtualMachines')[copyIndex()], '/vm;iaasvmcontainerv2;', variables('VirtualMachinesResourceGroup'),';',variables('VirtualMachines')[copyIndex()])]",
+      "location": "[parameters('location')]",
       "copy": {
         "name": "v2VmsCopy",
-        "count": "[length(variables('existingVirtualMachines'))]"
+        "count": "[length(variables('VirtualMachines'))]"
       },
       "properties": {
-        "protectedItemType": "[variables('v2VmType')]",
-        "policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies',variables('existingRecoveryServicesVault'),variables('existingBackupPolicy') )]",
-        "sourceResourceId": "[resourceId(subscription().subscriptionId,variables('existingVirtualMachinesResourceGroup'),'Microsoft.Compute/virtualMachines',variables('existingVirtualMachines')[copyIndex()])]"
+        "protectedItemType": "Microsoft.Compute/virtualMachines",
+        "policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies',variables('RecoveryServicesVault'),variables('BackupPolicy'))]",
+        "sourceResourceId": "[resourceId('Microsoft.Compute/virtualMachines',variables('VirtualMachines')[copyIndex()])]"
       }
     }
   ],

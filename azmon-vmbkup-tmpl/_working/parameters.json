@@ -8,10 +8,10 @@
     "Environment": {
       "value": "prod"
     },
-    "existingVirtualMachines": {
+    "VirtualMachines": {
       "value": ["azmonvmprod01"]
     },
-    "existingBackupPolicy": {
+    "BackupPolicy": {
       "value": "vm-nightly0300"
     },
     "UniqueNumber": {
