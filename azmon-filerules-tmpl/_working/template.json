@@ -61,7 +61,7 @@
         "description": "Computername of the server endpoint (cache server)"
       }
     },
-    "createdOn": {
+    "CreatedOn": {
       "defaultValue": "[utcNow()]",
       "type": "String"
     },
