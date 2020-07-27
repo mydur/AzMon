@@ -76,13 +76,20 @@
     "OwnedBy": {
       "defaultValue": "Default",
       "type": "String"
-    }
+    },
+    "UniqueNumber": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Unique number to add to the name of the accounts."
+      }
+    },
   },
   "variables": {
     "TemplateId": "azmon-file",
-    "TemplateVersion": "1.0.1",
+    "TemplateVersion": "1.0.2",
     "TemplateDate": "20190823",
-    "TemplateVersionDescription": "Added extra tags CreatedBy-OwnedBy-EndsOn",
+    "TemplateVersionDescription": "Added UniqueNumber to action group",
     "TemplateUsage": "Used to create file monitoring config",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -90,7 +97,7 @@
     "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
     "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
     "ServerEndpoint": "[toLower(parameters('ServerEndpoint'))]",
-    "actionGroupName": "[concat('filerules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupName": "[concat('filerules-', variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-agrp')]",
     "actionGroupShortName": "[take(concat('filerules', variables('Project')), 12)]",
     "alertTag": "[concat('hidden-link:', '/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",

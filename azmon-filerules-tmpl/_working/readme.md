@@ -11,7 +11,7 @@ _metricAlerts_
 | --- | :-------------------------------------------------- | :----------- | :--------------- | :--- | :----- |
 | 1   | AFS - File services availability (_storacctname_)   | Availability | Avg < 100 pct    | 15   | 60     |
 | 2   | AFS - Storage account availability (_storacctname_) | Availability | Avg < 100 pct    | 15   | 60     |
-| 3   | File capacity - Warning (_storacctname_)            | FileCapacity | Avg > WarnThresh | 15   | 60     |
+| 3   | AFS - File capacity - Warning (_storacctname_)      | FileCapacity | Avg > WarnThresh | 15   | 60     |
 | 4   | AFS - File capacity - Critical (_storacctname_)     | FileCapacity | Avg > CritThresh | 15   | 60     |
 
 _scheduledQueryRules_
