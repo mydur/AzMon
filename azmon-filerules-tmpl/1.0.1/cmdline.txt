@@ -1,0 +1,1 @@
+.\deploy.ps1 -subscriptionId "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a" -resourceGroupName "azmonfile-prod-rg" -resourceGroupLocation "westeurope" -deploymentName "filerules"
