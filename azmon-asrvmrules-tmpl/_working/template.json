@@ -65,13 +65,20 @@
     "OwnedBy": {
       "defaultValue": "Default",
       "type": "String"
+    },
+    "UniqueNumber": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Unique number to add to the name of the accounts."
+      }
     }
   },
   "variables": {
     "TemplateId": "azmon-asrvmrules",
     "TemplateVersion": "1.0.0",
     "TemplateDate": "20200420",
-    "TemplateDescription": "Initial version",
+    "TemplateDescription": "Added UniqueNumber to action group",
     "TemplateUsage": "Is used to create ASR config and process virtual machine monitoring rules.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -80,7 +87,7 @@
     "workspaceName": "[toLower(parameters('workspaceName'))]",
     "ASRvmName": "[toLower(parameters('ASRvmName'))]",
     "ASRcacheDrive": "[toUpper(parameters('ASRcacheDrive'))]",
-    "actionGroupName": "[concat('asrrules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupName": "[concat('asrrules-', variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-agrp')]",
     "actionGroupShortName": "[take(concat('asrrules', variables('Project')), 12)]",
     "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",

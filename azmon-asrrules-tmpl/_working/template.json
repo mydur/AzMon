@@ -79,13 +79,20 @@
     "OwnedBy": {
       "defaultValue": "Default",
       "type": "String"
+    },
+    "UniqueNumber": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Unique number to add to the name of the accounts."
+      }
     }
   },
   "variables": {
     "TemplateId": "azmon-asrrules",
     "TemplateVersion": "1.0.2",
     "TemplateDate": "20200421",
-    "TemplateDescription": "Moved sources and searches from basic to this template",
+    "TemplateDescription": "Added UniqueNumber to action group",
     "TemplateUsage": "Deploy the ASR alerting rules and activate monitoring",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -94,7 +101,7 @@
     "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
     "ASRVaultRGName": "[toLower(parameters('ASRVaultRGName'))]",
     "ASRVaultName": "[toLower(parameters('ASRVaultName'))]",
-    "actionGroupName": "[concat('asrrules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupName": "[concat('asrrules-', variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-agrp')]",
     "actionGroupShortName": "[take(concat('asrrules', variables('Project')), 12)]",
     "alertTag": "[concat('hidden-link:', '/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
