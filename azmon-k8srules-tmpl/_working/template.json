@@ -61,13 +61,20 @@
     "OwnedBy": {
       "defaultValue": "Default",
       "type": "String"
+    },
+    "UniqueNumber": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Unique number to add to the name of the accounts."
+      }
     }
   },
   "variables": {
     "TemplateId": "azmon-k8srules",
-    "TemplateVersion": "1.0.1",
+    "TemplateVersion": "1.0.2",
     "TemplateDate": "20200221",
-    "TemplateDescription": "Revision of freq and period",
+    "TemplateDescription": "Added UniqueNumber to action group",
     "TemplateUsage": "Deploy the K8S alerting rules and activate monitoring for the cluster",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -77,7 +84,7 @@
     "K8SRG": "[toLower(parameters('K8SResourceGroup'))]",
     "AMLResourceId": "[resourceId(variables('AMLRG'), 'microsoft.operationalinsights/workspaces', parameters('AMLWorkspaceName'))]",
     "K8SResourceId": "[resourceId(variables('K8SRG'), 'Microsoft.ContainerService/managedClusters', parameters('K8SClusterName'))]",
-    "actionGroupName": "[concat('k8srules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupName": "[concat('k8srules-', variables('Project'), parameters('UniqueNumber'), '-', variables('Environment'), '-agrp')]",
     "actionGroupShortName": "[take(concat('k8srules', variables('Project')), 12)]",
     "alertTag": "[concat('hidden-link:', '/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLRG'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLName'))]",
