@@ -83,7 +83,7 @@
       "metadata": {
         "description": "Unique number to add to the name of the accounts."
       }
-    },
+    }
   },
   "variables": {
     "TemplateId": "azmon-file",
