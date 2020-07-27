@@ -92,7 +92,7 @@ function CreateAutomationConnectionAsset ([string] $resourceGroup, [string] $aut
 
 Import-Module Az.Automation
 Enable-AzureRmAlias
-#Connect-AzAccount -TenantId $TenantId
+Connect-AzAccount -TenantId $TenantId
 $Subscription = Get-AzSubscription -SubscriptionId $SubscriptionId | Set-AzContext
 
 # Create a Run As account by using a service principal
