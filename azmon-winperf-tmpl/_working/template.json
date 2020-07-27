@@ -44,7 +44,7 @@
         "description": "String to filter the _ResourceId on (Computername or Resource Group name) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
-    "AZMONBasicRGName": {
+    "workspaceRGName": {
       "defaultValue": "",
       "type": "string",
       "metadata": {
@@ -77,16 +77,16 @@
     "TemplateDescription": "Initial version",
     "TemplateUsage": "Is used to create a single Windows service monitoring rule.",
     "TemplateDocumentation": "<Name of document.>",
-    "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
+    "workspaceRGName": "[toLower(parameters('workspaceRGName'))]",
     "workspaceName": "[toLower(parameters('workspaceName'))]",
     "actionGroupName": "[toLower(parameters('actionGroupName'))]",
     "resourceFilter": "[toLower(parameters('resourceFilter'))]",
     "perfCounter": "[replace(parameters('perfCounter'),'%', 'pct')]",
     "criticalRuleName": "[concat(parameters('perfObject'), ' - ', variables('perfCounter'), ' - ', parameters('perfInstance'), ' - Critical (', variables('resourceFilter'), ')')]",
     "warningRuleName": "[concat(parameters('perfObject'), ' - ', variables('perfCounter'), ' - ', parameters('perfInstance'), ' - Warning (', variables('resourceFilter'), ')')]",
-    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
-    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
-    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
   },
   "resources": [
     {

@@ -25,7 +25,7 @@
         "description": "String to filter the _ResourceId on (Computername or Resource Group name) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
       }
     },
-    "AZMONBasicRGName": {
+    "workspaceRGName": {
       "defaultValue": "",
       "type": "string",
       "metadata": {
@@ -61,13 +61,13 @@
     "svcShortName": "[parameters('svcShortName')]",
     "svcDisplayName": "[parameters('svcDisplayName')]",
     "resourceFilter": "[toLower(parameters('resourceFilter'))]",
-    "AZMONBasicRGName": "[toLower(parameters('AZMONBasicRGName'))]",
+    "workspaceRGName": "[toLower(parameters('workspaceRGName'))]",
     "workspaceName": "[toLower(parameters('workspaceName'))]",
     "actionGroupName": "[toLower(parameters('actionGroupName'))]",
     "ruleName": "[concat('Service - ', variables('svcShortName'), ' (', variables('resourceFilter'), ')')]",
-    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
-    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
-    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AZMONBasicRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
   },
   "resources": [
     {
