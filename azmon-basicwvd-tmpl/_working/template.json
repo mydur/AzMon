@@ -1,0 +1,809 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": [
+        "dev",
+        "test",
+        "acc",
+        "prod"
+      ],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "AMLWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Name"
+      }
+    },
+    "AMLWorkspaceRGName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Resource Group"
+      }
+    },
+    "dataRetention": {
+      "type": "int",
+      "defaultValue": 31,
+      "minValue": 31,
+      "maxValue": 730,
+      "metadata": {
+        "description": "Number of retention days in the PerGB2018 pricing tier (31-730)."
+      }
+    },
+    "Location": {
+      "type": "string",
+      "allowedValues": [
+        "East Asia",
+        "Southeast Asia",
+        "Central US",
+        "East US",
+        "East US 2",
+        "West US",
+        "North Central US",
+        "South Central US",
+        "North Europe",
+        "West Europe",
+        "Japan West",
+        "Japan East",
+        "Brazil South",
+        "Australia East",
+        "Australia",
+        "Southeast",
+        "South India",
+        "Central India",
+        "West India",
+        "Canada Central",
+        "Canada East",
+        "UK South",
+        "UK West",
+        "West Central US",
+        "West US 2",
+        "Korea Central",
+        "Korea South",
+        "France Central",
+        "France South",
+        "Australia Central",
+        "Australia Central 2",
+        "South Africa North",
+        "South Africa West"
+      ],
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The region or location where resources will be deployed"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-basicwvd",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20200817",
+    "TemplateDescription": "Initial version",
+    "TemplateUsage": "Deploy the basic Windows Virtual Desktop monitoring workspace configuration",
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
+    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
+    "ServerEndpoint": "[toLower(parameters('ServerEndpoint'))]"
+  },
+  "resources": [
+    {
+      "type": "microsoft.operationalinsights/workspaces",
+      "name": "[variables('AMLWorkspaceName')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "[parameters('Location')]",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "scale": null,
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "features": {
+          "searchVersion": 1
+        },
+        "retentionInDays": "[parameters('dataRetention')]"
+      },
+      "dependsOn": [
+      ],
+      "resources": [
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "TermSvcPctProcessorTime",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Terminal Services Session",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "% Processor Time"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "TermSvcActiveSessions",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Terminal Services Session",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Active Sessions"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "TermSvcInActiveSessions",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Terminal Services Session",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Inactive Sessions"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "TermSvcTotalSessions",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Terminal Services Session",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Total Sessions"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "ProcessPctUserTime",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Process",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "% User Time"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "ProcessIOReadOpsSec",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Process",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "IO Read Operations/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "ProcessIOWriteOpsSec",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Process",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "IO Write Operations/sec"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "ProcessThreadCount",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Process",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Thread Count"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "ProcessWorkingSet",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "Process",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Working Set"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "RemFXGraphAvgEncTime",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "RemoteFX Graphics",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Average Encoding Time"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "RemFXGraphAvgFramSkipInsufClient",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "RemoteFX Graphics",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Frames Skipped/Second - Insufficient Client Resources"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "RemFXGraphAvgFramSkipInsufNetw",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "RemoteFX Graphics",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Frames Skipped/Second - Insufficient Network Resources"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "RemFXGraphAvgFramSkipInsufServer",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "RemoteFX Graphics",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Frames Skipped/Second - Insufficient Server Resources"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "RemFXNetwCurTCPBandw",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "RemoteFX Network",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Current TCP Bandwidth"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "RemFXNetwCurTCPRTT",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "RemoteFX Network",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Current TCP RTT"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "RemFXNetwCurUDPBandw",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "RemoteFX Network",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Current UDP Bandwidth"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "RemFXNetwCurUDPRTT",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "RemoteFX Network",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Current UDP RTT"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PhysDiskAvgDiskByteRead",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "PhysicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk Bytes/Read"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PhysDiskAvgDiskByteWrite",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "PhysicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk Bytes/Write"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PhysDiskAvgDiskSecRead",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "PhysicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk sec/Read"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PhysDiskAvgDiskSecWrite",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "PhysicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk sec/Write"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PhysDiskAvgDiskByteTrans",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "PhysicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk Bytes/Transfer"
+          }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "datasources",
+          "name": "PhysDiskAvgDiskSecTrans",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ],
+          "kind": "WindowsPerformanceCounter",
+          "properties": {
+            "objectName": "PhysicalDisk",
+            "instanceName": "*",
+            "intervalSeconds": 60,
+            "counterName": "Avg. Disk sec/Transfer"
+          }
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDCurActiveSessions",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Current Active Sessions",
+            "Query": "Perf\n| where ObjectName == \"Terminal Services\"\n| where CounterName == \"Active Sessions\"\n| summarize arg_max(TimeGenerated, *) by Computer\n| project Computer, CounterName, CounterValue",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDCurDisconnectedSessions",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Current disconnected sessions",
+            "Query": "Perf\n| where ObjectName == \"Terminal Services\"\n| where CounterName == \"Inactive Sessions\"\n| summarize arg_max(TimeGenerated, *) by Computer\n| project Computer, CounterName, CounterValue",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDCurTotalSessions",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Current total sessions",
+            "Query": "Perf\n| where ObjectName == \"Terminal Services\" \n| where CounterName == \"Total Sessions\" \n| summarize arg_max(TimeGenerated, *) by Computer\n| project Computer, CounterName, CounterValue",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDAvgSessions",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Average sessions",
+            "Query": "Perf\n| where ObjectName == \"Terminal Services\"\n| where CounterName == \"Total Sessions\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 1h), Computer",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDMaxSessions",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Max sessions",
+            "Query": "Perf\n| where ObjectName == \"Terminal Services\"\n| where CounterName == \"Total Sessions\"\n| summarize AggregatedValue = max(CounterValue) by bin(TimeGenerated, 1h), Computer",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDSessionDurPerUser",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Session duration per user",
+            "Query": "let Events = WVDConnections | where UserName == \"username\";\nEvents\n| where State == \"Connected\"\n| project CorrelationId , UserName, ResourceAlias , StartTime=TimeGenerated\n| join (Events\n| where State == \"Completed\"\n| project EndTime=TimeGenerated, CorrelationId)\non CorrelationId\n| project Duration = EndTime - StartTime, ResourceAlias\n| sort by Duration desc",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDLogicalDisk",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Logical Disk",
+            "Query": "Perf\n| where ObjectName == \"LogicalDisk\" and CounterName == \"% Free Space\"\n| where InstanceName <> \"_Total\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDProcessor",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Processor",
+            "Query": "Perf\n| where ObjectName == \"Processor\" and CounterName == \"% Processor Time\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDNetwork",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Network",
+            "Query": "Perf\n| where ObjectName == \"Network Interface\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName, CounterName",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDMemory",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Memory",
+            "Query": "Perf\n| where ObjectName == \"Memory\" and CounterName == \"% Committed Bytes In Use\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDProcUtilPerUser",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Processor utilization per user",
+            "Query": "Perf\n| where ObjectName == \"Process\"\n| join\n(\nVMProcess\n| where UserName !contains \"system\" and UserName !contains \"service\"\n| extend InstanceName = ExecutableName\n| project TimeGenerated, InstanceName, Computer, UserName, UserDomain\n)\non InstanceName\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), InstanceName, CounterName, UserName, Computer",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDInOutNetBytesPerUser",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Inbound/outbound network bytes per user",
+            "Query": "VMConnection\n| join\n(\nVMProcess\n| where UserName !contains \"system\" and UserName !contains \"service\"\n| extend ProcessName = ExecutableName\n| project TimeGenerated, ProcessName, Computer, UserName, UserDomain\n)\non ProcessName",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDRTTPerfForRDP",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - RTT perf counter for RDP",
+            "Query": "Perf\n| where ObjectName == \"RemoteFX Network\"\n| where CounterName == \"Current TCP RTT\" or CounterName == \"Current UDP RTT\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 1h), Computer, InstanceName",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDClientTypeDistrib",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Windows Virtual Desktop client type distribution",
+            "Query": "WVDConnections\n| where State == \"Connected\"\n| summarize ClientCount = dcount(UserName) by ClientOS, ClientVersion",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDClientTypes",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Client types",
+            "Query": "WVDConnections\n| where State == \"Connected\"\n| extend ClientOSType = pack(\"ClientOSVersion\", ClientOS)\n| summarize AggregatedValue = count() by ClientOS",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDAgentHealth",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Windows Virtual Desktop agent health status",
+            "Query": "Heartbeat\n| summarize heartbeat_count = count() by bin(TimeGenerated, 30m), Computer // bin is used to set the time grain to 30 minutes\n| extend Available=iff(heartbeat_count > 0, true, false)\n| summarize LastCall = max(TimeGenerated) by Computer, alive\n| project Computer, LastCall, alive",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDDailyActiveUsers",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Daily active users",
+            "Query": "Perf\n| where ObjectName contains \"Terminal Services\" and CounterName == \"Total Sessions\"\n| summarize TotalSessions = max(CounterValue) by bin(TimeGenerated, 1d), Computer",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDTop10HostsCPU",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Top 10 hosts by CPU utilization",
+            "Query": "Perf\n| where ObjectName == \"Processor\" and CounterName == \"% Processor Time\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 1h), Computer\n| where AggregatedValue > 80\n| order by AggregatedValue desc\n| take 10",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "searchWVDDiskPerf",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics WVD Monitoring",
+            "DisplayName": "WVD - Disk performance",
+            "Query": "Perf\n| where ObjectName == \"PhysicalDisk\" and CounterName == \"Avg. Disk Bytes/Read\" and InstanceName !contains \"Total\"\n| parse InstanceName with * \" \" DriveLetter\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, DriveLetter",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
+    }
+  }
+}
