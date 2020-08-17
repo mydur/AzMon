@@ -19,7 +19,7 @@
       "type": "string",
       "defaultValue": "Azure Monitor",
       "metadata": {
-        "description": "The id of resource instance to which the workbook will be associated"
+        "description": "The id of resource instance to which the workbook will be associated."
       }
     },
     "workbookId": {
