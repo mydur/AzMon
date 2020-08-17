@@ -112,8 +112,7 @@
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
     "Environment": "[toLower(parameters('Environment'))]",
     "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
-    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
-    "ServerEndpoint": "[toLower(parameters('ServerEndpoint'))]"
+    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]"
   },
   "resources": [
     {
