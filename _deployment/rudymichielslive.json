@@ -30,9 +30,9 @@
   },
   "VMBkUp": {
     "existingVirtualMachines": [
-      "azmonprodvm12",
-      "azmonprodvm13",
-      "azmonprodvm14"
+      "azmonprodvm22",
+      "azmonprodvm23",
+      "azmonprodvm24"
     ],
     "backupPolicyName": "vm-nightly0300"
   },
