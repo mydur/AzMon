@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "value": "azmon"
+    },
+    "WorkspaceName": {
+      "value": "azmon-test-lana"
+    },
+    "WorkspaceRGName": {
+      "value": "azmon-test-rg"
+    },
+    "Environment": {
+      "value": "test"
+    },
+    "EndsOn": {
+      "value": "99999999"
+    },
+    "CreatedBy": {
+      "value": "Rudy Michiels"
+    },
+    "OwnedBy": {
+      "value": "Rudy Michiels"
+    }
+  }
+}
