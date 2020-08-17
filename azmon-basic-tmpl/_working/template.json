@@ -2065,6 +2065,29 @@
       ]
     },
     {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "name": "[concat('VMInsights(', variables('workspaceName'), ')')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "West Europe",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/VMInsights(', variables('workspaceName'), ')')]",
+      "plan": {
+        "name": "[concat('VMInsights(', variables('workspaceName'), ')')]",
+        "promotionCode": "",
+        "product": "OMSGallery/VMInsights",
+        "publisher": "Microsoft"
+      },
+      "scale": null,
+      "properties": {
+        "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+        "containedResources": [
+          "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'), '/views/VMInsights(', variables('workspaceName'), ')')]"
+        ]
+      },
+      "dependsOn": [
+        "[concat('microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
+      ]
+    },
+    {
       "type": "microsoft.operationalinsights/workspaces/providers/locks",
       "name": "[concat(variables('workspaceName'), '/Microsoft.Authorization/azmon-workspaceND-lock')]",
       "apiVersion": "2016-09-01",

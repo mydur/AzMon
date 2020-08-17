@@ -65,7 +65,7 @@
     "ruleName": "[concat('Service - ', variables('svcShortName'), ' (', variables('resourceFilter'), ')')]",
     "alertTag": "[concat('hidden-link:','/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
     "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
-    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('workspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('workspaceName'))]"
   },
   "resources": [
     {
