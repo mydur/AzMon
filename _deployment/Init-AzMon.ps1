@@ -447,7 +447,7 @@ If ($DeployBaseSetup) {
                 Write-Host ("Onboarding " + $WorkspaceName + " to ASC...") -ForegroundColor "White"
                 #Install-Module -Name Az.Security -Force
                 #Set-AzContext -Subscription "$SubscriptionId"
-                Register-AzResourceProvider –ProviderNamespace 'Microsoft.Security' | Out-Null
+                Register-AzResourceProvider -ProviderNamespace "Microsoft.Security" | Out-Null
                 Set-AzSecurityPricing -Name "VirtualMachines" -PricingTier $ParametersJSON.General.ASCOnboard | Out-Null
                 Set-AzSecurityWorkspaceSetting -Name "default" -Scope "/subscriptions/$SubscriptionId" -WorkspaceId "$WorkspaceId" | Out-Null
                 Set-AzSecurityContact -Name "default1" -Email $ParametersJSON.General.ASCContactEmail -Phone $ParametersJSON.General.ASCContactPhone -AlertAdmin -NotifyOnAlert | Out-Null
@@ -691,18 +691,20 @@ If ($AddVMResGroup) {
         $VMRulesActionGroupId = $AzMonVMRules.properties.outputs.ActionGroupId.value
         $ParametersJSON.Outputs.vmRulesActionGroupId = $VMRulesActionGroupId
         Write-Host ("   Adding DeployWinMMA policy assignment for " + $VMResourceGroupName)
-        $AssignmentDisplayName = "AzMon: Deploy Log Analytics Agent for Windows VMs in " + $VMResourceGroupName
-        $AssignmentName = "DeployWinMMA(" + $VMResourceGroupName + ")"
+        $AssignmentDisplayName = "AzMon: Enable Azure Monitor for VMs in " + $VMResourceGroupName
+        $AssignmentName = "EnableAzureMonitor(" + $VMResourceGroupName + ")"
         $PolicySetDef = Get-AzPolicySetDefinition -Id "/providers/Microsoft.Authorization/policySetDefinitions/55f3eceb-5573-4f18-9695-226972c6d74a" -ApiVersion "2019-01-01"
-        $PolicyParams = @{'logAnalytics_1' = $WorkspaceId }
-        $Assignment = New-AzPolicyAssignment -Name "$AssignmentName" -DisplayName "$AssignmentDisplayName" -Scope $VMResourceGroup.id -PolicySetDefinition $PolicySetDef -Location $Location -PolicyParameterObject $PolicyParams -AssignIdentity -ApiVersion "2019-01-01"
+        $PolicyParams = @{'logAnalytics_1' = $WorkspaceId } 
+        $AzContext = Get-AzContext
+        $Assignment = New-AzPolicyAssignment -Name "$AssignmentName" -DisplayName "$AssignmentDisplayName" -Scope $VMResourceGroup.id -PolicySetDefinition $PolicySetDef -Location $Location -PolicyParameterObject $PolicyParams -AssignIdentity -DefaultProfile $AzContext
+        Start-Sleep -Seconds 30
         $VMRoleAssignment = (az role assignment create `
                         --role Contributor `
                         --assignee-object-id $Assignment.Identity.PrincipalId `
                         --scope $VMResourceGroup.id) `
         | ConvertFrom-Json
         Write-Host ("     VM Role assignment: " + $VMRoleAssignment.id) -ForegroundColor "Gray"
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 30
         $ParametersJSON.Outputs.VMRoleAssignment = $VMRoleAssignment.id
         $RoleAssignment = (az role assignment create `
                         --role "Log Analytics Contributor" `
@@ -875,7 +877,8 @@ If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `
-                        "OwnedBy=$TagOwnedBy") `
+                        "OwnedBy=$TagOwnedBy" `
+                        "UniqueNumber=$UniqueNumber") `
         | ConvertFrom-Json
         Write-Host ("   " + $AzMonK8SRules.properties.provisioningState + " (" + $AzMonK8SRules.properties.correlationId + ")") -ForegroundColor "Gray"
         $ParametersJSON.Outputs.azMonK8SRulesTmpl = ($AzMonK8SRules.properties.provisioningState + "-" + $AzMonK8SRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
@@ -936,7 +939,8 @@ If ($IncludeASR -and $ParametersJSON.Outputs.azMonBasicASRTmpl.Contains("Succeed
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `
-                        "OwnedBy=$TagOwnedBy") `
+                        "OwnedBy=$TagOwnedBy" `
+                        "UniqueNumber=$UniqueNumber") `
         | ConvertFrom-Json
         Write-Host ("   " + $AzMonASRRules.properties.provisioningState + " (" + $AzMonASRRules.properties.correlationId + ")") -ForegroundColor "Gray"
         $ParametersJSON.Outputs.azMonASRRulesTmpl = ($AzMonASRRules.properties.provisioningState + "-" + $AzMonASRRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
@@ -979,7 +983,8 @@ If ($ASRserver -and $ParametersJSON.Outputs.azMonBasicASRTmpl.Contains("Succeede
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `
-                        "OwnedBy=$TagOwnedBy") `
+                        "OwnedBy=$TagOwnedBy" `
+                        "UniqueNumber=$UniqueNumber") `
         | ConvertFrom-Json
         Write-Host ("   " + $AzMonASRVMRules.properties.provisioningState + " (" + $AzMonASRVMRules.properties.correlationId + ")") -ForegroundColor "Gray"
         $ParametersJSON.Outputs.ASRvmName = ($AzMonASRVMRules.properties.provisioningState + "-" + $AzMonASRVMRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
@@ -1039,7 +1044,8 @@ If ($IncludeAFS -and $ParametersJSON.Outputs.azMonBasicAFSTmpl.Contains("Succeed
                         "CreatedOn=$TagCreatedOn" `
                         "EndsOn=$TagEndsOn" `
                         "CreatedBy=$UserDisplayName" `
-                        "OwnedBy=$TagOwnedBy") `
+                        "OwnedBy=$TagOwnedBy" `
+                        "UniqueNumber=$UniqueNumber") `
         | ConvertFrom-Json
         Write-Host ("   " + $AzMonAFSRules.properties.provisioningState + " (" + $AzMonAFSRules.properties.correlationId + ")") -ForegroundColor "Gray"
         $ParametersJSON.Outputs.azMonAFSRulesTmpl = ($AzMonAFSRules.properties.provisioningState + "-" + $AzMonAFSRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
@@ -1119,8 +1125,8 @@ If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocat
                         $nsgrule.Log = ($AzMonNSGRules.properties.provisioningState + "-" + $AzMonNSGRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
                 }
         }
-        $NSGRulesJSON | ConvertTo-Json | Out-File -FilePath "$NSGRulesFileLocation" -Force -Encoding ascii
+        $NSGRulesJSON | ConvertTo-Json | Out-File -FilePath '$NSGRulesFileLocation' -Force -Encoding ascii
 }
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
-$ParametersJSON | ConvertTo-Json | Out-File -FilePath "$ParametersFile" -Force -Encoding ascii
+$ParametersJSON | ConvertTo-Json | Out-File -FilePath '$ParametersFile' -Force -Encoding ascii

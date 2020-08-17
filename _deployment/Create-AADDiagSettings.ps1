@@ -1,73 +1,50 @@
-param(
-    $workspaceName
+param (
+  [string]$TENANTID,
+  [string]$SUBSCRIPTIONID,
+  [string]$LANARG,
+  [string]$LANANAME
 )
 
-Import-Module Az
-#Login-AzAccount
+Import-Module Az -Force
+$LANAID = '/subscriptions/{0}/resourcegroups/{1}/providers/microsoft.operationalinsights/workspaces/{2}' -f $SUBSCRIPTIONID, $LANARG, $LANANAME
+$SETTINGS_NAME = '$LANANAME'
 
+$clientId = '1b730954-1685-4b74-9bfd-dac224a7b894' #built-in client id for "azure powershell"
+$redirectUri = 'urn:ietf:wg:oauth:2.0:oob' #redirectUri for built-in client
+$graphUri = 'https://management.core.windows.net'
+$authority = 'https://login.microsoftonline.com/{0}' -f $TENANTID
+$authContext = New-Object Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext -ArgumentList $authority
 
-# Find the ResourceId for the Log Analytics workspace
-$ruleName = $workspaceName
-$workspaceResource = Get-AzResource -ResourceType "Microsoft.OperationalInsights/workspaces" -Name $workspaceName
-$workspaceId = $workspaceResource.ResourceId
-function Get-AzCachedAccessToken() {
-    $ErrorActionPreference = 'Stop'
+$authResult = $authContext.AcquireTokenAsync($graphUri, $clientId, $redirectUri, "Always")
+$token = $authResult.AccessToken
 
-    $azureRmProfileModuleVersion = (Get-Module Az.Profile).Version
-    $azureRmProfile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
-    if (-not $azureRmProfile.Accounts.Count) {
-        Write-Error "Ensure you have logged in before calling this function."    
-    }
-  
-    $currentAzureContext = Get-AzContext
-    $profileClient = New-Object Microsoft.Azure.Commands.ResourceManager.Common.RMProfileClient($azureRmProfile)
-    Write-Debug ("Getting access token for tenant" + $currentAzureContext.Tenant.TenantId)
-    $token = $profileClient.AcquireAccessToken($currentAzureContext.Tenant.TenantId)
-    $token.AccessToken
-}
-$token = Get-AzCachedAccessToken
+$uri = 'https://management.azure.com/providers/microsoft.aadiam/diagnosticSettings/{0}?api-version=2017-04-01-preview' -f $SETTINGS_NAME
 
-#setup diag settings
-$uri = "https://management.azure.com/providers/microsoft.aadiam/diagnosticSettings/{0}?api-version=2017-04-01-preview" -f $ruleName
-$body = @"
-{
-    "id": "providers/microsoft.aadiam/diagnosticSettings/$ruleName",
-    "type": null,
-    "name": "Log Analytics",
-    "location": null,
-    "kind": null,
-    "tags": null,
-    "properties": {
-      "storageAccountId": null,
-      "serviceBusRuleId": null,
-      "workspaceId": "$workspaceId",
-      "eventHubAuthorizationRuleId": null,
-      "eventHubName": null,
-      "metrics": [],
-      "logs": [
-        {
-          "category": "AuditLogs",
-          "enabled": true,
-          "retentionPolicy": { "enabled": false, "days": 0 }
-        },
-        {
-          "category": "SignInLogs",
-          "enabled": true,
-          "retentionPolicy": { "enabled": false, "days": 0 }
+$body = @{
+  id         = "/providers/microsoft.aadiam/providers/microsoft.insights/diagnosticSettings/{0}" -f $SETTINGS_NAME
+  name       = $SETTINGS_NAME
+  properties = @{
+    logs        = @(
+      @{
+        category        = "AuditLogs"
+        enabled         = $true
+        retentionPolicy = @{
+          days    = 0
+          enabled = $false
         }
-      ]
-    },
-    "identity": null
+      },
+      @{
+        category        = "SignInLogs"
+        enabled         = $true
+        retentionPolicy = @{
+          days    = 0
+          enabled = $false
+        }
+      }
+    )
+    metrics     = @()
+    workspaceId = $LANAID
   }
-"@
-
-$headers = @{
-    "Authorization" = "Bearer $token"
-    "Content-Type"  = "application/json"
 }
-$response = Invoke-WebRequest -Method Put -Uri $uri -Body $body -Headers $headers
 
-if ($response.StatusCode -ne 200) {
-    throw "an error occured: $($response | out-string)"
-
-}
+Invoke-WebRequest -Uri $uri -Body $(ConvertTo-Json $body -Depth 4) -Headers @{Authorization = "Bearer $token" } -Method Put -ContentType 'application/json'
