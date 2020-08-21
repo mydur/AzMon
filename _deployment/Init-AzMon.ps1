@@ -84,6 +84,7 @@ param (
         [switch]$IncludeAFS,
         [switch]$ASRserver,
         [switch]$IncludeNSG,
+        [switch]$IncludeWVD,
         [switch]$Update
 )
 
@@ -150,7 +151,7 @@ $RBOKAlertLifeCycleCloseThreshold = 20  # Number of days without changes after w
 # DOWNLOAD TEMPLATE FILES
 ##########################################################################
 Write-Host ("Downloading templates...") -ForegroundColor "White"
-$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working", "azmon-nsgrules-tmpl/_working", "azmon-subdiag-tmpl/_working", "azmon-aaddiags-tmpl/_working"
+$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working", "azmon-nsgrules-tmpl/_working", "azmon-subdiag-tmpl/_working", "azmon-aaddiags-tmpl/_working", "azmon-basicwvd-tmpl/_working", "azmon-wvdwbook-tmpl/_working"
 
 foreach ($TemplateFolder in $TemplateFolders) {
         Write-Host ("   " + $TemplateFolder + "...") -ForegroundColor "White" -NoNewline
@@ -431,7 +432,7 @@ If ($DeployBaseSetup) {
         # Azure Active Directory
         <#$TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-aaddiags-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         Write-Host ("   azmon-aaddiags-tmpl...")
-        $AzMonSvcHealth = (az deployment tenant create `
+        $AzMonAADDiagnostics = (az deployment tenant create `
                         --location "$Location" `
                         --template-file ($AzMonLocalPath + "\azmon-aaddiags-tmpl\_working\template.json") `
                         --name ("azmon-aaddiags-" + $TemplateJSON.variables.TemplateVersion) `
@@ -516,9 +517,6 @@ If ($DeployBaseSetup) {
         The vmworkbook template is used to deploy an Azure monitor workbook to report on computer health and base performance counters. The location or region where the workbook is deployed is the same as the one where the target resource group is located. As a resource group it's best to select the same resource group as the one where the log analytics workspace was deployed.
         #>
         Write-Host ("azmon-vmworkbook-tmpl...") -ForegroundColor "White"
-        $TemplateContents = Get-Content -Path ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json")
-        $NewTemplateContents = $TemplateContents -replace "a53c5946-e76d-4ca2-bee2-57cfbb3eee7a", $SubscriptionID -replace "azmon-prod-mydur", $VMWorkbookName -replace "azmon2437-prod-lana", $WorkspaceName -replace "azmon-prod-rg", $ResourceGroupName
-        $NewTemplateContents | Out-File -FilePath ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json") -Force  -Encoding ascii
         $AzMonVMWorkbook = (az deployment group create `
                         --resource-group "$ResourceGroupName" `
                         --template-file ($AzMonLocalPath + "\azmon-vmworkbook-tmpl\_working\template.json") `
@@ -677,6 +675,7 @@ If ($AddVMResGroup) {
                         --template-file ($AzMonLocalPath + "\azmon-vmrules-tmpl\_working\template.json") `
                         --name ("azmon-vmrules-" + $TemplateJSON.variables.TemplateVersion) `
                         --parameters `
+                        "Location=$LocationDisplayName" `
                         "Project=$TagProject" `
                         "Environment=$Environment" `
                         "AZMONBasicRGName=$ResourceGroupName" `
@@ -887,12 +886,118 @@ If ($IncludeK8S -and $WorkspaceName -ne "tbd") {
 #
 #
 ##########################################################################
+# IncludeWVD (Windows Virtual Desktop)
+##########################################################################
+#
+$WorkspaceName = $ParametersJSON.Outputs.workspaceName
+$azMonBasicWVDTmpl = $ParametersJSON.Outputs.azMonBasicWVDTmpl
+If ($IncludeWVD -and $WorkspaceName -ne "tbd" -and (-Not $ParametersJSON.Outputs.azMonBasicWVDTmpl.Contains("Succeeded"))) {
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-basicwvd-tmpl\_working\template.json") -Raw | ConvertFrom-Json
+        Write-Host ("azmon-basicwvd-tmpl...") -ForegroundColor "White"
+        $AzMonBasicWVD = (az deployment group create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-basicwvd-tmpl\_working\template.json") `
+                        --name ("azmon-basicwvd-" + $TemplateJSON.variables.TemplateVersion) `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "AMLWorkspaceName=$WorkspaceName" `
+                        "AMLWorkspaceRGName=$ResourceGroupName" `
+                        "dataRetention=$WorkspaceDataRetention" `
+                        "Location=$LocationDisplayName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        Write-Host ("   " + $AzMonBasicWVD.properties.provisioningState + " (" + $AzMonBasicWVD.properties.correlationId + ")") -ForegroundColor "Gray"
+        $ParametersJSON.Outputs.azMonBasicWVDTmpl = ($AzMonBasicWVD.properties.provisioningState + "-" + $AzMonBasicWVD.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+        Write-Host ("azmon-wvdwbook-tmpl...") -ForegroundColor "White"
+        $AzMonWVDWorkbook = (az deployment group create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-wvdwbook-tmpl\_working\template.json") `
+                        --name "azmon-wvdwbook" ) `
+        | ConvertFrom-Json
+        Write-Host ("   " + $AzMonWVDWorkbook.properties.provisioningState + " (" + $AzMonWVDWorkbook.properties.correlationId + ")") -ForegroundColor "Gray"
+        $ParametersJSON.Outputs.azMonWVDWorkbookTmpl = ($AzMonWVDWorkbook.properties.provisioningState + "-" + $AzMonWVDWorkbook.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+}
+
+If ($IncludeWVD -and $ParametersJSON.Outputs.azMonBasicWVDTmpl.Contains("Succeeded")) {
+        $WVDDiagSet = '[{\"category\":\"Checkpoint\",\"enabled\": true},{\"category\":\"Error\",\"enabled\": true},{\"category\": \"Management\",\"enabled\": true},{\"category\":\"Feed\",\"enabled\": true}]'
+        $WVDVMResourceGroupName = $ParametersJSON.WVD.HostPoolRGName
+        $WVDVMResourceGroupId = ((az group show --name "$WVDVMResourceGroupName") | ConvertFrom-JSON).id
+        Write-Host ("Adding WVD Workspaces to monitoring...") -ForegroundColor "White"
+        $WVDWorkspacesRGName = $ParametersJSON.WVD.WorkspacesRGName
+        Write-Host ("   Target WVD workspace RG name: " + $WVDWorkspacesRGName) -ForegroundColor "White"
+        foreach ($WVDWorkspace in $ParametersJSON.WVD.Workspaces) {
+                Write-Host ("   Adding " + $WVDWorkspace + "...") -ForegroundColor "White" -NoNewline
+                $WVDWorkspaceId = (Get-AzWvdWorkspace -Name "$WVDWorkspace" -ResourceGroupName "$WVDWorkspacesRGName").id
+                $WVDWorkspaceDiagnostics = (az monitor diagnostic-settings create `
+                                --name "$WorkspaceName" `
+                                --resource "$WVDWorkspaceId" `
+                                --workspace "$WorkspaceId" `
+                                --logs "$WVDDiagSet") `
+                | ConvertFrom-Json
+                Write-Host (" " + $WVDWorkspaceDiagnostics.id) -ForegroundColor "Gray"
+        }
+
+        # Add OS monitoring for host pool virtual machines
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-vmrules-tmpl\_working\template.json") -Raw | ConvertFrom-Json
+        Write-Host ("azmon-vmrules-tmpl...") -ForegroundColor "White"
+        $AzMonWVDVMRules = (az deployment group create `
+                        --resource-group "$WVDVMResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-vmrules-tmpl\_working\template.json") `
+                        --name ("azmon-vmrules-" + $TemplateJSON.variables.TemplateVersion) `
+                        --parameters `
+                        "Location=$LocationDisplayName" `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "AZMONBasicRGName=$ResourceGroupName" `
+                        "workspaceName=$WorkspaceName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        Write-Host ("   " + $AzMonWVDVMRules.properties.provisioningState + " (" + $AzMonWVDVMRules.properties.correlationId + ")") -ForegroundColor "Gray"
+        $ParametersJSON.Outputs.azMonWVDVMRulesTmpl = ($AzMonWVDVMRules.properties.provisioningState + "-" + $AzMonWVDVMRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+        $VMRulesActionGroupId = $AzMonWVDVMRules.properties.outputs.ActionGroupId.value
+        $ParametersJSON.Outputs.WVDvmRulesActionGroupId = $VMRulesActionGroupId
+        Write-Host ("Adding MMA deployment policy for hostpool " + $ParametersJSON.WVD.HostPoolName + " in resource group " + $ParametersJSON.WVD.HostPoolRGName) -ForegroundColor "White"
+        $AssignmentDisplayName = "AzMon: Enable Azure Monitor for WVD VMs in " + $WVDVMResourceGroupName
+        $AssignmentName = "EnableAzureMonitor(" + $WVDVMResourceGroupName + ")"
+        $PolicySetDef = Get-AzPolicySetDefinition -Id "/providers/Microsoft.Authorization/policySetDefinitions/55f3eceb-5573-4f18-9695-226972c6d74a" -ApiVersion "2019-01-01"
+        $PolicyParams = @{'logAnalytics_1' = $WorkspaceId } 
+        $AzContext = Get-AzContext
+        $Assignment = New-AzPolicyAssignment -Name "$AssignmentName" -DisplayName "$AssignmentDisplayName" -Scope $WVDVMResourceGroupId -PolicySetDefinition $PolicySetDef -Location $Location -PolicyParameterObject $PolicyParams -AssignIdentity -DefaultProfile $AzContext
+        Start-Sleep -Seconds 30
+        $VMRoleAssignment = (az role assignment create `
+                        --role Contributor `
+                        --assignee-object-id $Assignment.Identity.PrincipalId `
+                        --scope $WVDVMResourceGroupId) `
+        | ConvertFrom-Json
+        Write-Host ("     VM Role assignment: " + $VMRoleAssignment.id) -ForegroundColor "Gray"
+        Start-Sleep -Seconds 30
+        $ParametersJSON.Outputs.VMRoleAssignment = $VMRoleAssignment.id
+        $RoleAssignment = (az role assignment create `
+                        --role "Log Analytics Contributor" `
+                        --assignee-object-id $Assignment.Identity.PrincipalId `
+                        --scope $ParametersJSON.Outputs.azMonResGroupId) `
+        | ConvertFrom-Json
+        Write-Host ("     LANA Role assignment: " + $RoleAssignment.id) -ForegroundColor "Gray"
+        $ParametersJSON.Outputs.LANARoleAssignment = $RoleAssignment.id
+        # End OS monitoring host pool virtual machines
+
+}
+#
+#
+##########################################################################
 # IncludeASR (Azure Site Recovery)
 ##########################################################################
 #
 $WorkspaceName = $ParametersJSON.Outputs.workspaceName
 $azMonBasicASRTmpl = $ParametersJSON.Outputs.azMonBasicASRTmpl
-If ($IncludeASR -and $WorkspaceName -ne "tbd" -and (-Not $azMonBasicASRTmpl.Contains("Succeeded"))) {
+If ($IncludeASR -and $WorkspaceName -ne "tbd" -and (-Not $ParametersJSON.Outputs.azMonBasicASRTmpl.Contains("Succeeded"))) {
         $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-basicasr-tmpl\_working\template.json") -Raw | ConvertFrom-Json
         Write-Host ("azmon-basicasr-tmpl...") -ForegroundColor "White"
         $AzMonBasicASR = (az deployment group create `
