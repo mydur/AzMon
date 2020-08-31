@@ -8,7 +8,7 @@ The purpose of this template is to deploy a basic setup of Azure Monitor. It con
 
 For the storage account and automation account there's no initial configuration but the log analytics workspace has initial configurations set in the template for the following:
 
-- Datasources
+- Datasources 
 - Saved searches
 - Solutions
 - Linked services
@@ -75,11 +75,12 @@ To be able to re-use the template for different customers/projects the following
 - **Environment:** Can be one of the following: dev-test-acc-prod.
 - **UniqueNumber:** Unique number to add to the name of the accounts.
 - **Location:** The region in which the deployment will take place.
+- **DataRetention:** Number of retention days in the PerGB2018 pricing tier (31-730).
 - **CreatedOn:** This paramters is in fact a variable that holds the current date and time to be added as a tag to the resources created by this template. Because of technical reasons this has to be a parameter and not a variable. The default value for the parameter is the outcome of the function [utcNow()]
 - **EndsOn:** This parameter provides an indication of when the created resource should be end-of-life. It helps when cleaning up your Azure resources to have an idea when a resource isn't used anymore. The format of the date provided is yyyymmdd. When there's no end date available you should use 99999999.
 - **CreatedBy:** A free text field to provide information about the person or team that created the resource. Isn't to be confused with the OwnedBy field.
 - **OwnedBy:** A free text field to provide information about the person or team that owns the resource. Isn't to be confused with the CreatedBy field.
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FARMtemplates%2Fmaster%2Fazmon-basic-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmydur%2FAzMon%2Fmaster%2Fazmon-basic-tmpl%2F%5Fworking%2Ftemplate.json" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
 </a><br />
