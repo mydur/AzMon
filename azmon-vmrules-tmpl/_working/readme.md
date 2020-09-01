@@ -18,13 +18,13 @@ _scheduledQueryRules_
 | 11  | Processor - Queue Length - Critica                   | >2     | >5        | 15   | 45     |
 | 12  | Processor - Time Total - Critical                    | >2     | >85       | 15   | 45     |
 | 13  | Processor - Time Total - Warning                     | >2     | >70       | 15   | 45     |
-| 14  | Service - DHCP Client                                | >1     | >0        | 5    | 10     |
-| 15  | Service - DNS Client                                 | >1     | >0        | 5    | 10     |
-| 16  | Service - Windows Event Log                          | >1     | >0        | 5    | 10     |
-| 17  | Service - Windows Firewall                           | >1     | >0        | 5    | 10     |
-| 18  | Service - RPC                                        | >1     | >0        | 5    | 10     |
-| 19  | Service - Server                                     | >1     | >0        | 5    | 10     |
-| 20  | Service - WinRM                                      | >1     | >0        | 5    | 10     |
+| 14  | Service - DHCP Client                                | =1     | >0        | 5    | 5      |
+| 15  | Service - DNS Client                                 | =1     | >0        | 5    | 5      |
+| 16  | Service - Windows Event Log                          | =1     | >0        | 5    | 5      |
+| 17  | Service - Windows Firewall                           | =1     | >0        | 5    | 5      |
+| 18  | Service - RPC                                        | =1     | >0        | 5    | 5      |
+| 19  | Service - Server                                     | =1     | >0        | 5    | 5      |
+| 20  | Service - WinRM                                      | =1     | >0        | 5    | 5      |
 | 21  | Logical Disk - Free MB on C - Critical               | >2     | <5000     | 15   | 45     |
 
 _Actiongroup_

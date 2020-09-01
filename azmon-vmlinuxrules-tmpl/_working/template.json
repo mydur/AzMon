@@ -11,12 +11,7 @@
     },
     "Environment": {
       "type": "string",
-      "allowedValues": [
-        "dev",
-        "test",
-        "acc",
-        "prod"
-      ],
+      "allowedValues": ["dev", "test", "acc", "prod"],
       "defaultValue": "test",
       "metadata": {
         "description": "Can one of the following, dev-test-acc-prod"
@@ -55,9 +50,9 @@
   },
   "variables": {
     "TemplateId": "azmon-vmlinuxrules",
-    "TemplateVersion": "1.0.1",
-    "TemplateDate": "20200221",
-    "TemplateDescription": "Revision of freq and period",
+    "TemplateVersion": "1.0.2",
+    "TemplateDate": "20200901",
+    "TemplateDescription": "Service monitoring window and consecutive changes",
     "TemplateUsage": "Is used to create virtual machine monitoring rules.",
     "TemplateDocumentation": "<Name of document.>",
     "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
@@ -95,9 +90,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -150,9 +143,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -205,9 +196,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -260,9 +249,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -315,9 +302,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -370,9 +355,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -425,9 +408,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -480,9 +461,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -535,9 +514,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -590,9 +567,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 15m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -645,13 +620,11 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"ntpd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 10
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -664,7 +637,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "GreaterThan",
+              "thresholdOperator": "Equals",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -700,13 +673,11 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"crond\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 10
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -719,7 +690,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "GreaterThan",
+              "thresholdOperator": "Equals",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -755,13 +726,11 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"sshd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 10
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -774,7 +743,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "GreaterThan",
+              "thresholdOperator": "Equals",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -810,13 +779,11 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"syslogd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 10
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -829,7 +796,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "GreaterThan",
+              "thresholdOperator": "Equals",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -865,13 +832,11 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"auditd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 5,
-          "timeWindowInMinutes": 10
+          "timeWindowInMinutes": 5
         },
         "action": {
           "severity": "1",
@@ -884,7 +849,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "GreaterThan",
+              "thresholdOperator": "Equals",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -920,9 +885,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 5')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -975,9 +938,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue > 5')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1030,9 +991,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 5')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1085,9 +1044,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue > 5')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1140,9 +1097,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 500')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1195,9 +1150,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue < 500')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1250,9 +1203,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 95')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1305,9 +1256,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue < 95')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1360,9 +1309,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue < 500')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1415,9 +1362,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue > 500')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1470,9 +1415,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n//| where AggregatedValue > 85')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1525,9 +1468,7 @@
           "query": "[concat('let ResourceGroupName = \"/resourcegroups/', resourceGroup().name, '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 15m), Computer \n| where AggregatedValue < 85')]",
           "datasourceId": "[variables('datasourceId')]",
           "queryType": "ResultCount",
-          "authorizedResources": [
-            "[variables('authorizedResources')]"
-          ]
+          "authorizedResources": ["[variables('authorizedResources')]"]
         },
         "schedule": {
           "frequencyInMinutes": 15,
@@ -1581,25 +1522,16 @@
             "emailAddress": "[variables('emailAddress')]"
           }
         ],
-        "smsReceivers": [
-        ],
-        "webhookReceivers": [
-        ],
-        "itsmReceivers": [
-        ],
-        "azureAppPushReceivers": [
-        ],
-        "automationRunbookReceivers": [
-        ],
-        "voiceReceivers": [
-        ],
-        "logicAppReceivers": [
-        ],
-        "azureFunctionReceivers": [
-        ]
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
       },
-      "dependsOn": [
-      ]
+      "dependsOn": []
     }
   ],
   "outputs": {
