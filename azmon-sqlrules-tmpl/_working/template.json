@@ -1,0 +1,1133 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "AMLWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Name"
+      }
+    },
+    "AMLWorkspaceRGName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Resource Group"
+      }
+    },
+    "dataRetention": {
+      "type": "int",
+      "defaultValue": 31,
+      "minValue": 31,
+      "maxValue": 730,
+      "metadata": {
+        "description": "Number of retention days in the PerGB2018 pricing tier (31-730)."
+      }
+    },
+    "SQLRGName": {
+      "type": "String",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Resourcegroup name where VMs are deployed (used for demo saved searches) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Location": {
+      "type": "string",
+      "allowedValues": [
+        "East Asia",
+        "Southeast Asia",
+        "Central US",
+        "East US",
+        "East US 2",
+        "West US",
+        "North Central US",
+        "South Central US",
+        "North Europe",
+        "West Europe",
+        "Japan West",
+        "Japan East",
+        "Brazil South",
+        "Australia East",
+        "Australia",
+        "Southeast",
+        "South India",
+        "Central India",
+        "West India",
+        "Canada Central",
+        "Canada East",
+        "UK South",
+        "UK West",
+        "West Central US",
+        "West US 2",
+        "Korea Central",
+        "Korea South",
+        "France Central",
+        "France South",
+        "Australia Central",
+        "Australia Central 2",
+        "South Africa North",
+        "South Africa West"
+      ],
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The region or location where resources will be deployed"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-sqlrules",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "202000904",
+    "TemplateDescription": "Initial version",
+    "TemplateUsage": "Deploy the SQL alerting rules and activate monitoring",
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
+    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
+    "SQLRGName": "[toUpper(parameters('SQLRGName'))]",
+    "actionGroupName": "[concat('sqlrules-', variables('Project'), '-', variables('Environment'), '-agrp')]",
+    "actionGroupShortName": "[take(concat('sqlrules', variables('Project')), 12)]",
+    "alertTag": "[concat('hidden-link:', '/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
+    "datasourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
+    "authorizedResources": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', variables('AMLWorkspaceRGName'), '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
+    "emailAddress": "dummy@nowhere.com"
+  },
+  "resources": [
+    {
+      "name": "[concat('SQL - DTU usage in percent - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - DTU usage in percent - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"dtu_consumption_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 85,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - DTU usage in percent - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - DTU usage in percent - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"dtu_consumption_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 95,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - IO usage physical data read in percent - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - IO usage physical data read in percent - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"physical_data_read_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 85,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - IO usage physical data read in percent - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - IO usage physical data read in percent - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"physical_data_read_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 95,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - IO usage log write in percent - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - IO usage log write in percent - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"log_write_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 85,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - IO usage log write in percent - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - IO usage log write in percent - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"log_write_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 95,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Failed connections - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Failed connections - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"connection_failed\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 10,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Failed connections - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Failed connections - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"connection_failed\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 20,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Sessions in percent - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Sessions in percent - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"sessions_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 85,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Sessions in percent - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Sessions in percent - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"sessions_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 95,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Workers in percent - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Workers in percent - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"workers_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 85,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Workers in percent - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Workers in percent - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"workers_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 95,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Blocked connections - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Blocked connections - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"blocked_by_firewall\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 10,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Blocked connections - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Blocked connections - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"blocked_by_firewall\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 20,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+
+    {
+      "name": "[concat('SQL - Storage in percent - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL -Storage in percent - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"storage_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 85,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Storage in percent - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Storage in percent - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"storage_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 95,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Deadlocks - Warning (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Deadlocks - Warning (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"deadlocks\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n| where AggregatedValue <= 10 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 5,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+    {
+      "name": "[concat('SQL - Deadlocks - Critical (', variables('SQLRGName'), ')')]",
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-16",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]",
+        "[variables('alertTag')]": "Resource"
+      },
+      "properties": {
+        "description": "[concat('SQL - Deadlocks - Critical (', variables('SQLRGName'), ')')]",
+        "enabled": "true",
+        "source": {
+          "query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"deadlocks\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
+          "datasourceId": "[variables('datasourceId')]",
+          "queryType": "ResultCount",
+          "authorizedResources": ["[variables('authorizedResources')]"]
+        },
+        "schedule": {
+          "frequencyInMinutes": 10,
+          "timeWindowInMinutes": 60
+        },
+        "action": {
+          "severity": "1",
+          "aznsAction": {
+            "actionGroup": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+            ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 10,
+            "metricTrigger": {
+              "thresholdOperator": "GreaterThan",
+              "threshold": 3,
+              "metricTriggerType": "Consecutive",
+              "metricColumn": "Resource"
+            }
+          },
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+        }
+      },
+      "dependsOn": [
+        "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+      ]
+    },
+
+    {
+      "type": "microsoft.insights/actionGroups",
+      "name": "[variables('actionGroupName')]",
+      "apiVersion": "2018-03-01",
+      "location": "Global",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "properties": {
+        "groupShortName": "[variables('actionGroupShortName')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[concat(parameters('Project'), ' SMTP_-EmailAction-')]",
+            "emailAddress": "[variables('emailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": [],
+        "itsmReceivers": [],
+        "azureAppPushReceivers": [],
+        "automationRunbookReceivers": [],
+        "voiceReceivers": [],
+        "logicAppReceivers": [],
+        "azureFunctionReceivers": []
+      },
+      "dependsOn": []
+    }
+  ],
+  "outputs": {
+    "ActionGroupId": {
+      "type": "string",
+      "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.insights/actionGroups/', variables('actionGroupName'))]"
+    },
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
+    }
+  }
+}

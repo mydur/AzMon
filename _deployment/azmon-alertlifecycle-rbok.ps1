@@ -1,7 +1,7 @@
 $SubscriptionId = Get-AutomationVariable -Name "General_SubscriptionId"
-$TenantId = Get-AutomationVariable -Name "General_TenantId" 
-$ClientID = Get-AutomationVariable -Name "General_ClientId"      
-$ClientSecret = Get-AutomationVariable -Name "General_ClientSecret"  
+$TenantId = Get-AutomationVariable -Name "General_TenantId"
+$ClientID = Get-AutomationVariable -Name "General_ClientId"
+$ClientSecret = Get-AutomationVariable -Name "General_ClientSecret"
 $AckThreshold = Get-AutomationVariable -Name "AlertLifeCycle_AckThreshold"
 $ClosedThreshold = Get-AutomationVariable -Name "AlertLifeCycle_CloseThreshold"
 
@@ -37,4 +37,4 @@ foreach ($Alert in $Alerts.value) {
 }
 
 Write-Output "Closed: $NumClosed"
-Write-Output "Acked: $NumAcked" 
+Write-Output "Acked: $NumAcked"
