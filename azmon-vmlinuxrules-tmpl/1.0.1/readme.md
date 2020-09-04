@@ -17,11 +17,11 @@ _scheduledQueryRules_
 | 8   | Linux Syslog - auth – Warning                          | >2     | >4        | 15   | 45     |
 | 9   | Linux Syslog - syslog – Critical                       | >2     | >1        | 15   | 45     |
 | 10  | Linux Syslog - syslog – Warning                        | >2     | >4        | 15   | 45     |
-| 11  | Linux Daemon State - ntpd                              | =1     | >0        | 5    | 5      |
-| 12  | Linux Daemon State - crond                             | =1     | >0        | 5    | 5      |
-| 13  | Linux Daemon State - sshd                              | =1     | >0        | 5    | 5      |
-| 14  | Linux Daemon State - syslogd                           | =1     | >0        | 5    | 5      |
-| 15  | Linux Daemon State - auditd                            | =1     | >0        | 5    | 5      |
+| 11  | Linux Daemon State - ntpd                              | >1     | >0        | 5    | 10     |
+| 12  | Linux Daemon State - crond                             | >1     | >0        | 5    | 10     |
+| 13  | Linux Daemon State - sshd                              | >1     | >0        | 5    | 10     |
+| 14  | Linux Daemon State - syslogd                           | >1     | >0        | 5    | 10     |
+| 15  | Linux Daemon State - auditd                            | >1     | >0        | 5    | 10     |
 | 16  | Linux Memory - pct Available – Critical                | >2     | <5        | 15   | 45     |
 | 17  | Linux Memory - pct Available – Warning                 | >2     | <15       | 15   | 45     |
 | 18  | Linux Memory - pct Available Swap Space – Critical     | >2     | <5        | 15   | 45     |

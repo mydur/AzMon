@@ -1,0 +1,328 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Project": {
+      "defaultValue": "",
+      "type": "string",
+      "metadata": {
+        "description": "Identifier for the project, application or customer -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Environment": {
+      "type": "string",
+      "allowedValues": ["dev", "test", "acc", "prod"],
+      "defaultValue": "test",
+      "metadata": {
+        "description": "Can one of the following, dev-test-acc-prod"
+      }
+    },
+    "AMLWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Name"
+      }
+    },
+    "AMLWorkspaceRGName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Monitor Log Analytics Workspace Resource Group"
+      }
+    },
+    "dataRetention": {
+      "type": "int",
+      "defaultValue": 31,
+      "minValue": 31,
+      "maxValue": 730,
+      "metadata": {
+        "description": "Number of retention days in the PerGB2018 pricing tier (31-730)."
+      }
+    },
+    "SQLRGName": {
+      "type": "String",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Resourcegroup name where VMs are deployed (used for demo saved searches) -=- PLEASE ONLY USE LOWER CASE AND NUMBERS -=-"
+      }
+    },
+    "Location": {
+      "type": "string",
+      "allowedValues": [
+        "East Asia",
+        "Southeast Asia",
+        "Central US",
+        "East US",
+        "East US 2",
+        "West US",
+        "North Central US",
+        "South Central US",
+        "North Europe",
+        "West Europe",
+        "Japan West",
+        "Japan East",
+        "Brazil South",
+        "Australia East",
+        "Australia",
+        "Southeast",
+        "South India",
+        "Central India",
+        "West India",
+        "Canada Central",
+        "Canada East",
+        "UK South",
+        "UK West",
+        "West Central US",
+        "West US 2",
+        "Korea Central",
+        "Korea South",
+        "France Central",
+        "France South",
+        "Australia Central",
+        "Australia Central 2",
+        "South Africa North",
+        "South Africa West"
+      ],
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The region or location where resources will be deployed"
+      }
+    },
+    "CreatedOn": {
+      "defaultValue": "[utcNow()]",
+      "type": "String"
+    },
+    "EndsOn": {
+      "defaultValue": "yyyymmdd",
+      "type": "String"
+    },
+    "CreatedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    },
+    "OwnedBy": {
+      "defaultValue": "Default",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "TemplateId": "azmon-basicsql",
+    "TemplateVersion": "1.0.0",
+    "TemplateDate": "20200903",
+    "TemplateDescription": "Initial version",
+    "TemplateUsage": "Deploy the basic SQL monitoring workspace configuration",
+    "TemplateDocumentation": "<Name of document.>",
+    "Project": "[toLower(replace(parameters('Project'), '-', ''))]",
+    "Environment": "[toLower(parameters('Environment'))]",
+    "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
+    "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
+    "SQLRGName": "[toLower(parameters('SQLRGName'))]"
+  },
+  "resources": [
+    {
+      "type": "microsoft.operationalinsights/workspaces",
+      "name": "[variables('AMLWorkspaceName')]",
+      "apiVersion": "2015-11-01-preview",
+      "location": "[parameters('Location')]",
+      "tags": {
+        "TemplateId": "[variables('TemplateId')]",
+        "TemplateVersion": "[variables('TemplateVersion')]",
+        "CreatedOn": "[parameters('CreatedOn')]",
+        "EndsOn": "[parameters('EndsOn')]",
+        "CreatedBy": "[parameters('CreatedBy')]",
+        "OwnedBy": "[parameters('OwnedBy')]",
+        "Project": "[parameters('Project')]",
+        "Environment": "[parameters('Environment')]"
+      },
+      "scale": null,
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "features": {
+          "searchVersion": 1
+        },
+        "retentionInDays": "[parameters('dataRetention')]"
+      },
+      "dependsOn": [],
+      "resources": [
+        {
+          "type": "Microsoft.OperationsManagement/solutions",
+          "name": "[concat('AzureSQLAnalytics(', variables('AMLWorkspaceName'), ')')]",
+          "apiVersion": "2015-11-01-preview",
+          "location": "[parameters('Location')]",
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/AzureSQLAnalytics(', variables('AMLWorkspaceName'), ')')]",
+          "plan": {
+            "name": "[concat('AzureSQLAnalytics(', variables('AMLWorkspaceName'), ')')]",
+            "promotionCode": "",
+            "product": "OMSGallery/AzureSQLAnalytics",
+            "publisher": "Microsoft"
+          },
+          "scale": null,
+          "properties": {
+            "workspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]",
+            "containedResources": [
+              "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'), '/views/AzureAutomation(', variables('AMLWorkspaceName'), ')')]"
+            ]
+          },
+          "dependsOn": [
+            "[concat('microsoft.operationalinsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLDTUusage",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - DTU usage in percent",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"dtu_consumption_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLIOusagePhysDataRead",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - IO usage physical data read in percent",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"physical_data_read_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLIOusageLogWrite",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - IO usage log write in percent",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"log_write_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLStorageUsagePercent",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - Storage usage in percent",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"storage_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLFailedConnections",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - Failed connections",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"connection_failed\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLSessionsPercent",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - Sessions usage in percent",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"sessions_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLWorkersPercent",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - Workers usage in percent",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"workers_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLBlockedConnections",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - Blocked connections",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"blocked_by_firewall\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        },
+        {
+          "type": "savedSearches",
+          "name": "SearchSQLDeadlocks",
+          "apiVersion": "2017-03-15-preview",
+          "scale": null,
+          "properties": {
+            "etag": "*",
+            "Category": "Getronics SQL Monitoring",
+            "DisplayName": "SQL - Deadlocks",
+            "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"deadlocks\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 10 //This line only for Warning rule\n| order by TimeGenerated')]",
+            "Version": 2
+          },
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', variables('AMLWorkspaceName'))]"
+          ]
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "TemplateVersion": {
+      "type": "string",
+      "value": "[variables('TemplateVersion')]"
+    },
+    "TemplateDate": {
+      "type": "string",
+      "value": "[variables('TemplateDate')]"
+    }
+  }
+}
