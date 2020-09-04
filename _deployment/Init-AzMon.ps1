@@ -49,6 +49,12 @@
 	
         .PARAMETER IncludeNSG
                 This switch indicates that the monitoring for Network Security Groups should be enabled and configured.
+
+        .PARAMETER IncludeWVD
+                This switch indicates that the monitoring for Windows Virtual Desktop should be enabled and configured.
+
+        .PARAMETER IncludeSQL
+                This switch indicates that the monitoring for Azure SQL should be enabled and configured.
                 
         .NOTES
 		Title:          Init-AzMon.ps1
@@ -85,6 +91,7 @@ param (
         [switch]$ASRserver,
         [switch]$IncludeNSG,
         [switch]$IncludeWVD,
+        [switch]$IncludeSQL,
         [switch]$Update
 )
 
@@ -151,7 +158,7 @@ $RBOKAlertLifeCycleCloseThreshold = 20  # Number of days without changes after w
 # DOWNLOAD TEMPLATE FILES
 ##########################################################################
 Write-Host ("Downloading templates...") -ForegroundColor "White"
-$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working", "azmon-nsgrules-tmpl/_working", "azmon-subdiag-tmpl/_working", "azmon-aaddiags-tmpl/_working", "azmon-basicwvd-tmpl/_working", "azmon-wvdwbook-tmpl/_working"
+$TemplateFolders = "azmon-basic-tmpl/_working", "azmon-basicrules-tmpl/_working", "azmon-svchealth-tmpl/_working", "azmon-nwrules-tmpl/_working", "azmon-vmworkbook-tmpl/_working", "azmon-backupsol-tmpl/_working", "azmon-vmrules-tmpl/_working", "azmon-nonazurevms-tmpl/_working", "azmon-rschealth-tmpl/_working", "azmon-vault-tmpl/_working", "azmon-vmbkup-tmpl/_working", "azmon-delegatedrights-tmpl/_working", "azmon-delegatedvmrights-tmpl/_working", "azmon-vmlinuxrules-tmpl/_working", "azmon-basiclinux-tmpl/_working", "azmon-k8srules-tmpl/_working", "azmon-asrrules-tmpl/_working", "azmon-asrvmrules-tmpl/_working", "azmon-basicasr-tmpl/_working", "azmon-filerules-tmpl/_working", "azmon-basicfile-tmpl/_working", "azmon-nsgrules-tmpl/_working", "azmon-subdiag-tmpl/_working", "azmon-aaddiags-tmpl/_working", "azmon-basicwvd-tmpl/_working", "azmon-wvdwbook-tmpl/_working", "azmon-basicsql-tmpl/_working", "azmon-sqlrules-tmpl/_working", "azmon-sqlwbook-tmpl/_working"
 
 foreach ($TemplateFolder in $TemplateFolders) {
         Write-Host ("   " + $TemplateFolder + "...") -ForegroundColor "White" -NoNewline
@@ -1232,6 +1239,90 @@ If ($IncludeNSG -and $WorkspaceName -ne "tbd" -and (Test-Path $NSGRulesFileLocat
         }
         $NSGRulesJSON | ConvertTo-Json | Out-File -FilePath '$NSGRulesFileLocation' -Force -Encoding ascii
 }
+#
+##########################################################################
+# IncludeSQL (Azure SQL)
+##########################################################################
+#
+$WorkspaceName = $ParametersJSON.Outputs.workspaceName
+$SQLRGName = $ParametersJSON.SQL.SQLRGName
+$azMonBasicSQLTmpl = $ParametersJSON.Outputs.azMonBasicSQLTmpl
+If ($IncludeSQL -and $WorkspaceName -ne "tbd" -and (-Not $ParametersJSON.Outputs.azMonBasicSQLTmpl.Contains("Succeeded"))) {
+        $TemplateJSON = Get-Content -Path ($AzMonLocalPath + "\azmon-basicsql-tmpl\_working\template.json") -Raw | ConvertFrom-Json
+        Write-Host ("azmon-basicsql-tmpl...") -ForegroundColor "White"
+        $AzMonBasicSQL = (az deployment group create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-basicsql-tmpl\_working\template.json") `
+                        --name ("azmon-basicsql-" + $TemplateJSON.variables.TemplateVersion) `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "AMLWorkspaceName=$WorkspaceName" `
+                        "AMLWorkspaceRGName=$ResourceGroupName" `
+                        "dataRetention=$WorkspaceDataRetention" `
+                        "Location=$LocationDisplayName" `
+                        "SQLRGName=$SQLRGName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        Write-Host ("   " + $AzMonBasicSQL.properties.provisioningState + " (" + $AzMonBasicSQL.properties.correlationId + ")") -ForegroundColor "Gray"
+        $ParametersJSON.Outputs.azMonBasicSQLTmpl = ($AzMonBasicSQL.properties.provisioningState + "-" + $AzMonBasicSQL.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+        Write-Host ("azmon-sqlwbook-tmpl...") -ForegroundColor "White"
+        $AzMonSQLWorkbook = (az deployment group create `
+                        --resource-group "$ResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-sqlwbook-tmpl\_working\template.json") `
+                        --name "azmon-sqlwbook" ) `
+        | ConvertFrom-Json
+        Write-Host ("   " + $AzMonSQLWorkbook.properties.provisioningState + " (" + $AzMonSQLWorkbook.properties.correlationId + ")") -ForegroundColor "Gray"
+        $ParametersJSON.Outputs.azMonSQLWorkbookTmpl = ($AzMonSQLWorkbook.properties.provisioningState + "-" + $AzMonSQLWorkbook.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+}
+If ($IncludeSQL -and $ParametersJSON.Outputs.azMonBasicSQLTmpl.Contains("Succeeded")) {
+        $SQLDiagSet = '[{\"category\":\"SQLInsights\",\"enabled\": true},{\"category\":\"AutomaticTuning\",\"enabled\": true},{\"category\": \"QueryStoreRuntimeStatistics\",\"enabled\": true},{\"category\":\"QueryStoreWaitStatistics\",\"enabled\": true},{\"category\":\"Errors\",\"enabled\": true},{\"category\":\"DatabaseWaitStatistics\",\"enabled\": true},{\"category\":\"Timeouts\",\"enabled\": true},{\"category\":\"Blocks\",\"enabled\": true},{\"category\":\"Deadlocks\",\"enabled\": true},{\"category\":\"Basic\",\"enabled\": true},{\"category\":\"InstanceAndAppAdvanced\",\"enabled\": true},{\"category\":\"WorkloadManagement\",\"enabled\": true}]'
+        $SQLResourceGroupName = $ParametersJSON.SQL.SQLRGName
+        $SQLServerName = $ParametersJSON.SQL.SQLServerName
+        $WVDVMResourceGroupId = ((az group show --name "$SQLVMResourceGroupName") | ConvertFrom-JSON).id
+        Write-Host ("Adding SQL databases (resource group) to monitoring...") -ForegroundColor "White"
+        Write-Host ("   Target SQL databases Server name: " + $SQLResourceGroupName) -ForegroundColor "White"
+        Write-Host ("   Target SQL databases RG name: " + $SQLServerName) -ForegroundColor "White"
+        $AzSQLDatabases = Get-AzSqlDatabase -ServerName "$SQLServerName" -ResourceGroupName "$SQLResourceGroupName"
+        foreach ($SQLDatabase in $AzSQLDatabases) {
+                Write-Host ("   Adding " + $SQLDatabase.DatabaseName + "...") -ForegroundColor "White" -NoNewline
+                $SQLDatabaseId = $SQLDatabase.ResourceId
+                $SQLDatabaseDiagnostics = (az monitor diagnostic-settings create `
+                                --name "$WorkspaceName" `
+                                --resource "$SQLDatabaseId" `
+                                --workspace "$WorkspaceId" `
+                                --logs "$SQLDiagSet") `
+                | ConvertFrom-Json
+                Write-Host (" " + $SQLDatabaseDiagnostics.id) -ForegroundColor "Gray"
+        }
+        Write-Host ("azmon-sqlrules-tmpl...") -ForegroundColor "White"
+        $AzMonSQLRules = (az deployment group create `
+                        --resource-group "$SQLResourceGroupName" `
+                        --template-file ($AzMonLocalPath + "\azmon-sqlrules-tmpl\_working\template.json") `
+                        --name ("azmon-sqlrules-" + $TemplateJSON.variables.TemplateVersion) `
+                        --parameters `
+                        "Project=$TagProject" `
+                        "Environment=$Environment" `
+                        "AMLWorkspaceName=$WorkspaceName" `
+                        "AMLWorkspaceRGName=$ResourceGroupName" `
+                        "dataRetention=$WorkspaceDataRetention" `
+                        "Location=$LocationDisplayName" `
+                        "SQLRGName=$SQLRGName" `
+                        "CreatedOn=$TagCreatedOn" `
+                        "EndsOn=$TagEndsOn" `
+                        "CreatedBy=$UserDisplayName" `
+                        "OwnedBy=$TagOwnedBy") `
+        | ConvertFrom-Json
+        Write-Host ("   " + $AzMonSQLRules.properties.provisioningState + " (" + $AzMonSQLRules.properties.correlationId + ")") -ForegroundColor "Gray"
+        $ParametersJSON.Outputs.azMonSQLRulesTmpl = ($AzMonSQLRules.properties.provisioningState + "-" + $AzMonSQLRules.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
+        $ParametersJSON.Outputs.SQLRGName = $SQLResourceGroupName
+        $ParametersJSON.Outputs.SQLServerName = $SQLServerName
+        $ParametersJSON.Outputs.SQLRulesActionGroupId = $AzMonSQLRules.properties.outputs.ActionGroupId.value
+}
+
 #
 # The next line outputs the ParametersJSON variable, that was modified with some output data from the template deployments, backup to its original .json parameter file.
 $ParametersJSON | ConvertTo-Json | Out-File -FilePath '$ParametersFile' -Force -Encoding ascii
