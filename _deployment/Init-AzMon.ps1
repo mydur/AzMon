@@ -1279,10 +1279,10 @@ If ($IncludeSQL -and $WorkspaceName -ne "tbd" -and (-Not $ParametersJSON.Outputs
         $ParametersJSON.Outputs.azMonSQLWorkbookTmpl = ($AzMonSQLWorkbook.properties.provisioningState + "-" + $AzMonSQLWorkbook.properties.outputs.templateVersion.value + "-" + (Get-Date -Format "yyyyMMdd"))
 }
 If ($IncludeSQL -and $ParametersJSON.Outputs.azMonBasicSQLTmpl.Contains("Succeeded")) {
-        $SQLDiagSet = '[{\"category\":\"SQLInsights\",\"enabled\": true},{\"category\":\"AutomaticTuning\",\"enabled\": true},{\"category\": \"QueryStoreRuntimeStatistics\",\"enabled\": true},{\"category\":\"QueryStoreWaitStatistics\",\"enabled\": true},{\"category\":\"Errors\",\"enabled\": true},{\"category\":\"DatabaseWaitStatistics\",\"enabled\": true},{\"category\":\"Timeouts\",\"enabled\": true},{\"category\":\"Blocks\",\"enabled\": true},{\"category\":\"Deadlocks\",\"enabled\": true},{\"category\":\"Basic\",\"enabled\": true},{\"category\":\"InstanceAndAppAdvanced\",\"enabled\": true},{\"category\":\"WorkloadManagement\",\"enabled\": true}]'
+        $SQLDiagSet = '[{\"category\":\"SQLInsights\",\"enabled\": true},{\"category\":\"AutomaticTuning\",\"enabled\": true},{\"category\": \"QueryStoreRuntimeStatistics\",\"enabled\": true},{\"category\":\"QueryStoreWaitStatistics\",\"enabled\": true},{\"category\":\"Errors\",\"enabled\": true},{\"category\":\"DatabaseWaitStatistics\",\"enabled\": true},{\"category\":\"Timeouts\",\"enabled\": true},{\"category\":\"Blocks\",\"enabled\": true},{\"category\":\"Deadlocks\",\"enabled\": true}]'
         $SQLResourceGroupName = $ParametersJSON.SQL.SQLRGName
         $SQLServerName = $ParametersJSON.SQL.SQLServerName
-        $WVDVMResourceGroupId = ((az group show --name "$SQLVMResourceGroupName") | ConvertFrom-JSON).id
+        $SQLResourceGroupId = ((az group show --name "$SQLResourceGroupName") | ConvertFrom-JSON).id
         Write-Host ("Adding SQL databases (resource group) to monitoring...") -ForegroundColor "White"
         Write-Host ("   Target SQL databases Server name: " + $SQLResourceGroupName) -ForegroundColor "White"
         Write-Host ("   Target SQL databases RG name: " + $SQLServerName) -ForegroundColor "White"

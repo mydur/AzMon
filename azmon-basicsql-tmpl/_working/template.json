@@ -115,7 +115,7 @@
     "Environment": "[toLower(parameters('Environment'))]",
     "AMLWorkspaceRGName": "[toLower(parameters('AMLWorkspaceRGName'))]",
     "AMLWorkspaceName": "[toLower(parameters('AMLWorkspaceName'))]",
-    "SQLRGName": "[toLower(parameters('SQLRGName'))]"
+    "SQLRGName": "[toUpper(parameters('SQLRGName'))]"
   },
   "resources": [
     {
