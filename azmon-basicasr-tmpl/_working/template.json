@@ -180,7 +180,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics ASR Monitoring",
+            "Category": "Atos ASR Monitoring",
             "DisplayName": "ASR - Replication health - Critical",
             "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRVaultName__', '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
             "Version": 2
@@ -196,7 +196,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics ASR Monitoring",
+            "Category": "Atos ASR Monitoring",
             "DisplayName": "ASR - Replication health - Warning",
             "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRVaultName__', '\"\n| project TimeGenerated, name_s , replicationHealth_s\n| where replicationHealth_s == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated asc')]",
             "Version": 2
@@ -212,7 +212,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics ASR Monitoring",
+            "Category": "Atos ASR Monitoring",
             "DisplayName": "ASR - RPO breaches - Warning",
             "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where tolower(Resource) == \"', '__ASRVaultName__', '\"\n| extend RPO = case(rpoInSeconds_d > ', '__RPOCritical__', ', \"Critical\", rpoInSeconds_d ', '__RPOWarning__', ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Warning\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
             "Version": 2
@@ -228,7 +228,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics ASR Monitoring",
+            "Category": "Atos ASR Monitoring",
             "DisplayName": "ASR - RPO breaches - Critical",
             "Query": "[concat('AzureDiagnostics \n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s) \n| where tolower(Resource) == \"', '__ASRVaultName__', '\"\n| extend RPO = case(rpoInSeconds_d > ', '__RPOCritical__', ', \"Critical\", rpoInSeconds_d ', '__RPOWarning__', ', \"Warning\", \"Ok\")\n| project TimeGenerated, name_s, RPO\n| where RPO == \"Critical\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 15m), name_s\n| order by TimeGenerated')]",
             "Version": 2
@@ -244,7 +244,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics ASR Monitoring",
+            "Category": "Atos ASR Monitoring",
             "DisplayName": "ASR - Too many test failovers missing - Warning",
             "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where isnotempty(failoverHealth_s) and isnotnull(failoverHealth_s)\n| where tolower(Resource) == \"', 'ASRVaultName', '\"\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| project TimeGenerated, VirtualMachine = name_s , VaultName = Resource , TestFailoverStatus = failoverHealth_s \n| where TestFailoverStatus == \"Critical\"\n//| summarize AggregatedValue = count() by TestFailoverStatus\n//| order by TimeGenerated asc')]",
             "Version": 2
@@ -260,7 +260,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics ASR Monitoring",
+            "Category": "Atos ASR Monitoring",
             "DisplayName": "ASR - Job failures",
             "Query": "[concat('AzureDiagnostics\n| where Category == \"AzureSiteRecoveryJobs\"\n| where tolower(Resource) == \"', 'ASRVaultName', '\"\n| where ResultType == \"Failed\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m)')]",
             "Version": 2
@@ -276,7 +276,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics ASR Monitoring",
+            "Category": "Atos ASR Monitoring",
             "DisplayName": "ASR - Test failover last date 90days",
             "Query": "[concat('AzureDiagnostics\n| where replicationProviderName_s == \"InMageAzureV2\"\n| where tolower(Resource) == \"asr-test-bvlt\"\n| where Category == \"AzureSiteRecoveryReplicatedItems\"\n| where isnotempty(name_s) and isnotnull(name_s)\n| where lastSuccessfulTestFailoverTime_t <= ago(90d)\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by name_s\n| summarize count()')]",
             "Version": 2

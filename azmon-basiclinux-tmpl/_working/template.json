@@ -488,7 +488,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - daemon - Warning",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -503,7 +503,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - daemon - Critical",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"daemon\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -518,7 +518,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - kern - Critical",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -533,7 +533,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - kern - Warning",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"kern\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -548,7 +548,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - cron - Warning",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -563,7 +563,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - cron - Critical",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"cron\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -578,7 +578,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - auth - Warning",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -593,7 +593,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - auth - Critical",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"auth\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -608,7 +608,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - syslog - Warning",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"err\",\"warning\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -623,7 +623,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Syslog - syslog - Critical",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nSyslog\n| where _ResourceId contains ResourceGroupName\n| where Facility == \"syslog\"\n| where SeverityLevel in (\"emerg\",\"alert\",\"crit\")\n| summarize AggregatedValue=cnt() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -638,7 +638,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Daemon State - ntpd",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"ntpd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -653,7 +653,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Daemon State - crond",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"crond\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -668,7 +668,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Daemon State - sshd",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"sshd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -683,7 +683,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Daemon State - syslogd",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"syslogd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -698,7 +698,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Daemon State - auditd",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nConfigurationChange\n| where _ResourceId contains ResourceGroupName\n| where ConfigChangeType == \"Daemons\" \n| where SvcDisplayName == \"auditd\"\n| where SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\"\n| where SvcState <> \"Running\"\n| summarize AggregatedValue=count() by bin(TimeGenerated, 5m), Computer')]",
             "version": 2
@@ -713,7 +713,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Perf Memory pct Available",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Memory\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 5')]",
             "version": 2
@@ -728,7 +728,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Perf Memory pct Available Swap Space",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"% Available Swap Space\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 5')]",
             "version": 2
@@ -743,7 +743,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Perf Memory Pages per Sec",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Memory\" \n| where CounterName == \"Pages/sec\"\n| where InstanceName == \"Memory\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue > 500')]",
             "version": 2
@@ -758,7 +758,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Perf Logical Disk pct Used Root",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"% Used Space\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue > 95')]",
             "version": 2
@@ -773,7 +773,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Perf Logical Disk Free MB Root",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Logical Disk\" \n| where CounterName == \"Free Megabytes\"\n| where InstanceName == \"/\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n| where AggregatedValue < 500')]",
             "version": 2
@@ -788,7 +788,7 @@
           "apiVersion": "2017-03-15-preview",
           "properties": {
             "etag": "*",
-            "category": "Getronics Linux Monitoring",
+            "category": "Atos Linux Monitoring",
             "displayName": "Linux Perf Processor IO Wait Time",
             "query": "[concat('let ResourceGroupName = \"/resourcegroups/', variables('VMRGNAme'), '/\";\nPerf\n| where _ResourceId contains ResourceGroupName\n| where ObjectName == \"Processor\" \n| where CounterName == \"% IO Wait Time\"\n| where InstanceName == \"_Total\"\n| summarize AggregatedValue=avg(CounterValue) by bin(TimeGenerated, 5m), Computer \n//| where AggregatedValue > 85')]",
             "version": 2

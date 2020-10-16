@@ -175,7 +175,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - DTU usage in percent",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"dtu_consumption_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2
@@ -191,7 +191,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - IO usage physical data read in percent",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"physical_data_read_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2
@@ -207,7 +207,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - IO usage log write in percent",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"log_write_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2
@@ -223,7 +223,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - Storage usage in percent",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"storage_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2
@@ -239,7 +239,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - Failed connections",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"connection_failed\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2
@@ -255,7 +255,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - Sessions usage in percent",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"sessions_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2
@@ -271,7 +271,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - Workers usage in percent",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"workers_percent\"\n| summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 95 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2
@@ -287,7 +287,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - Blocked connections",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"blocked_by_firewall\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 20 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2
@@ -303,7 +303,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics SQL Monitoring",
+            "Category": "Atos SQL Monitoring",
             "DisplayName": "SQL - Deadlocks",
             "Query": "[concat('AzureMetrics\n| where ResourceProvider == \"MICROSOFT.SQL\"\n| where ResourceGroup == \"', variables('SQLRGName'),'\"\n| where MetricName == \"deadlocks\"\n| summarize AggregatedValue = avg(Total) by bin(TimeGenerated, 10m), Resource\n//| where AggregatedValue <= 10 //This line only for Warning rule\n| order by TimeGenerated')]",
             "Version": 2

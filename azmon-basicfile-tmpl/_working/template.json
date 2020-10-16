@@ -427,7 +427,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - A connection with the service could not be established",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80072ee7\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -443,7 +443,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync can not access the Azure file share specified in the cloud endpoint",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8305f\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -459,7 +459,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed because the request is not authorized to perform this operation",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c86044\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -475,7 +475,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - The storage account name used could not be resolved",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80C83060\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -491,7 +491,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - An unknown error occured while accessing the storage account",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8308a\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -507,7 +507,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed due to storage account locked",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c83092\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -523,7 +523,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed due to a problem with the sync database",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x8e5e044e\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -539,7 +539,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - You reached the Azure file share storage limit",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8603e\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -555,7 +555,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - The Azure file share cannot be found",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c86030\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -571,7 +571,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed due to a problem with authentication",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c80300\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -587,7 +587,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed due to authentication identity not found",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c83079\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -603,7 +603,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - The volume where the server endpoint is located is low on disk space",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x8e5e0211\" or EventData contains “0x80c8031a”\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -619,7 +619,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed due to problems with many individual files",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8023b\" or EventData contains “0x80c8021c” or EventData contains “0x80c80253”\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -635,7 +635,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed due to a problem with the server endpoint path",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c80019\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -651,7 +651,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - The service is currently unavailable",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8004b\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -667,7 +667,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed due to an exception",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80131500\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -683,7 +683,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed because permissions on the System Volume Information folder are incorrect",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8027e\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
@@ -699,7 +699,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics AFS Monitoring",
+            "Category": "Atos AFS Monitoring",
             "DisplayName": "AFS - Sync failed because the Azure file share was deleted and recreated",
             "Query": "[concat('let ServerEndpoint = \"', variables('ServerEndpoint'), '\";\nEvent\n| where (Source == \"Microsoft-FileSync-Agent\") or (Source == \"Microsoft-FileSync-Management\")\n| where Computer == ServerEndpoint\n| where EventLevelName == \"Error\"\n| where EventData contains \"0x80c8027e\"\n| summarize AggregatedValue = count() by bin(TimeGenerated, 30m), Computer\n| order by TimeGenerated desc\n')]",
             "Version": 2
