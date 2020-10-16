@@ -40,27 +40,27 @@ _Datasources (perf):_
 &nbsp;
 
 _Saved searches:_
-| #   | Name                             | Category                 | Display name                                           |
-| --- | :------------------------------- | :----------------------- | :----------------------------------------------------- |
-| 1   | searchWVDCurActiveSessions       | Getronics WVD Monitoring | WVD - Current Active Sessions                          |
-| 2   | searchWVDCurDisconnectedSessions | Getronics WVD Monitoring | WVD - Current disconnected sessions                    |
-| 3   | searchWVDCurTotalSessions        | Getronics WVD Monitoring | WVD - Current total sessions                           |
-| 4   | searchWVDAvgSessions             | Getronics WVD Monitoring | WVD - Average sessions                                 |
-| 5   | searchWVDMaxSessions             | Getronics WVD Monitoring | WVD - Max sessions                                     |
-| 6   | searchWVDSessionDurPerUser       | Getronics WVD Monitoring | WVD - Session duration per user                        |
-| 7   | searchWVDLogicalDisk             | Getronics WVD Monitoring | WVD - Logical Disk                                     |
-| 8   | searchWVDProcessor               | Getronics WVD Monitoring | WVD - Processor                                        |
-| 9   | searchWVDNetwork                 | Getronics WVD Monitoring | WVD - Network                                          |
-| 10  | searchWVDMemory                  | Getronics WVD Monitoring | WVD - Memory                                           |
-| 11  | searchWVDProcUtilPerUser         | Getronics WVD Monitoring | WVD - Processor utilization per user                   |
-| 12  | searchWVDInOutNetBytesPerUser    | Getronics WVD Monitoring | WVD - Inbound/outbound network bytes per user          |
-| 13  | searchWVDRTTPerfForRDP           | Getronics WVD Monitoring | WVD - RTT perf counter for RDP                         |
-| 14  | searchWVDClientTypeDistrib       | Getronics WVD Monitoring | WVD - Windows Virtual Desktop client type distribution |
-| 15  | searchWVDClientTypes             | Getronics WVD Monitoring | WVD - Client types                                     |
-| 16  | searchWVDAgentHealth             | Getronics WVD Monitoring | WVD - Windows Virtual Desktop agent health status      |
-| 17  | searchWVDDailyActiveUsers        | Getronics WVD Monitoring | WVD - Daily active users                               |
-| 18  | searchWVDTop10HostsCPU           | Getronics WVD Monitoring | WVD - Top 10 hosts by CPU utilization                  |
-| 19  | searchWVDDiskPerf                | Getronics WVD Monitoring | WVD - Disk performance                                 |
+| #   | Name                             | Category            | Display name                                           |
+| --- | :------------------------------- | :------------------ | :----------------------------------------------------- |
+| 1   | searchWVDCurActiveSessions       | Atos WVD Monitoring | WVD - Current Active Sessions                          |
+| 2   | searchWVDCurDisconnectedSessions | Atos WVD Monitoring | WVD - Current disconnected sessions                    |
+| 3   | searchWVDCurTotalSessions        | Atos WVD Monitoring | WVD - Current total sessions                           |
+| 4   | searchWVDAvgSessions             | Atos WVD Monitoring | WVD - Average sessions                                 |
+| 5   | searchWVDMaxSessions             | Atos WVD Monitoring | WVD - Max sessions                                     |
+| 6   | searchWVDSessionDurPerUser       | Atos WVD Monitoring | WVD - Session duration per user                        |
+| 7   | searchWVDLogicalDisk             | Atos WVD Monitoring | WVD - Logical Disk                                     |
+| 8   | searchWVDProcessor               | Atos WVD Monitoring | WVD - Processor                                        |
+| 9   | searchWVDNetwork                 | Atos WVD Monitoring | WVD - Network                                          |
+| 10  | searchWVDMemory                  | Atos WVD Monitoring | WVD - Memory                                           |
+| 11  | searchWVDProcUtilPerUser         | Atos WVD Monitoring | WVD - Processor utilization per user                   |
+| 12  | searchWVDInOutNetBytesPerUser    | Atos WVD Monitoring | WVD - Inbound/outbound network bytes per user          |
+| 13  | searchWVDRTTPerfForRDP           | Atos WVD Monitoring | WVD - RTT perf counter for RDP                         |
+| 14  | searchWVDClientTypeDistrib       | Atos WVD Monitoring | WVD - Windows Virtual Desktop client type distribution |
+| 15  | searchWVDClientTypes             | Atos WVD Monitoring | WVD - Client types                                     |
+| 16  | searchWVDAgentHealth             | Atos WVD Monitoring | WVD - Windows Virtual Desktop agent health status      |
+| 17  | searchWVDDailyActiveUsers        | Atos WVD Monitoring | WVD - Daily active users                               |
+| 18  | searchWVDTop10HostsCPU           | Atos WVD Monitoring | WVD - Top 10 hosts by CPU utilization                  |
+| 19  | searchWVDDiskPerf                | Atos WVD Monitoring | WVD - Disk performance                                 |
 
 &nbsp;
 
