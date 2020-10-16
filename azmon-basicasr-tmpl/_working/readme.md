@@ -15,13 +15,13 @@ _Datasources:_
 _Saved queries:_
 | #   | Name                         | Category                 | Display name                                    |
 | --- | :--------------------------- | :----------------------- | :---------------------------------------------- |
-| 1   | searchASRReplHealthCritical  | Getronics ASR Monitoring | ASR - Replication health – Critical             |
-| 2   | searchASRReplHealthWarning   | Getronics ASR Monitoring | ASR - Replication health – Warning              |
-| 3   | searchASRRPOBreachWarning    | Getronics ASR Monitoring | ASR - RPO breaches – Warning                    |
-| 4   | searchASRRPOBreachCritical   | Getronics ASR Monitoring | ASR - RPO breaches – Critical                   |
-| 5   | searchASRTestFailoverMissing | Getronics ASR Monitoring | ASR - Too many test failovers missing – Warning |
-| 6   | searchASRJobFailures         | Getronics ASR Monitoring | ASR - Job failures                              |
-| 7   | searchASRTestFailover90d     | Getronics ASR Monitoring | ASR - Test failover last date 90days            |
+| 1   | searchASRReplHealthCritical  | Atos ASR Monitoring | ASR - Replication health – Critical             |
+| 2   | searchASRReplHealthWarning   | Atos ASR Monitoring | ASR - Replication health – Warning              |
+| 3   | searchASRRPOBreachWarning    | Atos ASR Monitoring | ASR - RPO breaches – Warning                    |
+| 4   | searchASRRPOBreachCritical   | Atos ASR Monitoring | ASR - RPO breaches – Critical                   |
+| 5   | searchASRTestFailoverMissing | Atos ASR Monitoring | ASR - Too many test failovers missing – Warning |
+| 6   | searchASRJobFailures         | Atos ASR Monitoring | ASR - Job failures                              |
+| 7   | searchASRTestFailover90d     | Atos ASR Monitoring | ASR - Test failover last date 90days            |
 
 
 

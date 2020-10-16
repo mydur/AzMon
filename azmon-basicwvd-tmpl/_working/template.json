@@ -495,7 +495,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Current Active Sessions",
             "Query": "Perf\n| where ObjectName == \"Terminal Services\"\n| where CounterName == \"Active Sessions\"\n| summarize arg_max(TimeGenerated, *) by Computer\n| project Computer, CounterName, CounterValue",
             "Version": 2
@@ -511,7 +511,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Current disconnected sessions",
             "Query": "Perf\n| where ObjectName == \"Terminal Services\"\n| where CounterName == \"Inactive Sessions\"\n| summarize arg_max(TimeGenerated, *) by Computer\n| project Computer, CounterName, CounterValue",
             "Version": 2
@@ -527,7 +527,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Current total sessions",
             "Query": "Perf\n| where ObjectName == \"Terminal Services\" \n| where CounterName == \"Total Sessions\" \n| summarize arg_max(TimeGenerated, *) by Computer\n| project Computer, CounterName, CounterValue",
             "Version": 2
@@ -543,7 +543,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Average sessions",
             "Query": "Perf\n| where ObjectName == \"Terminal Services\"\n| where CounterName == \"Total Sessions\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 1h), Computer",
             "Version": 2
@@ -559,7 +559,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Max sessions",
             "Query": "Perf\n| where ObjectName == \"Terminal Services\"\n| where CounterName == \"Total Sessions\"\n| summarize AggregatedValue = max(CounterValue) by bin(TimeGenerated, 1h), Computer",
             "Version": 2
@@ -575,7 +575,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Session duration per user",
             "Query": "let Events = WVDConnections | where UserName == \"username\";\nEvents\n| where State == \"Connected\"\n| project CorrelationId , UserName, ResourceAlias , StartTime=TimeGenerated\n| join (Events\n| where State == \"Completed\"\n| project EndTime=TimeGenerated, CorrelationId)\non CorrelationId\n| project Duration = EndTime - StartTime, ResourceAlias\n| sort by Duration desc",
             "Version": 2
@@ -591,7 +591,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Logical Disk",
             "Query": "Perf\n| where ObjectName == \"LogicalDisk\" and CounterName == \"% Free Space\"\n| where InstanceName <> \"_Total\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName",
             "Version": 2
@@ -607,7 +607,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Processor",
             "Query": "Perf\n| where ObjectName == \"Processor\" and CounterName == \"% Processor Time\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName",
             "Version": 2
@@ -623,7 +623,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Network",
             "Query": "Perf\n| where ObjectName == \"Network Interface\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName, CounterName",
             "Version": 2
@@ -639,7 +639,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Memory",
             "Query": "Perf\n| where ObjectName == \"Memory\" and CounterName == \"% Committed Bytes In Use\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName",
             "Version": 2
@@ -655,7 +655,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Processor utilization per user",
             "Query": "Perf\n| where ObjectName == \"Process\"\n| join\n(\nVMProcess\n| where UserName !contains \"system\" and UserName !contains \"service\"\n| extend InstanceName = ExecutableName\n| project TimeGenerated, InstanceName, Computer, UserName, UserDomain\n)\non InstanceName\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), InstanceName, CounterName, UserName, Computer",
             "Version": 2
@@ -671,7 +671,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Inbound/outbound network bytes per user",
             "Query": "VMConnection\n| join\n(\nVMProcess\n| where UserName !contains \"system\" and UserName !contains \"service\"\n| extend ProcessName = ExecutableName\n| project TimeGenerated, ProcessName, Computer, UserName, UserDomain\n)\non ProcessName",
             "Version": 2
@@ -687,7 +687,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - RTT perf counter for RDP",
             "Query": "Perf\n| where ObjectName == \"RemoteFX Network\"\n| where CounterName == \"Current TCP RTT\" or CounterName == \"Current UDP RTT\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 1h), Computer, InstanceName",
             "Version": 2
@@ -703,7 +703,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Windows Virtual Desktop client type distribution",
             "Query": "WVDConnections\n| where State == \"Connected\"\n| summarize ClientCount = dcount(UserName) by ClientOS, ClientVersion",
             "Version": 2
@@ -719,7 +719,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Client types",
             "Query": "WVDConnections\n| where State == \"Connected\"\n| extend ClientOSType = pack(\"ClientOSVersion\", ClientOS)\n| summarize AggregatedValue = count() by ClientOS",
             "Version": 2
@@ -735,7 +735,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Windows Virtual Desktop agent health status",
             "Query": "Heartbeat\n| summarize heartbeat_count = count() by bin(TimeGenerated, 30m), Computer // bin is used to set the time grain to 30 minutes\n| extend Available=iff(heartbeat_count > 0, true, false)\n| summarize LastCall = max(TimeGenerated) by Computer, alive\n| project Computer, LastCall, alive",
             "Version": 2
@@ -751,7 +751,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Daily active users",
             "Query": "Perf\n| where ObjectName contains \"Terminal Services\" and CounterName == \"Total Sessions\"\n| summarize TotalSessions = max(CounterValue) by bin(TimeGenerated, 1d), Computer",
             "Version": 2
@@ -767,7 +767,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Top 10 hosts by CPU utilization",
             "Query": "Perf\n| where ObjectName == \"Processor\" and CounterName == \"% Processor Time\"\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 1h), Computer\n| where AggregatedValue > 80\n| order by AggregatedValue desc\n| take 10",
             "Version": 2
@@ -783,7 +783,7 @@
           "scale": null,
           "properties": {
             "etag": "*",
-            "Category": "Getronics WVD Monitoring",
+            "Category": "Atos WVD Monitoring",
             "DisplayName": "WVD - Disk performance",
             "Query": "Perf\n| where ObjectName == \"PhysicalDisk\" and CounterName == \"Avg. Disk Bytes/Read\" and InstanceName !contains \"Total\"\n| parse InstanceName with * \" \" DriveLetter\n| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, DriveLetter",
             "Version": 2

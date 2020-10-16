@@ -16,15 +16,15 @@ The template also adds saved queries to the AML workspace.
 _Saved searches:_
 | #   | Name                         | Category                 | Display name                                 |
 | --- | :--------------------------- | :----------------------- | :------------------------------------------- |
-| 1   | SearchSQLDTUusage            | Getronics SQL Monitoring | SQL - DTU usage in percent                   |
-| 2   | SearchSQLIOusagePhysDataRead | Getronics SQL Monitoring | SQL - IO usage physical data read in percent |
-| 3   | SearchSQLIOusageLogWrite     | Getronics SQL Monitoring | SQL - IO usage log write in percent          |
-| 4   | SearchSQLStorageUsagePercent | Getronics SQL Monitoring | SQL - Storage usage in percent               |
-| 5   | SearchSQLFailedConnections   | Getronics SQL Monitoring | SQL - Failed connections                     |
-| 6   | SearchSQLSessionsPercent     | Getronics SQL Monitoring | SQL - Sessions usage in percent              |
-| 7   | SearchSQLWorkersPercent      | Getronics SQL Monitoring | SQL - Workers usage in percent               |
-| 8   | SearchSQLBlockedConnections  | Getronics SQL Monitoring | SQL - Blocked connections                    |
-| 9   | SearchSQLDeadlocks           | Getronics SQL Monitoring | SQL - Deadlocks                              |
+| 1   | SearchSQLDTUusage            | Atos SQL Monitoring | SQL - DTU usage in percent                   |
+| 2   | SearchSQLIOusagePhysDataRead | Atos SQL Monitoring | SQL - IO usage physical data read in percent |
+| 3   | SearchSQLIOusageLogWrite     | Atos SQL Monitoring | SQL - IO usage log write in percent          |
+| 4   | SearchSQLStorageUsagePercent | Atos SQL Monitoring | SQL - Storage usage in percent               |
+| 5   | SearchSQLFailedConnections   | Atos SQL Monitoring | SQL - Failed connections                     |
+| 6   | SearchSQLSessionsPercent     | Atos SQL Monitoring | SQL - Sessions usage in percent              |
+| 7   | SearchSQLWorkersPercent      | Atos SQL Monitoring | SQL - Workers usage in percent               |
+| 8   | SearchSQLBlockedConnections  | Atos SQL Monitoring | SQL - Blocked connections                    |
+| 9   | SearchSQLDeadlocks           | Atos SQL Monitoring | SQL - Deadlocks                              |
 
 
 &nbsp;

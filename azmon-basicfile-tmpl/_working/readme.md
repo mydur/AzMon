@@ -32,24 +32,24 @@ _Datasources (event):_
 _Saved queries:_
 | #   | Name                          | Category                 | Display name                                                                                |
 | --- | :---------------------------- | :----------------------- | :------------------------------------------------------------------------------------------ |
-| 1   | searchAFSConnNotEstablished   | Getronics AFS Monitoring | AFS - A connection with the service could not be established                                |
-| 2   | searchAFSNoAccessAzFileShare  | Getronics AFS Monitoring | AFS - Sync can't access the Azure file share specified in the cloud endpoint                |
-| 3   | searchAFSFailedNotAuth        | Getronics AFS Monitoring | AFS - Sync failed because the request is not authorized to perform this operation           |
-| 4   | searchAFSStoAcctNameResolve   | Getronics AFS Monitoring | AFS - The storage account name used could not be resolved                                   |
-| 5   | searchAFSUnknownErrAccess     | Getronics AFS Monitoring | AFS - An unknown error occured while accessing the storage account                          |
-| 6   | searchAFSSyncFailStorAcctLck  | Getronics AFS Monitoring | AFS - Sync failed due to storage account locked                                             |
-| 7   | searchAFSSyncFailDatabase     | Getronics AFS Monitoring | AFS - Sync failed due to a problem with the sync database                                   |
-| 8   | searchAFSFileShareLImit       | Getronics AFS Monitoring | AFS - You reached the Azure file share storage limit                                        |
-| 9   | searchAFSFileShareNotFound    | Getronics AFS Monitoring | AFS - The Azure file share cannot be found                                                  |
-| 10  | searchAFSSyncFailAuth         | Getronics AFS Monitoring | AFS - Sync failed due to a problem with authentication                                      |
-| 11  | searchAFSSyncFaulAuthId       | Getronics AFS Monitoring | AFS - Sync failed due to authentication identity not found                                  |
-| 12  | searchAFSVolumeLowDisk        | Getronics AFS Monitoring | AFS - The volume where the server endpoint is located is low on disk space                  |
-| 13  | searchAFSSyncFailManyFiles    | Getronics AFS Monitoring | AFS - Sync failed due to problems with many individual files                                |
-| 14  | searchAFSSyncFailServerPath   | Getronics AFS Monitoring | AFS - Sync failed due to a problem with the server endpoint path                            |
-| 15  | searchAFSServiceUnavailable   | Getronics AFS Monitoring | AFS - The service is currently unavailable                                                  |
-| 16  | searchAFSSyncFailException    | Getronics AFS Monitoring | AFS - Sync failed due to an exception                                                       |
-| 17  | searchAFSSyncFailPermSysVol   | Getronics AFS Monitoring | AFS - Sync failed because permissions on the System Volume Information folder are incorrect |
-| 18  | searchAFSSyncFailDeleteCreate | Getronics AFS Monitoring | AFS - Sync failed because the Azure file share was deleted and recreated                    |
+| 1   | searchAFSConnNotEstablished   | Atos AFS Monitoring | AFS - A connection with the service could not be established                                |
+| 2   | searchAFSNoAccessAzFileShare  | Atos AFS Monitoring | AFS - Sync can't access the Azure file share specified in the cloud endpoint                |
+| 3   | searchAFSFailedNotAuth        | Atos AFS Monitoring | AFS - Sync failed because the request is not authorized to perform this operation           |
+| 4   | searchAFSStoAcctNameResolve   | Atos AFS Monitoring | AFS - The storage account name used could not be resolved                                   |
+| 5   | searchAFSUnknownErrAccess     | Atos AFS Monitoring | AFS - An unknown error occured while accessing the storage account                          |
+| 6   | searchAFSSyncFailStorAcctLck  | Atos AFS Monitoring | AFS - Sync failed due to storage account locked                                             |
+| 7   | searchAFSSyncFailDatabase     | Atos AFS Monitoring | AFS - Sync failed due to a problem with the sync database                                   |
+| 8   | searchAFSFileShareLImit       | Atos AFS Monitoring | AFS - You reached the Azure file share storage limit                                        |
+| 9   | searchAFSFileShareNotFound    | Atos AFS Monitoring | AFS - The Azure file share cannot be found                                                  |
+| 10  | searchAFSSyncFailAuth         | Atos AFS Monitoring | AFS - Sync failed due to a problem with authentication                                      |
+| 11  | searchAFSSyncFaulAuthId       | Atos AFS Monitoring | AFS - Sync failed due to authentication identity not found                                  |
+| 12  | searchAFSVolumeLowDisk        | Atos AFS Monitoring | AFS - The volume where the server endpoint is located is low on disk space                  |
+| 13  | searchAFSSyncFailManyFiles    | Atos AFS Monitoring | AFS - Sync failed due to problems with many individual files                                |
+| 14  | searchAFSSyncFailServerPath   | Atos AFS Monitoring | AFS - Sync failed due to a problem with the server endpoint path                            |
+| 15  | searchAFSServiceUnavailable   | Atos AFS Monitoring | AFS - The service is currently unavailable                                                  |
+| 16  | searchAFSSyncFailException    | Atos AFS Monitoring | AFS - Sync failed due to an exception                                                       |
+| 17  | searchAFSSyncFailPermSysVol   | Atos AFS Monitoring | AFS - Sync failed because permissions on the System Volume Information folder are incorrect |
+| 18  | searchAFSSyncFailDeleteCreate | Atos AFS Monitoring | AFS - Sync failed because the Azure file share was deleted and recreated                    |
 
 To be able to re-use the template the following parameters were introduced:
 
