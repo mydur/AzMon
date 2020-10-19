@@ -4,10 +4,10 @@
 		Deploy the AzMon environment in Azure.
 	
 	.DESCRIPTION
-		This script deploys all necessary resources and configuration for monitoring in Azure according to Getronics standards. It uses a parameters file of which the location can be passed to the script via a parameter.The Azure CLI is a requirement and can be automatically checked by using the CheckPrereqs (switch) parameter.
+		This script deploys all necessary resources and configuration for monitoring in Azure according to Atos standards. It uses a parameters file of which the location can be passed to the script via a parameter.The Azure CLI is a requirement and can be automatically checked by using the CheckPrereqs (switch) parameter.
 	
 	.EXAMPLE
-		Init-AzMon.ps1 -ParametersFile "C:\Getronics\contorso123.json" -CheckPrereqs
+		Init-AzMon.ps1 -ParametersFile "C:\Atos\contorso123.json" -CheckPrereqs
 		
 		This command will use the contorso123.json file as parameter source and first check the prerequisites (Azure CLI) before starting the deployment.
 		
@@ -102,13 +102,13 @@ param (
 [console]::ForegroundColor = "White"
 [console]::BackgroundColor = "Black"
 Clear-Host
-New-Item -Path "C:\Getronics" -ItemType Directory -ErrorAction SilentlyContinue
-New-Item -Path "C:\Getronics\AzMon" -ItemType Directory -ErrorAction SilentlyContinue
-#Set-Location -Path "C:\Getronics\AzMon"
+New-Item -Path "C:\Atos" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item -Path "C:\Atos\AzMon" -ItemType Directory -ErrorAction SilentlyContinue
+#Set-Location -Path "C:\Atos\AzMon"
 If ($CheckPrereqs) {
-        Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile "C:\Getronics\AzMon\AzureCLI.msi"
+        Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile "C:\Atos\AzMon\AzureCLI.msi"
         Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
-        Remove-Item -Force "C:\Getronics\AzMon\AzureCLI.msi"
+        Remove-Item -Force "C:\Atos\AzMon\AzureCLI.msi"
 }
 
 ##########################################################################
@@ -142,11 +142,11 @@ $WorkspaceId = $ParametersJSON.Outputs.workspaceId
 $KeyvaultName = "azgov$UniqueNumber-$Environment-keyv"
 $KeyvaultRGName = "azgov-$Environment-rg"
 $AzAutoAadaName = "azmonauto-$Environment-aada"
-$TagOwnedBy = "Getronics"
+$TagOwnedBy = "Atos"
 $TagCreatedOn = (Get-Date -Format "yyyyMMdd")
 $TagEnvironment = $Environment
 $TagProject = "AzMon"
-$AzMonLocalPath = "C:\Getronics\AzMon"
+$AzMonLocalPath = "C:\Atos\AzMon"
 $GithubBaseFolder = "https://github.com/mydur/AzMon/raw/master/"
 $VMWorkbookName = "azmon-$Environment-wbok"
 $AutoAcctName = $ParametersJSON.Outputs.autoAcctName
@@ -247,7 +247,7 @@ This part of the script deploys the base setup of AzMon. Actual delployments are
        - azmon-nwrules-tmpl
        - azmon-vmworkbook-tmpl
        - azmon-backupsol-tmpl
-The location of these templates is fixed in the script and the location starts with C:\Getronics\AzMon. Under this folder there should be a subfolder for each template. For the 1st one in the list this would then be C:\Getronics\AzMon\azmon-basic-tmpl. Below that folder there should be a '_working' folder that contains the actual template file. The process is the same for every template in the list. This folder setup is also used during developoment of the templates. In future versions we will probably get the templates from Github.
+The location of these templates is fixed in the script and the location starts with C:\Atos\AzMon. Under this folder there should be a subfolder for each template. For the 1st one in the list this would then be C:\Atos\AzMon\azmon-basic-tmpl. Below that folder there should be a '_working' folder that contains the actual template file. The process is the same for every template in the list. This folder setup is also used during developoment of the templates. In future versions we will probably get the templates from Github.
 
 Besides the templates there's 2 other type of activities that are executed:
        - Creation of a resource group
@@ -452,7 +452,7 @@ If ($DeployBaseSetup) {
         ---------------
         #>
         if ($ParametersJSON.General.ASCOnboard -eq "Free" -or $ParametersJSON.General.ASCOnboard -eq "Standard") {
-                Write-Host ("Onboarding " + $WorkspaceName + " to ASC...") -ForegroundColor "White"
+                Write-Host ("Onboarding subscription " + $SubscriptionName + " to ASC...") -ForegroundColor "White"
                 #Install-Module -Name Az.Security -Force
                 #Set-AzContext -Subscription "$SubscriptionId"
                 Register-AzResourceProvider -ProviderNamespace "Microsoft.Security" | Out-Null
@@ -655,7 +655,7 @@ The resource group is the smallest collection that we use to identify resources 
  - azmon-vmbkup-tmpl
 The last template, azmon-vmbkup-tmpl, is used to add virtual machines to the backup. This template should be used for all machines that require backup by the backup vault that is hosted in the same resource group as the virtual machines themselves. 
 
-The location of these templates is fixed in the script and the location starts with C:\Getronics\AzMon. Under this folder there should be a subfolder for each template. For the 1st one in the list this would then be C:\Getronics\AzMon\azmon-basic-tmpl. Below that folder there should be a '_working' folder that contains the actual template file. The process is the same for every template in the list. This folder setup is also used during developoment of the templates. In future versions we will probably get the templates from Github.
+The location of these templates is fixed in the script and the location starts with C:\Atos\AzMon. Under this folder there should be a subfolder for each template. For the 1st one in the list this would then be C:\Atos\AzMon\azmon-basic-tmpl. Below that folder there should be a '_working' folder that contains the actual template file. The process is the same for every template in the list. This folder setup is also used during developoment of the templates. In future versions we will probably get the templates from Github.
 
 NOTE: The method of deployment for azmon-vmbkup-tmpl is different from all the other templates. See later in this script for more information.
 

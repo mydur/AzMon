@@ -885,7 +885,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "Equals",
+              "thresholdOperator": "Equal",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -938,7 +938,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "Equals",
+              "thresholdOperator": "Equal",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -991,7 +991,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "Equals",
+              "thresholdOperator": "Equal",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -1044,7 +1044,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "Equals",
+              "thresholdOperator": "Equal",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -1097,7 +1097,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "Equals",
+              "thresholdOperator": "Equal",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -1150,7 +1150,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "Equals",
+              "thresholdOperator": "Equal",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
@@ -1203,7 +1203,7 @@
             "thresholdOperator": "GreaterThan",
             "threshold": 0,
             "metricTrigger": {
-              "thresholdOperator": "Equals",
+              "thresholdOperator": "Equal",
               "threshold": 1,
               "metricTriggerType": "Consecutive",
               "metricColumn": "Computer"
